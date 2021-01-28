@@ -1,5 +1,5 @@
-import sys
-sys.path.append("..")
+import sys, os
+sys.path.append(os.getcwd())
 from imports import ilpgraph, graph_parser
 from imports import networkx as imp_nx
 import networkx as nx 
@@ -14,7 +14,7 @@ def maximalMatching(G):
     """
 
     edges = list(G.edges())
-    nodes = list(G.nodes())
+    print(edges)
     chosenEdges = []
 
     while len(edges) != 0:
@@ -38,5 +38,7 @@ def maximalMatching(G):
     print(chosenEdges)
 
 if __name__ == '__main__':
-    G = imp_nx.col_file_to_networkx('')
+    dirname = os.path.dirname(__file__)
+    path = os.path.join(dirname, r'test_instances\1-FullIns_3.col')
+    G = imp_nx.col_file_to_networkx(path)
     maximalMatching(G)
