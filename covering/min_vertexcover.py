@@ -1,25 +1,44 @@
 from gurobipy import *
+from covering import warmstart_vertex_covering as ws
 
 
-def createModel(G):    
+def createModel(G, warmstart:bool = False):    
     """ Create an ILP for the minimum vertex cover problem                
-    Arguments:            G -- an unweighted ILPGraph                    
-    Returns:            a Gurobi model     
+    Arguments:                  G -- an unweighted ILPGraph                    
+    Returns:                	a Gurobi model     
     """        
-    # Create model    
-    m = Model("graphilp_min_vertex_cover")        
+   # Create model    
+    m = Model("graphilp_min_vertex_cover")    
+    warmstartNodes = set()    
     # Add variables for edges and nodes    
-    G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))    
-    m.update()    
-    nodes = G.node_variables        
+    if (warmstart == True):
+        wsNodesHeur = ws.maximalMatching(G)
+        wsNodesApprox = ws.createApproximation(G)
+        if (len(wsNodesHeur) < len(wsNodesApprox)):
+            warmstartNodes = wsNodesHeur
+        else:
+            warmstartNodes = wsNodesApprox
+    
+    node_list = G.G.nodes()
+    nodesAmount = len(node_list)
+    x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
+    for i in range(nodesAmount):
+        if(i in warmstartNodes):
+            x[i].Start = 1
+    
+    m.update()            
+    vars = m.getVars()
+    for i in range(len(vars)):
+        if (vars[i].Start == 1):
+            print("foundi t at" + str(i))
+    m.setObjective(sum(x[i] for i in range(nodesAmount)), GRB.MINIMIZE)
     # Create constraints    
     ## for every edge, at least one vertex must be in a vertex cover of G    
-    for (u, v) in G.G.edges:                
-        m.addConstr(nodes[u] + nodes[v] >= 1 )    
-    # set optimisation objective: minimize cardinality of the vertex cover   
-    m.setObjective( gurobipy.quicksum(nodes), GRB.MINIMIZE)      
-
-    return m
+    for (u, v) in G.G.edges():            
+        m.addConstr(x[int(u)] + x[int(v)] >= 1 )    
+    
+    m.optimize()
+    return x
 
 def extractSolution(G, model):    
     """ Get a list of vertices comprising a vertex cover           
