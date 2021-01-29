@@ -6,7 +6,7 @@ node_list = None
 edge_list = None
 edge_dict = None
 rev_edge_dict = None
-def createModel(G, start_terminal, nodeColoring: bool = False):    
+def createModel(G, start_terminal, cycleBasis:bool = False, nodeColoring: bool = False):    
     """ Create an ILP for the linear Steiner Problem. The model can be seen in Paper Chapter 3.0. This model
     doesn't implement tightened labels.
     Arguments:            G -- an ILPGraph                    
@@ -91,6 +91,15 @@ def createModel(G, start_terminal, nodeColoring: bool = False):
             
             m.addConstr(  m.getVarByName("edge_" + str(edge[0]) + "_" + str(edge[1])) + m.getVarByName("nodecolour_" + str(edge[0]))\
                         + m.getVarByName("nodecolour_" + str(edge[1])) <= 2 )
+    
+    if (cycleBasis == True):
+        cycles = nx.cycle_basis(G.G)
+        for cycle_list in cycles:
+            cycle = []
+            for pos in range(len(cycle_list)):
+                cycle.append((cycle_list[pos], cycle_list[(pos+1)%len(cycle_list)]))
+            cycle_idx = [edge if edge in edge_list else (edge[1], edge[0]) for edge in cycle]
+            m.addConstr(gurobipy.quicksum([m.getVarByName("edge_" + str(u) + "_" + str(v)) for (u, v) in cycle_idx]) <= len(cycle_idx)-1)
 
     return m
 
