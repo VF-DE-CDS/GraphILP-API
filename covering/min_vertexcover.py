@@ -19,19 +19,15 @@ def createModel(G, warmstart:bool = False):
         else:
             warmstartNodes = wsNodesApprox
     
-    node_list = G.G.nodes()
-    nodesAmount = len(node_list)
+    node_list = list(G.G.nodes())
     x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
-    for i in range(nodesAmount):
+    for i in node_list:
         if(i in warmstartNodes):
             x[i].Start = 1
     
     m.update()            
-    vars = m.getVars()
-    for i in range(len(vars)):
-        if (vars[i].Start == 1):
-            print("foundi t at" + str(i))
-    m.setObjective(sum(x[i] for i in range(nodesAmount)), GRB.MINIMIZE)
+
+    m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)
     # Create constraints    
     ## for every edge, at least one vertex must be in a vertex cover of G    
     for (u, v) in G.G.edges():            

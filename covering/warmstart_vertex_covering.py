@@ -36,7 +36,6 @@ def maximalMatching(G):
 
             if (curEdgeStart == startNode or curEdgeEnd == startNode or curEdgeStart == endNode or curEdgeEnd == endNode):
                 edges.remove(edgesCopy[i])
-    print(chosenNodes)
     return chosenNodes
 
 
@@ -48,17 +47,19 @@ def createApproximation(G):
     # Create model    
     m = Model("graphilp_min_vertex_cover")        
     # Add variables for edges and nodes    
-    node_list = G.G.nodes()
+    node_list = list(G.G.nodes())
     nodes = len(node_list)
-    x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
+    x = {}
+    for i in range(nodes):
+        x[node_list[i]] = m.addVar(vtype = GRB.BINARY)
 
     m.update()            
-    m.setObjective(sum(x[i] for i in range(nodes)), GRB.MINIMIZE)
+    m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)
     # Create constraints    
     ## for every edge, at least one vertex must be in a vertex cover of G    
     for (u, v) in G.G.edges():            
         m.addConstr(x[int(u)] + x[int(v)] >= 1 )    
-    for i in range(nodes):
+    for i in node_list:
         m.addConstr(x[i] <= 1)
         m.addConstr(x[i] >= 0)
     
