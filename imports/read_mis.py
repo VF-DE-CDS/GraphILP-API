@@ -48,7 +48,6 @@ def mis_to_networkx(path):
         
     # Create a new NetworkX Object, i.e. Graph
     G = nx.Graph()
-
     # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
     G.add_edges_from(edges)
 

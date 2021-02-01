@@ -11,20 +11,25 @@ def createModel(G, warmstart:bool = False):
     m = Model("graphilp_min_vertex_cover")    
     warmstartNodes = set()    
     # Add variables for edges and nodes    
-    if (warmstart == True):
-        wsNodesHeur = ws.maximalMatching(G)
-        wsNodesApprox = ws.createApproximation(G)
-        if (len(wsNodesHeur) < len(wsNodesApprox)):
-            warmstartNodes = wsNodesHeur
-        else:
-            warmstartNodes = wsNodesApprox
-    
+    #if (warmstart == True):
+    #    wsNodesHeur = ws.maximalMatching(G)
+    #    wsNodesApprox = ws.createApproximation(G)
+    #    print("Approx Nodes : ", len(wsNodesApprox))
+    #    print("Heuristic Nodes: ",  len(wsNodesApprox)) 
+    #    if (len(wsNodesHeur) < len(wsNodesApprox)):
+    #        warmstartNodes = wsNodesHeur
+    #        print("Chose Heuristic Warmstart")
+    #    else:
+    #        warmstartNodes = wsNodesApprox
+    #        print("Chose Aprrox Warmstart")
+    #warmstartNodes = ws.createApproximation(G)
+    print("Heuristic done")    
     node_list = list(G.G.nodes())
     x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
     for i in node_list:
         if(i in warmstartNodes):
             x[i].Start = 1
-    
+    print("Start Nodes Set")
     m.update()            
 
     m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)

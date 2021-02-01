@@ -19,23 +19,26 @@ def maximalMatching(G):
     chosenEdges = []
     chosenNodes = set()
     while len(edges) != 0:
+        
         edge = edges[0]
+        print("Found edge ", edge)
+        print("Remaining edges", len(edges))
         startNode = int(edges[0][0])
         endNode = int(edges[0][1])
-
         chosenEdges.append((startNode, endNode))
         chosenNodes.add(startNode)
         chosenNodes.add(endNode)
-        
         edges.remove(edge)
         edgesCopy = list.copy(edges)
         for i in range(len(edgesCopy)):
-
+            
             curEdgeStart = edgesCopy[i][0]
             curEdgeEnd = edgesCopy[i][1]
 
             if (curEdgeStart == startNode or curEdgeEnd == startNode or curEdgeStart == endNode or curEdgeEnd == endNode):
                 edges.remove(edgesCopy[i])
+    print("Minimum Nodes from Heuristic ", len(chosenNodes))
+    print(chosenNodes)
     return chosenNodes
 
 
@@ -51,7 +54,7 @@ def createApproximation(G):
     nodes = len(node_list)
     x = {}
     for i in range(nodes):
-        x[node_list[i]] = m.addVar(vtype = GRB.BINARY)
+        x[node_list[i]] = m.addVar()
 
     m.update()            
     m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)
@@ -62,7 +65,6 @@ def createApproximation(G):
     for i in node_list:
         m.addConstr(x[i] <= 1)
         m.addConstr(x[i] >= 0)
-    
     m.optimize()
     vars = m.getVars()
     chosenNodes = set()
