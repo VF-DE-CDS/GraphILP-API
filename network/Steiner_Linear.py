@@ -15,11 +15,11 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
     """        
     # Create model
     m = Model("Steiner Tree")        
-    m.Params.threads = 3
+    
     # Add variables for edges and nodes
     global node_list, edge_list, edge_dict, rev_edge_dict
-    node_list = G.nodes
-    edge_list = G.edges
+    node_list = G.G.nodes()
+    edge_list = G.G.edges()
     edge_dict = dict(enumerate(edge_list))
     rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
 
@@ -27,7 +27,7 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
     # create node variables and node label variables
     for node in node_list:
         m.addVar(vtype=gurobipy.GRB.BINARY, name="node_" + str(node))
-        m.addVar(vtype=gurobipy.GRB.INTEGER, lb=1, ub=G.number_of_nodes(), name="label_" + str(node))
+        m.addVar(vtype=gurobipy.GRB.INTEGER, lb=1, ub=G.G.number_of_nodes(), name="label_" + str(node))
 
     # create edge variables
     for edge in edge_list:
@@ -37,8 +37,8 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
     m.update()    
 
     m.setObjective(
-        gurobipy.quicksum([G.edges[u,v]['weight'] * m.getVarByName("edge_" + str(u) + "_" + str(v)) for (u, v) in edge_list])\
-        + gurobipy.quicksum([G.edges[u,v]['weight'] * m.getVarByName("edge_" + str(v) + "_" + str(u)) for (u, v) in edge_list]),\
+        gurobipy.quicksum([G.G.edges[u,v]['weight'] * m.getVarByName("edge_" + str(u) + "_" + str(v)) for (u, v) in edge_list])\
+        + gurobipy.quicksum([G.G.edges[u,v]['weight'] * m.getVarByName("edge_" + str(v) + "_" + str(u)) for (u, v) in edge_list]),\
         GRB.MINIMIZE)
 
     # Enforce terminals
@@ -68,7 +68,7 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
     
     
     # Orientation and labeling constraint alternative
-    n = G.number_of_nodes()
+    n = G.G.number_of_nodes()
     for (u,v) in edge_list:
         m.addConstr(  n * m.getVarByName("edge_" + str(v) + "_" + str(u)) + m.getVarByName("label_" + str(v))\
                     - m.getVarByName("label_" + str(u)) >= 1 - n*(1-m.getVarByName("edge_" + str(u) + "_" + str(v))))
@@ -82,3 +82,27 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
         m.addConstr(gurobipy.quicksum([m.getVarByName("edge_" + str(u) + "_" + str(v)) for (u, v) in edges]) <= 1)
     
     return m
+
+def extractSolution(G, model):
+    """ Get the optimal tour in G 
+    
+        Arguments:
+            G     -- a weighted ILPGraph
+            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+            
+        Returns:
+            the edges of an optimal tour/path in G 
+    """
+    edge_list = G.G.edges()
+    tst = set(edge_list)
+    G.G.remove_edges_from([(u, v) for (u, v) in edge_list if (v, u) in tst])
+    edge_list = list(G.G.edges())
+    edge_dict = dict(enumerate(edge_list))
+    rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
+    
+    solution = [(u,v) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(u) + "_" + str(v)).X > 0.1]
+    solution += [(v,u) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(v) + "_" + str(u)).X > 0.1]
+    
+    print(solution)
+    
+    return solution

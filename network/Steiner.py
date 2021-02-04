@@ -15,11 +15,11 @@ def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = Fal
     """        
     # Create model
     m = Model("Steiner Tree")        
-    m.Params.threads = 3
+    
     # Add variables for edges and nodes
     global node_list, edge_list, edge_dict, rev_edge_dict
-    node_list = G.nodes
-    edge_list = G.edges
+    node_list = G.G.nodes()
+    edge_list = G.G.edges()
     edge_dict = dict(enumerate(edge_list))
     rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
 
@@ -86,6 +86,29 @@ def callback_cycle(model, where):
         except:
             return
 
+        
+        
+def extractSolution(G, model):
+    """ Get the optimal tour in G 
+    
+        Arguments:
+            G     -- a weighted ILPGraph
+            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+            
+        Returns:
+            the edges of an optimal tour/path in G 
+    """
+    edge_list = G.G.edges()
+    tst = set(edge_list)
+    G.G.remove_edges_from([(u, v) for (u, v) in edge_list if (v, u) in tst])
+    edge_list = list(G.G.edges())
+    edge_dict = dict(enumerate(edge_list))
+    rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
+    
+    solution = [edge_dict[int(model.getVarByName("edge_" + str(rev_edge_dict[edge])).VarName.split('_')[1])] for edge in edge_list\
+        if model.getVarByName("edge_" + str(rev_edge_dict[edge])).X > 0.5]
+    print(solution)
+    return solution
 # -
 
 
