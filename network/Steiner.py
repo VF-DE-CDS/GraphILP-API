@@ -2,112 +2,104 @@
 from gurobipy import *
 import networkx as nx
 
-node_list = None
-edge_list = None
-edge_dict = None
-rev_edge_dict = None
+# a dictionary translating edge variables to edge names for the callback
+var2edge = None
 
-def createModel(G, terminals, cycleBasis: bool = False, nodeColoring: bool = False):    
-    """ Create an ILP for the linear Steiner Problem. The model can be seen in Paper Chapter 3.0. This model
-    doesn't implement tightened labels.
-    Arguments:            G -- an ILPGraph                    
+# a dictionary translating edge names to edge variables for the callback
+edge2var = None
+
+def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeColoring: bool = False):    
+    """ Create an ILP for the minimum Steiner tree problem in graphs.
+    Documentation is still a TODO!
+    This variant implements a version with callbacks forbidding any cycles that may show...
+    cycleBasis and nodeColoring are currently not supported.
+    Arguments:            G -- an ILPGraph    
+                          terminals -- a list of nodes that need be connected by the Steiner tree
+                          weight -- the argument in the edge dictionary of the graph used to store edge cost
     Returns:              a Gurobi model     
     """        
+    global var2edge
+    global edge2var
+    
     # Create model
-    m = Model("Steiner Tree")        
+    m = Model("Steiner Tree")  
+    m.Params.LazyConstraints = 1
     
     # Add variables for edges and nodes
-    global node_list, edge_list, edge_dict, rev_edge_dict
-    node_list = G.G.nodes()
-    edge_list = G.G.edges()
-    edge_dict = dict(enumerate(edge_list))
-    rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
-
-    # create node variables
-    for node in node_list:
-        m.addVar(vtype=gurobipy.GRB.BINARY, name="node_" + str(node))
-        m.addVar(vtype=gurobipy.GRB.BINARY, name="nodecolour_" + str(node))
-
-    # create edge variables
-    for edge in edge_list:
-        m.addVar(vtype=gurobipy.GRB.BINARY, name="edge_" + str(rev_edge_dict[edge]))
-
+    G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
+    G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))
     m.update()    
-
-    m.setObjective(gurobipy.quicksum([edge_list[u,v]['weight'] * m.getVarByName("edge_" + str(rev_edge_dict[(u,v)])) for (u, v) in edge_list]),\
-                  GRB.MINIMIZE)
+    
+    # abbreviations
+    edges = G.edge_variables
+    nodes = G.node_variables
+    
+    var2edge = dict(zip(edges.values(), edges.keys()))
+    edge2var = edges
+    
+    # set objective: minimise the sum of the weights of edges selected for the solution
+    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
 
     # equality constraints for terminals (each terminal needs to be chosen)
-    for node in node_list:
+    for node, node_var in nodes.items():
+        # the outer loop makes sure that terminals that are not in the graph are ignored
         if node in terminals:
-            m.addConstr(m.getVarByName("node_" + str(node)) == 1)
+            m.addConstr(node_var == 1)
 
     # restrict number of edges
-    m.addConstr(  gurobipy.quicksum([m.getVarByName("node_" + str(node)) for node in node_list])\
-            - gurobipy.quicksum([m.getVarByName("edge_" + str(rev_edge_dict[edge])) for edge in edge_list]) == 1)
+    m.addConstr(gurobipy.quicksum(nodes.values()) - gurobipy.quicksum(edges.values()) == 1)
+
     
     # if edge is chosen, both adjacent nodes need to be chosen
-    for edge in edge_list:
-        m.addConstr(  2*m.getVarByName("edge_" + str(rev_edge_dict[edge])) - m.getVarByName("node_" + str(edge[0]))\
-                    - m.getVarByName("node_" + str(edge[1])) <= 0 )
+    for edge, edge_var in edges.items():
+        m.addConstr(2*edge_var - nodes[edge[0]] - nodes[edge[1]] <= 0)
 
-   # prohibit isolated vertices
-    for node in node_list:
-        edge_vars = [m.getVarByName("edge_" + str(rev_edge_dict[edge])) for edge in edge_list if (node==edge[0]) or (node==edge[1])]
-        m.addConstr(m.getVarByName("node_" + str(node)) - gurobipy.quicksum(edge_vars) <= 0)
+    # prohibit isolated vertices
+    for node, node_var in nodes.items():
+        edge_vars = [edge_var for edge, edge_var in edges.items() if (node==edge[0]) or (node==edge[1])]
+        m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
+        
+    m.update()
 
-    if (nodeColoring == True):
-        for edge in edge_list:
-            m.addConstr(  m.getVarByName("edge_" + str(rev_edge_dict[edge])) - m.getVarByName("nodecolour_" + str(edge[0]))\
-                        - m.getVarByName("nodecolour_" + str(edge[1])) <= 0 )
-            m.addConstr(  m.getVarByName("edge_" + str(rev_edge_dict[edge])) + m.getVarByName("nodecolour_" + str(edge[0]))\
-                        + m.getVarByName("nodecolour_" + str(edge[1])) <= 2 )
-
-    
     return m
 
-    
 def callback_cycle(model, where):
-    #if where == gurobipy.GRB.Callback.MIPSOL:
-    if where == gurobipy.GRB.Callback.MIPNODE:
+    """ Callback insert constraints to forbid cycles in solution candidates
+    """
+    if where == gurobipy.GRB.Callback.MIPSOL: 
+        # check for cycles whenever a new solution candidate is found
         variables = model.getVars()
-        #cur_sol = model.cbGetSolution(variables)
-        cur_sol = model.cbGetNodeRel(variables)
-        
-        solution = [edge_dict[int(variables[i].VarName.split('_')[1])] for i in range(len(variables)) if (cur_sol[i] > 0.5) and (variables[i].VarName.split('_')[0] == 'edge')]
+        cur_sol = model.cbGetSolution(variables)
+
+        # create graph from current solution
+        solution = [var2edge[variables[i]] for i in range(len(variables)) if (cur_sol[i] > 0.5) and (variables[i]in var2edge)]
         G2 = nx.Graph()
         G2.add_edges_from(solution)
+        
         try:
+            # find a cycle in the solution
             cycle = nx.find_cycle(G2)
-            cycle_idx = [edge if edge in edge_list else (edge[1], edge[0]) for edge in cycle]
-            forbidden_cycles.append(cycle_idx)
-            #model.addConstr(gurobipy.quicksum([model.getVarByName("edge_" + str(rev_edge_dict[edge])) for edge in cycle_idx]) <= len(cycle_idx)-1)
-            model.cbLazy(gurobipy.quicksum([model.getVarByName("edge_" + str(rev_edge_dict[edge])) for edge in cycle_idx]) <= len(cycle_idx)-1)
+            cycle_idx = [edge if edge in var2edge.values() else (edge[1], edge[0]) for edge in cycle]
+            
+            # add new constraint
+            model.cbLazy(gurobipy.quicksum([edge2var[edge] for edge in cycle_idx]) <= len(cycle_idx)-1)
+
         except:
+            # do nothing if no cycle was found
             return
 
-        
-        
 def extractSolution(G, model):
-    """ Get the optimal tour in G 
+    """ Get the optimal Steiner tree in G 
     
         Arguments:
             G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+            model -- a solved Gurobi model for the minimum Steiner tree problem
             
         Returns:
-            the edges of an optimal tour/path in G 
+            the edges of an optimal Steiner tree connecting all terminals in G
     """
-    edge_list = G.G.edges()
-    tst = set(edge_list)
-    G.G.remove_edges_from([(u, v) for (u, v) in edge_list if (v, u) in tst])
-    edge_list = list(G.G.edges())
-    edge_dict = dict(enumerate(edge_list))
-    rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
-    
-    solution = [edge_dict[int(model.getVarByName("edge_" + str(rev_edge_dict[edge])).VarName.split('_')[1])] for edge in edge_list\
-        if model.getVarByName("edge_" + str(rev_edge_dict[edge])).X > 0.5]
-    print(solution)
+    solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
+
     return solution
 # -
 
