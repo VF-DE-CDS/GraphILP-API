@@ -25,6 +25,7 @@ def maximalMatching(G):
         print("Remaining edges", len(edges))
         startNode = int(edges[0][0])
         endNode = int(edges[0][1])
+        biggestNode = max(startNode, endNode)
         chosenEdges.append((startNode, endNode))
         chosenNodes.add(startNode)
         chosenNodes.add(endNode)
@@ -37,6 +38,8 @@ def maximalMatching(G):
 
             if (curEdgeStart == startNode or curEdgeEnd == startNode or curEdgeStart == endNode or curEdgeEnd == endNode):
                 edges.remove(edgesCopy[i])
+            if curEdgeStart > biggestNode and curEdgeEnd > biggestNode:
+                break
     print("Minimum Nodes from Heuristic ", len(chosenNodes))
     print(chosenNodes)
     return chosenNodes
