@@ -66,14 +66,14 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     # for (u,v) in edge_list:
     #     m.addConstr(m.getVarByName("edge_" + str(u) + "_" + str(v)) + m.getVarByName("edge_" + str(v) + "_" + str(u)) <= 1)
     
-    print("1")
+
     # NEW, runtime can be greatly improved if iterating is done in a smarter way
     for edge, edge_var in edges.items():
         reverseEdge = edge[::-1]
         rev_edge_var = edge2var.get(reverseEdge)
         if rev_edge_var != None:
             m.addConstr(edge_var + rev_edge_var <= 1)
-    print("2")
+
     # 
     # OLD
     # if edge is chosen, both adjacent nodes need to be chosen
@@ -99,7 +99,10 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     # NEW
     # prohibit isolated vertices
     for node, node_var in nodes.items():
-        edge_vars = [edge_var for edge, edge_var in edges.items() if (node==edge[0]) or (node==edge[1])]
+        edge_vars = []
+        for edge, edge_var in edges.items():
+            if (node == edge[0] or node == edge[1]):
+                edge_vars.append(edge_var)
         m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
 
     
