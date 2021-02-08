@@ -13,12 +13,13 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     
     n = G.G.number_of_nodes()
 
-    # create edge variables
+    # create reverse edge for every edge in the Graph
     for edge in G.G.edges():
         G.G.add_edge(*edge[::-1])
 
     G.setNodeVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.BINARY))
     G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
+    # Label variables for Linear implementation. 
     G.setLabelVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.INTEGER, lb = 1, ub = n))
 
     m.update()  
@@ -28,14 +29,13 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     nodes = G.node_variables
     labels = G.label_variables
     edge2var = dict(zip(edges.keys(), edges.values()))
+    
+    # OLD
     # create node variables
     # create node variables and node label variables
     # for node in node_list:
     #    m.addVar(vtype=gurobipy.GRB.BINARY, name="node_" + str(node))
     #    m.addVar(vtype=gurobipy.GRB.INTEGER, lb=1, ub=G.G.number_of_nodes(), name="label_" + str(node))
-
-    
-      
 
     m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
     
@@ -67,14 +67,15 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     #     m.addConstr(m.getVarByName("edge_" + str(u) + "_" + str(v)) + m.getVarByName("edge_" + str(v) + "_" + str(u)) <= 1)
     
 
-    # NEW, runtime can be greatly improved if iterating is done in a smarter way
+    # NEW
+    # at most one direction per edge can be chosen
+    # runtime can probably be greatly improved if iterating is done in a smarter way
     for edge, edge_var in edges.items():
         reverseEdge = edge[::-1]
         rev_edge_var = edge2var.get(reverseEdge)
         if rev_edge_var != None:
             m.addConstr(edge_var + rev_edge_var <= 1)
 
-    # 
     # OLD
     # if edge is chosen, both adjacent nodes need to be chosen
     # for (u, v) in edge_list:
@@ -101,6 +102,10 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     for node, node_var in nodes.items():
         edge_vars = []
         for edge, edge_var in edges.items():
+            # If the node is startpoint or endpoint of the edge, add the edge
+            # to the array of edge variables
+            # Since the edges variable containt both directions, we can write this much short than
+            # in the previous formulation
             if (node == edge[0] or node == edge[1]):
                 edge_vars.append(edge_var)
         m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
