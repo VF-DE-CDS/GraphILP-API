@@ -20,7 +20,7 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     """        
     global var2edge
     global edge2var
-    
+    print(nodeColoring)
     # Create model
     m = Model("Steiner Tree")  
     m.Params.LazyConstraints = 1
@@ -28,25 +28,26 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     # Add variables for edges and nodes
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
     G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))
+    
     m.update()    
     
     # abbreviations
     edges = G.edge_variables
     nodes = G.node_variables
-    
+
     var2edge = dict(zip(edges.values(), edges.keys()))
     edge2var = edges
     
     # set objective: minimise the sum of the weights of edges selected for the solution
     m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
 
-    # equality constraints for terminals (each terminal needs to be chosen)
+    # equality constraints for terminals (each terminal needs to be chosen, i.e. set it's value to 1)
     for node, node_var in nodes.items():
         # the outer loop makes sure that terminals that are not in the graph are ignored
         if node in terminals:
             m.addConstr(node_var == 1)
 
-    # restrict number of edges
+    # restrict number of edges, at max one edge between each pair of nodes
     m.addConstr(gurobipy.quicksum(nodes.values()) - gurobipy.quicksum(edges.values()) == 1)
 
     
