@@ -14,6 +14,9 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     n = G.G.number_of_nodes()
 
     # create edge variables
+    for edge in G.G.edges():
+        G.G.add_edge(*edge[::-1])
+
     G.setNodeVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.BINARY))
     G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
     G.setLabelVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.INTEGER, lb = 1, ub = n))
