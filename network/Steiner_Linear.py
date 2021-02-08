@@ -144,15 +144,20 @@ def extractSolution(G, model):
         Returns:
             the edges of an optimal tour/path in G 
     """
-    edge_list = G.G.edges()
-    tst = set(edge_list)
-    G.G.remove_edges_from([(u, v) for (u, v) in edge_list if (v, u) in tst])
-    edge_list = list(G.G.edges())
-    edge_dict = dict(enumerate(edge_list))
-    rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
+    solution = []
+    for edge, edge_var in G.edge_variables.items():
+        if edge_var.X > 0.5:
+            solution.append(edge)
     
-    solution = [(u,v) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(u) + "_" + str(v)).X > 0.1]
-    solution += [(v,u) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(v) + "_" + str(u)).X > 0.1]
+    #edge_list = G.G.edges()
+    #tst = set(edge_list)
+    #G.G.remove_edges_from([(u, v) for (u, v) in edge_list if (v, u) in tst])
+    #edge_list = list(G.G.edges())
+    #edge_dict = dict(enumerate(edge_list))
+    #rev_edge_dict = dict(zip(edge_dict.values(), edge_dict.keys()))
+    
+    #solution = [(u,v) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(u) + "_" + str(v)).X > 0.1]
+    #solution += [(v,u) for (u,v) in G.G.edges if model.getVarByName("edge_" + str(v) + "_" + str(u)).X > 0.1]
     
     print(solution)
     
