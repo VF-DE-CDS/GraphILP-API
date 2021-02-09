@@ -3,10 +3,32 @@ from gurobipy import *
 import networkx as nx
 
 def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeColoring: bool = False):    
-    """ Create an ILP for the linear Steiner Problem. The model can be seen in Paper Chapter 3.0. This model
+    r""" Create an ILP for the linear Steiner Problem. 
+    
+    The model can be seen in Paper Chapter 3.0. This model
     doesn't implement tightened labels.
-    Arguments:            G -- an ILPGraph                    
-    Returns:              a Gurobi model     
+    
+    :param G: an ILPGraph
+    :param terminals: a list of nodes that need to be connected by the Steiner tree
+    :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
+
+    :return: a Gurobi model
+
+    ILP:
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min \sum_{(i,j) \in E} w_{ij} x_{ij}\\
+            \text{s.t.} &&\\
+            x_{ij} + x_{ji} \leq 1 && \text{(restrict edges to one direction)}\\
+            x_r = 1 && \text{(require root to be chosen)}\\
+            \sum x_i - \sum x_{ij} = 1 && \text{(enforce circle when graph is not connected)}\\
+            2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
+            x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
+            n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
+            n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \end{align*}
     """        
     
     # ensure that input is a directed graph

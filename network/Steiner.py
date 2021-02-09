@@ -12,14 +12,12 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     r""" Create an ILP for the minimum Steiner tree problem in graphs.
 
     Some more text.
+    
+    :param G: an ILPGraph
+    :param terminals: a list of nodes that need to be connected by the Steiner tree
+    :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
 
-    Arguments:
-        G -- an ILPGraph    
-        terminals -- a list of nodes that need to be connected by the Steiner tree
-        weight -- name of the argument in the edge dictionary of the graph used to store edge cost
-        
-    Returns:
-        a Gurobi model
+    :return: a Gurobi model
         
     ILP:
         .. math::
