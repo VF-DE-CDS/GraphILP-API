@@ -3,4 +3,8 @@
    
    covering
    cuts_flows
+   imports
+   matching
    network
+   packing
+   partitioning
