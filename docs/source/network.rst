@@ -6,7 +6,7 @@ Networks
 
 Steiner Tree Problem
 --------------------
-.. automodule:: network.Steiner
+.. automodule:: graphilp.network.Steiner
    :noindex:
 
 .. autosummary::
@@ -17,7 +17,7 @@ Steiner Tree Problem
    
 Linear-size
 ===========
-.. automodule:: network.Steiner_Linear
+.. automodule:: graphilp.network.Steiner_Linear
    :noindex:
 
 .. autosummary::
@@ -29,7 +29,7 @@ Linear-size
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
 
-.. automodule:: network.PCST
+.. automodule:: graphilp.network.PCST
    :noindex:
 
 .. autosummary::
@@ -41,7 +41,7 @@ Prize Collecting Steiner Tree (PCST)
 Linear-size
 ===========
 
-.. automodule:: network.PCST_Linear
+.. automodule:: graphilp.network.PCST_Linear
    :noindex:
 
 .. autosummary::
@@ -52,7 +52,7 @@ Linear-size
    
 Travelling Salesman Problem (TSP)
 ---------------------------------
-.. automodule:: network.max_atsp
+.. automodule:: graphilp.network.max_atsp
    :noindex:
 
 .. autosummary::
@@ -64,17 +64,17 @@ Travelling Salesman Problem (TSP)
 Details
 ------------
 
-.. automodule:: network.Steiner
+.. automodule:: graphilp.network.Steiner
    :members:
 
-.. automodule:: network.Steiner_Linear
+.. automodule:: graphilp.network.Steiner_Linear
    :members:   
 
-.. automodule:: network.PCST
+.. automodule:: graphilp.network.PCST
    :members:   
    
-.. automodule:: network.PCST_Linear
+.. automodule:: graphilp.network.PCST_Linear
    :members:   
 
-.. automodule:: network.max_atsp
+.. automodule:: graphilp.network.max_atsp
    :members:   

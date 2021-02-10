@@ -4,5 +4,5 @@
 Cuts and Flows
 ***************
 
-.. automodule:: cuts_flows.max_cut
+.. automodule:: graphilp.cuts_flows.max_cut
   :members:
