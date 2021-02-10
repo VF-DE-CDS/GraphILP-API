@@ -4,6 +4,9 @@
 Covering
 *********
 
+.. image:: illustration_covering.png
+    :height: 200
+
 Dominating set
 -------------------
 .. automodule:: graphilp.covering.min_dom_set
