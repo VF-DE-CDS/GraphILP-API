@@ -2,9 +2,11 @@ from gurobipy import *
 
 
 def createModel(G):    
-    """ Create an ILP for the minimum edge dominating set problem            
-    Arguments:            G -- an ILPGraph                    
-    Returns:            a Gurobi model     
+    """ Create an ILP for the minimum edge dominating set problem  
+    
+    :param G: an ILPGraph                    
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
     # Create model    
     m = Model("graphilp_min_edge_dominating_set")        
@@ -25,10 +27,13 @@ def createModel(G):
     return m
 
 def extractSolution(G, model):    
-    """ Get a list of edges comprising a edge dominating set           
-    Arguments:            G     -- a ILPGraph            
-    model -- a solved Gurobi model for minimum edge dominating set                   
-    Returns:            a list of edges comprising a minimum edge dominating set    """    
+    """ Get a list of edges comprising a edge dominating set  
+    
+    :param G: a ILPGraph            
+    :param model: a solved Gurobi model for minimum edge dominating set                   
+    
+    :return: a list of edges comprising a minimum edge dominating set
+    """    
     dominating_set = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]        
     
     return dominating_set
