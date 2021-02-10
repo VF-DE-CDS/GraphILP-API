@@ -10,3 +10,6 @@ class ILPGraph:
         
     def setNodeVars(self, variables):
         self.node_variables = variables
+
+    def setLabelVars(self, variables):
+        self.label_variables = variables
