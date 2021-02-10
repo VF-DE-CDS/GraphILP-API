@@ -16,8 +16,7 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
 
     :return: a Gurobi model   
     
-    ILP:
-        
+    ILP: 
         .. math::
             :nowrap:
 
