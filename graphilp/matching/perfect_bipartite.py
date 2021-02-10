@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from gurobipy import *
 
 def createModel(G, A, direction=GRB.MAXIMIZE):
@@ -20,7 +21,12 @@ def createModel(G, A, direction=GRB.MAXIMIZE):
                 \text{(exactly one edge adjacent to each } u \in A\text{)}\\
                 \forall u \in V \setminus A: \sum_{\{u,v\} \in E} x_{uv} = 1 && 
                 \text{(exactly one edge adjacent to each } u \in V \setminus A\text{)}\\
-                \end{align*}   
+                \end{align*} 
+             
+            This is actually a linear program, i.e., solutions to the LP relaxation are automatically integral.
+
+        References:
+            Lovász, Plummer: `Matching Theory <https://www.ams.org/publications/authors/books/postpub/chel-367>`_, Chapter 7.1.
                 
         Example:
             .. list-table:: 
