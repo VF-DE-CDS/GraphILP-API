@@ -28,6 +28,19 @@ Linear-size
    
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
+
+.. automodule:: network.PCST
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+
+Linear-size
+===========
+
 .. automodule:: network.PCST_Linear
    :noindex:
 
@@ -55,6 +68,9 @@ Details
    :members:
 
 .. automodule:: network.Steiner_Linear
+   :members:   
+
+.. automodule:: network.PCST
    :members:   
    
 .. automodule:: network.PCST_Linear

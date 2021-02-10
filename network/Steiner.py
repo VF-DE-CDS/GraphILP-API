@@ -37,7 +37,7 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     """        
     global var2edge
     global edge2var
-    print(nodeColoring)
+
     # Create model
     m = Model("Steiner Tree")  
     m.Params.LazyConstraints = 1
