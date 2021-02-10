@@ -1,13 +1,11 @@
 from gurobipy import *
 
 def createModel(G):
-    """ Create an ILP for the minimum k-flow problem (https://en.wikipedia.org/wiki/Nowhere-zero_flow)
+    """ Create an ILP for the `minimum k-flow problem <https://en.wikipedia.org/wiki/Nowhere-zero_flow>`_
         
-        Arguments:
-            G -- a weighted ILPGraph
+        :param G: a weighted ILPGraph
             
-        Returns:
-            a Gurobi model 
+        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """
     
     # Create model
@@ -55,12 +53,10 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get the flow bound and a dictionary of edges weights realising a flow
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for minimum k-flow
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for minimum k-flow
             
-        Returns:
-            the minimal flow bound k and a dictionary of edges weights realising a flow
+        :return: the minimal flow bound k and a dictionary of edges weights realising a flow
     """
     edge_vars = G.edge_variables
     

@@ -30,12 +30,33 @@ def createWarmstart(G, m, node_to_color=None):
 
 
 def createModel(G, **kwargs):
-    """ 
+    r""" 
     Create an ILP for minimum vertex coloring.
     
     :param G: graph to find minimum vertex coloring for
     :type G: ILPGraph
     :rtype: Gurobi model
+    
+    ILP:    
+        .. math::
+            :nowrap:
+            
+            \begin{align*}
+            \min \sum_{1\le i \le H}w_{i} && \text{ (minimize the total number of colors used) }\\
+            \text{s.t.} \\
+            \sum_{i=1}^{H} x_{vi} = 1\;\forall v\in V && \text{ (make sure every vertex gets exactly one color) } \\
+            x_{ui}+x_{vi}\le w_{i}\;\forall(u,v)\in E, i=1,\ldots,H && \text{ (make sure no two neighboring vertices get the same color) } \\
+            x_{vi},w_{i}\in\{0,1\}\;\forall v\in V, i=1,\ldots, H && \text{ (assigning a color or not is a binary decision) }
+            \end{align*}
+
+        Example:
+            .. image:: example_mapcolouring.png
+              :width: 320
+
+            There are examples in 
+            
+            * `examples/min_vertex_coloring_example.ipynb <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/min_vertex_coloring_example.ipynb>`_
+            * `examples/Map colouring.ipynb <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_    
     """
     
     #initialize gurobi model

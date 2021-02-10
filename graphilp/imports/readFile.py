@@ -1,8 +1,5 @@
 # + endofcell="--"
-import sys
-# import os
-sys.path.append('..')
-from imports import ilpgraph
+from graphilp.imports import ilpgraph
 import networkx as nx
 import re
 

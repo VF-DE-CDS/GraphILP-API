@@ -3,11 +3,9 @@ from gurobipy import *
 def createModel(G):
     """ Create an ILP for maximum weight matching
         
-        Arguments:
-            G -- a weighted ILPGraph
-            
-        Returns:
-            a Gurobi model 
+    :param G: a weighted ILPGraph                    
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """
     
     # Create model
@@ -39,12 +37,10 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get a list of the edges comprising the maximum weight matching
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for maximum weight matching
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for maximum weight matching
             
-        Returns:
-            a list of edges comprising the maximum weight matching
+        :return: a list of edges comprising the maximum weight matching
     """
     matching = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
     
