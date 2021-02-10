@@ -2,9 +2,11 @@ from gurobipy import *
 
 
 def createModel(G):    
-    """ Create an ILP for the maximum independet set problem                
-    Arguments:            G -- a ILPGraph                    
-    Returns:            a Gurobi model     
+    """ Create an ILP for the maximum independet set problem  
+    
+    :param G: a weighted bipartite ILPGraph
+
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
     # Create model    
     m = Model("graphilp_max_ind_set")        
@@ -22,10 +24,13 @@ def createModel(G):
     return m
 
 def extractSolution(G, model):    
-    """ Get a list of vertices comprising a maximum independent set           
-    Arguments:            G     -- a ILPGraph            
-    model -- a solved Gurobi model for maximum independent set                    
-    Returns:            a list of vertices comprising a maximum independent set    """    
+    """ Get a list of vertices comprising a maximum independent set 
+    
+    :param G: an ILPGraph            
+    :param model: a solved Gurobi model for maximum independent set
+    
+    :returns: a list of vertices comprising a maximum independent set
+    """    
     ind_set = [node for node, node_var in G.node_variables.items() if node_var.X < 0.5]        
     
     return ind_set

@@ -1,10 +1,14 @@
-import sys, os
-sys.path.append(os.getcwd())
-from imports import ilpgraph, graph_parser
-from imports import networkx as imp_nx
-from covering import min_vertexcover
+# +
+from graphilp.imports import ilpgraph#, graph_parser
+from graphilp.imports import networkx as imp_nx
+from graphilp.covering import min_vertexcover
+
 import networkx as nx 
+
 from gurobipy import *
+
+
+# -
 
 def maximalMatching(G):
     """
@@ -46,9 +50,11 @@ def maximalMatching(G):
 
 
 def createApproximation(G):
-    """ Create a LP for the minimum vertex cover problem as a method of approximation                
-    Arguments:              G -- a weighted ILPGraph                    
-    Returns:                a Gurobi model     
+    """ Create a LP for the minimum vertex cover problem as a method of approximation
+    
+    :param G: a weighted ILPGraph                    
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
     # Create model    
     m = Model("graphilp_min_vertex_cover")        

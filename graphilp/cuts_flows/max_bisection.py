@@ -3,9 +3,11 @@ import math
 
 
 def createModel(G):    
-    """ Create an ILP for the maximum bisection problem                
-    Arguments:            G -- an ILPGraph                    
-    Returns:            a Gurobi model     
+    """ Create an ILP for the maximum bisection problem
+    
+    :param G: an ILPGraph                    
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
     # Create model    
     m = Model("graphilp_max_bisection")        
@@ -38,10 +40,13 @@ def createModel(G):
 
 
 def extractSolution(G, model):    
-    """ Get a list of vertices comprising a maximum balanced cut of G          
-    Arguments:            G     -- a ILPGraph            
-    model -- a solved Gurobi model for the maximum bisection problem                    
-    Returns:            a list of vertices comprising a maximum balanced cut of G    """    
+    """ Get a list of vertices comprising a maximum balanced cut of G 
+    
+    :param G: an ILPGraph            
+    :param model: a solved Gurobi model for the maximum bisection problem  
+    
+    :return: a list of vertices comprising a maximum balanced cut of G
+    """    
     cut_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
     
     return cut_nodes

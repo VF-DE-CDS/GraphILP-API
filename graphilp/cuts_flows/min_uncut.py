@@ -6,11 +6,9 @@ import networkx as nx
 def createModel(G):
     """ Create an ILP for the min uncut problem
         
-        Arguments:
-            G -- a weighted ILPGraph
-            
-        Returns:
-            a Gurobi model 
+    :param G: a weighted ILPGraph                    
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """
     
     # Create model
@@ -41,12 +39,10 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get a list of vertices comprising a maximum cut of the complement graph
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for minimum uncut problem
+        :param G: a weighted ILPGraph
+        :model: a solved Gurobi model for minimum uncut problem
             
-        Returns:
-            a list of vertices comprising a cut and a solution to the minimum uncut problem
+        :return: a list of vertices comprising a cut and a solution to the minimum uncut problem
     """
     cut_nodes = [node for node, node_var in G.node_variables.items() if node_var.X < 0.5]
     
