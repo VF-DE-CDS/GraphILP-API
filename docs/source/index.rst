@@ -1,3 +1,8 @@
+.. _contents:
+
+Integer linear programs for graph problems
+==========================================
+
 .. toctree::
    :maxdepth: 2
    

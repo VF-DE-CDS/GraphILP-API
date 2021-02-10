@@ -14,7 +14,7 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param prize: name of the argument in the node dictionary of the graph used to store node prize values
 
-    :return: a Gurobi model   
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP: 
         .. math::
