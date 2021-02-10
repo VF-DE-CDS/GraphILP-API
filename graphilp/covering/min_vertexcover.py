@@ -1,11 +1,14 @@
 from gurobipy import *
-from covering import warmstart_vertex_covering as ws
+from graphilp.covering import warmstart_vertex_covering as ws
 
 
 def createModel(G, warmstart:bool = False):    
-    """ Create an ILP for the minimum vertex cover problem                
-    Arguments:                  G -- an unweighted ILPGraph                    
-    Returns:                	a Gurobi model     
+    """ Create an ILP for the minimum vertex cover problem
+    
+    :param G: an unweighted ILPGraph                    
+    :param warmstart: choose whether to use a warmstart
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
    # Create model    
     m = Model("graphilp_min_vertex_cover")    
@@ -42,18 +45,23 @@ def createModel(G, warmstart:bool = False):
     return x
 
 def extractSolution(G, model):    
-    """ Get a list of vertices comprising a vertex cover           
-    Arguments:            G     -- a ILPGraph            
-    model -- a solved Gurobi model for minimum vertex cover                    
-    Returns:            a list of vertices comprising a minimum vertex cover    """    
+    """ Get a list of vertices comprising a vertex cover  
+    
+    :param G: an ILPGraph            
+    :param model: a solved Gurobi model for minimum vertex cover                    
+    
+    :return: a list of vertices comprising a minimum vertex cover
+    """    
     vertex_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
     
     return vertex_nodes
 
 def createModelWeighted(G):
-    """ Create an ILP for the minimum vertex cover problem                
-    Arguments:              G -- a weighted ILPGraph                    
-    Returns:                a Gurobi model     
+    """ Create an ILP for the minimum vertex cover problem 
+    
+    :param G: a weighted ILPGraph   
+    
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_    
     """        
     # Create model    
     m = Model("graphilp_min_vertex_cover")        
