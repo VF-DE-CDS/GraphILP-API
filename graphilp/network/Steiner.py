@@ -34,6 +34,16 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
             n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
             n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
             \end{align*}
+
+    Example:
+            .. list-table:: 
+               :widths: 50 50
+               :header-rows: 0
+
+               * - .. image:: example_steiner.png
+                 - `Steiner trees <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/SteinerTreesOnStreetmap.ipynb>`_
+
+                   Find the shortest tree connecting a given set of nodes in a graph.
     """        
     global var2edge
     global edge2var
