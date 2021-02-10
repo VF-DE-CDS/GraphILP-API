@@ -1,15 +1,32 @@
 from gurobipy import *
 
 def createModel(G, A, direction=GRB.MAXIMIZE):
-    """ Create an ILP for maximum/minimum bipartite perfect matching
+    r""" Create an ILP for maximum/minimum bipartite perfect matching
         
-        Arguments:
-            G -- a weighted bipartite ILPGraph
-            A -- subset of the vertex set of G giving the bipartition (each edge has exactly one end in A)
-            direction -- GRB.MAXIMIZE for maximum weight matching, GRB.MINIMIZE for minimum weight matching
+        :param G: a weighted bipartite ILPGraph
+        :param A: subset of the vertex set of G giving the bipartition (each edge has exactly one end in A)
+        :param direction: GRB.MAXIMIZE for maximum weight matching, GRB.MINIMIZE for minimum weight matching
             
-        Returns:
-            a Gurobi model
+        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+        
+        ILP:    
+            .. math::
+                :nowrap:
+
+                \begin{align*}
+                \max / \min \sum_{\{i, j\} \in E} w_{ij} x_{ij}\\
+                \text{s.t.} &&\\
+                \forall u \in A: \sum_{\{u,v\} \in E} x_{uv} = 1 && 
+                \text{(exactly one edge adjacent to each } u \in A\text{)}\\
+                \forall u \in V \setminus A: \sum_{\{u,v\} \in E} x_{uv} = 1 && 
+                \text{(exactly one edge adjacent to each } u \in V \setminus A\text{)}\\
+                \end{align*}   
+                
+        Example:
+            .. image:: example_bipartite.png
+              :width: 320
+            
+            There is an example in `examples/2-coloured partitions.ipynb <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2-coloured%20partitions.ipynb>`_
     """
     
     # Create model
@@ -40,12 +57,10 @@ def createModel(G, A, direction=GRB.MAXIMIZE):
 def extractSolution(G, model):
     """ Get a list of the edges comprising the miniumum/maximum weight perfect bipartite matching
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for minimum/maximum weight perfect bipartite matching
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for minimum/maximum weight perfect bipartite matching
             
-        Returns:
-            a list of edges comprising the minimum/maximum weight perfect bipartite matching
+        :return: a list of edges comprising the minimum/maximum weight perfect bipartite matching
     """
     if model.Status == GRB.INFEASIBLE:
         matching = []
