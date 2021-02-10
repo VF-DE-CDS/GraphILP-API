@@ -111,14 +111,12 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     return m
 
 def extractSolution(G, model):
-    """ Get the optimal tour in G 
+    r""" Get the optimal Steiner tree in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for the minimum Steiner tree problem
             
-        Returns:
-            the edges of an optimal tour/path in G 
+        :return: the edges of an optimal Steiner tree connecting all terminals in G
     """
     solution = []
     for edge, edge_var in G.edge_variables.items():

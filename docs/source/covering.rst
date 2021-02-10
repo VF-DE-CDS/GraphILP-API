@@ -4,5 +4,5 @@
 Covering
 *********
 
-.. automodule:: covering.min_dom_set
+.. automodule:: graphilp.covering.min_dom_set
   :members:

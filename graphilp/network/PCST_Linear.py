@@ -130,14 +130,12 @@ def callback_cycle(model, where):
             return 
         
 def extractSolution(G, model):
-    """ Get the optimal tour in G 
+    r""" Get the optimal prize collecting Steiner tree in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+        :param G: an ILPGraph
+        :param model: a solved Gurobi model for Prize Collecting Steiner tree 
             
-        Returns:
-            the edges of an optimal tour/path in G 
+        :return: the edges of an optimal prize collecting Steiner tree 
     """
     solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
 
