@@ -23,10 +23,18 @@ def createModel(G, A, direction=GRB.MAXIMIZE):
                 \end{align*}   
                 
         Example:
-            .. image:: example_bipartite.png
-              :width: 320
-            
-            There is an example in `examples/2-coloured partitions.ipynb <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2-coloured%20partitions.ipynb>`_
+            .. list-table:: 
+               :widths: 50 50
+               :header-rows: 0
+
+               * - .. image:: example_bipartite.png
+                 - `Two-coloured partitions <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2-coloured%20partitions.ipynb>`_
+
+                   Learn how to use perfect matching in bipartite graphs to find a way 
+
+                   to connect n random blue points in the plane 
+                   
+                   to n random orange points without crossings.
     """
     
     # Create model
