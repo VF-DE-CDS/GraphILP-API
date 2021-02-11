@@ -4,11 +4,9 @@ import networkx as nx
 def createGenModel(G, type_obj, metric, start= None, end= None ):
     """ Create an ILP for the min/max Path asymmetric TSP 
         
-        Arguments:
-            G -- a weighted ILPGraph
+        :param G: a weighted ILPGraph
             
-        Returns:
-            a Gurobi model 
+        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """
     
     # Create model
@@ -72,16 +70,14 @@ def createGenModel(G, type_obj, metric, start= None, end= None ):
 def extractSolution(G, model):
     """ Get the optimal tour in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for min/max Path asymmetric TSP 
             
-        Returns:
-            the edges of an optimal tour/path in G 
+        :return: the edges of an optimal tour/path in G 
     """
     edge_vars = G.edge_variables
     
-    tour = [      edge  for edge, edge_var in edge_vars.items() if edge_var.X > 0.5]
+    tour = [edge  for edge, edge_var in edge_vars.items() if edge_var.X > 0.5]
     
     return tour
 
