@@ -12,9 +12,6 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
                 cycleBasis:bool = False, nodeColoring: bool = False):    
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem. 
     
-    The model can be seen in Paper Chapter 3.0. This model
-    doesn't implement tightened labels.
-    
     :param G: an ILPGraph
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
