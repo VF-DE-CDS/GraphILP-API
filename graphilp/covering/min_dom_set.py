@@ -2,11 +2,21 @@ from gurobipy import *
 
 
 def createModel(G):    
-    """ Create an ILP for the minimum dominating set problem 
+    r""" Create an ILP for the minimum dominating set problem 
     
     :param G: an ILPGraph                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP:
+        .. math::
+            :nowrap:
+    
+            \begin{align*}
+            \min \sum_{v\in V}~x_v\\
+            \text{s.t.}&&\\
+            \forall v \in V:& \sum_{a\in \bigcup_{v\in e} e  }  x_a \geq 1 & \text{(each node is covered by a neighbour)}  
+            \end{align*} 
     """        
     # Create model    
     m = Model("graphilp_min_dominating_set")     

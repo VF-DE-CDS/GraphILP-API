@@ -26,8 +26,8 @@ Clique
    extractSolution
 
 
-Independet set
---------------
+Independent set
+---------------
 
 .. automodule:: graphilp.packing.max_indset
    :noindex:
