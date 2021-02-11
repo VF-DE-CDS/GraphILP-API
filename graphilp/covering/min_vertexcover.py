@@ -3,12 +3,22 @@ from graphilp.covering import warmstart_vertex_covering as ws
 
 
 def createModel(G, warmstart:bool = False):    
-    """ Create an ILP for the minimum vertex cover problem
+    r""" Create an ILP for the minimum vertex cover problem
     
     :param G: an unweighted ILPGraph                    
     :param warmstart: choose whether to use a warmstart
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP:
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min \sum_{v\in V} x_v\\
+            \text{s.t.}&&\\
+            \forall \{k,j\} \in E: & x_k + x_j \geq 1 & \text{(at least one vertex in each edge is covered)}
+            \end{align*}
     """        
    # Create model    
     m = Model("graphilp_min_vertex_cover")    
@@ -57,26 +67,43 @@ def extractSolution(G, model):
     return vertex_nodes
 
 def createModelWeighted(G):
-    """ Create an ILP for the minimum vertex cover problem 
+    r""" Create an ILP for the minimum vertex cover problem 
     
     :param G: a weighted ILPGraph   
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_    
+
+    ILP:
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min \sum_{v\in V} w_v x_v\\
+            \text{s.t.}&&\\
+            \forall \{k,j\} \in E: & x_k + x_j \geq 1 & \text{(at least one vertex in each edge is covered)}
+            \end{align*}
+
     """        
     # Create model    
-    m = Model("graphilp_min_vertex_cover")        
+    m = Model("graphilp_min_vertex_cover")  
+    
     # Add variables for edges and nodes    
-    G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))    
+    G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))   
+    
     node_list = G.G.nodes()
+    
     weights = []
     for node in node_list(data=True):
         weights.append(node[1]['prize'])
     m.update()    
-    nodes = G.node_variables        
+    
+    nodes = G.node_variables  
+    
     # Create constraints    
     ## for every edge, at least one vertex must be in a vertex cover of G    
     for (u, v) in G.G.edges:                
         m.addConstr(nodes[u] + nodes[v] >= 1 )    
+        
     # set optimisation objective: minimize cardinality of the vertex cover   
     m.setObjective( gurobipy.quicksum(nodes*weights), GRB.MINIMIZE)      
 
