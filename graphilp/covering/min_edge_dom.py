@@ -2,11 +2,22 @@ from gurobipy import *
 
 
 def createModel(G):    
-    """ Create an ILP for the minimum edge dominating set problem  
+    r""" Create an ILP for the minimum edge dominating set problem  
     
     :param G: an ILPGraph                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+
+    ILP:    
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min_{x}\sum_{e\in E}x_e\\
+            \text{s.t.}&&\\
+            \forall e \in E:& \sum_{a\in E ~:~e\cap a \neq \emptyset  }  x_a \geq 1 &
+            \text{(each edge must be covered by an adjacent one)} \\
+            \end{align*} 
     """        
     # Create model    
     m = Model("graphilp_min_edge_dominating_set")        
