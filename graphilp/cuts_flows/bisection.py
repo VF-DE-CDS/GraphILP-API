@@ -2,15 +2,17 @@ from gurobipy import *
 import math
 
 
-def createModel(G):    
-    """ Create an ILP for the maximum bisection problem
+def createModel(G, direction=GRB.MAXIMIZE):    
+    """ Create an ILP for the minimum/maximum bisection problem
     
     :param G: an ILPGraph                    
+    :param direction: GRB.MAXIMIZE for maximum weight matching, GRB.MINIMIZE for minimum weight matching
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """        
     # Create model    
-    m = Model("graphilp_max_bisection")        
+    m = Model("graphilp_bisection")  
+    
     # Add variables for edges and nodes    
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
     G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))
@@ -28,24 +30,24 @@ def createModel(G):
     m.addConstr( gurobipy.quicksum(nodes) <= bound_upper )
     m.addConstr( gurobipy.quicksum(nodes) >= bound_lower )
 
-    ## for every edge, the nodes must be seperated    
+    ## for every edge, the nodes must be separated    
     for (u, v) in G.G.edges():                
         m.addConstr( edges[(u, v)]  <= nodes[v] +nodes[u] )
         m.addConstr( edges[(u, v)] <= 2 - nodes[v] - nodes[u] ) 
    
-    # set optimisation objective: maximize the cardinality of the number of edges in the cut   
-    m.setObjective( gurobipy.quicksum(  edges), GRB.MAXIMIZE)   
+    # set optimisation objective: minimize/maximize the cardinality of the number of edges in the cut   
+    m.setObjective( gurobipy.quicksum(  edges), direction)   
 
     return m
 
 
 def extractSolution(G, model):    
-    """ Get a list of vertices comprising a maximum balanced cut of G 
+    """ Get a list of vertices comprising a minimum/maximum balanced cut of G 
     
     :param G: an ILPGraph            
-    :param model: a solved Gurobi model for the maximum bisection problem  
+    :param model: a solved Gurobi model for the minimum/maximum bisection problem  
     
-    :return: a list of vertices comprising a maximum balanced cut of G
+    :return: a list of vertices comprising a minimum/maximum balanced cut of G
     """    
     cut_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
     

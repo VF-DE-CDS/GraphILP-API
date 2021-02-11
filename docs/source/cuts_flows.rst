@@ -7,16 +7,7 @@ Cuts and Flows
 Bisection
 ---------
 
-.. automodule:: graphilp.cuts_flows.min_bisection
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-
-.. automodule:: graphilp.cuts_flows.max_bisection
+.. automodule:: graphilp.cuts_flows.bisection
    :noindex:
 
 .. autosummary::
@@ -62,12 +53,9 @@ Flows
 Details
 ------------
 
-.. automodule:: graphilp.cuts_flows.min_bisection
+.. automodule:: graphilp.cuts_flows.bisection
    :members:
   
-.. automodule:: graphilp.cuts_flows.max_bisection
-   :members:
-
 .. automodule:: graphilp.cuts_flows.max_cut
    :members:
    
