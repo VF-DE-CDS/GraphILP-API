@@ -13,7 +13,7 @@ def createModel(G):
             :nowrap:
 
             \begin{align*}
-            \min_{x}\sum_{e\in E}x_e\\
+            \min \sum_{e\in E}x_e\\
             \text{s.t.}&&\\
             \forall e \in E:& \sum_{a\in E ~:~e\cap a \neq \emptyset  }  x_a \geq 1 &
             \text{(each edge must be covered by an adjacent one)} \\

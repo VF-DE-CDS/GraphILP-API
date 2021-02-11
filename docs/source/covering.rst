@@ -51,6 +51,7 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
    :nosignatures:
    
    createModel
+   createModelWeighted
    extractSolution
    
 Warmstarts
