@@ -18,17 +18,6 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
         .. math::
             :nowrap:
 
-            \begin{align*}
-            \min \sum_{(i,j) \in E} w_{ij} x_{ij}\\
-            \text{s.t.} &&\\
-            x_{ij} + x_{ji} \leq 1 && \text{(restrict edges to one direction)}\\
-            x_r = 1 && \text{(require root to be chosen)}\\
-            \sum x_i - \sum x_{ij} = 1 && \text{(enforce circle when graph is not connected)}\\
-            2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
-            n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
-            n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
-            \end{align*}
 
     Example:
             .. list-table:: 
@@ -48,6 +37,13 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     Terminals = len(terminals)
     Capacity = 2000
     
+    edges = G.G.edges()
+    for edge in edges:
+        if (edge[::-1] in edges):
+            continue
+        else:
+            G.G.add_edge(*edge[::-1])
+
     # Create Neighbourhood of the Root
     Neighbourhood = []
     for edge in G.G.edges():
@@ -66,10 +62,10 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     
     # Edge variables y
     y = {}
-    z = {}
+    f = {}
     for edge in G.G.edges():
         y[edge] = m.addVar(vtype = gurobipy.GRB.BINARY, name = "y" + str(edge))
-        z[edge] = m.addVar(vtype = gurobipy.GRB.INTEGER, name = "z" + str(edge))
+        f[edge] = m.addVar(vtype = gurobipy.GRB.INTEGER, name = "f" + str(edge))
     #G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
     # Flow Variables z
     #G.setFlowVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.INTEGER, name = "z"))
@@ -81,7 +77,7 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     edge2var = dict(zip(edges.keys(), edges.values()))
     
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([y[edge] * 5 for edge in edges]), GRB.MINIMIZE)
+    m.setObjective(gurobipy.quicksum([y[edge] * 1 for edge in edges if (edge[0] != 0)]), GRB.MINIMIZE)
 
     for edge in edges:
         # at most one direction per edge can be chosen
@@ -89,10 +85,10 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
         reverseEdge = edge[::-1]
         m.addConstr(y[edge] + y[reverseEdge] <= 1)
         # Maximum Capacity must not be exceeded for every edges
-        m.addConstr(z[edge] <= y[edge] * Capacity)
+        m.addConstr(f[edge] <= y[edge] * Capacity)
     
     # All flow has to end in the Root
-    m.addConstr(gurobipy.quicksum(z[edge] for edge in Neighbourhood) == Terminals)   
+    m.addConstr(gurobipy.quicksum(f[edge] for edge in Neighbourhood) == Terminals)   
 
     # Flow conservation constraint
     for j in nodes:
@@ -106,17 +102,17 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
             if((j, i) in edges):
                 outgoingEdges.append((j,i))
         if j != root and j != 0:
-            m.addConstr(sum(z[edgeOut] for edgeOut in outgoingEdges) - sum(z[edgeIn] for edgeIn in incomingEdges) == 0)
+            m.addConstr(sum(f[edgeOut] for edgeOut in outgoingEdges) - sum(f[edgeIn] for edgeIn in incomingEdges) == 0)
 
     # Flow is started from Source node and must not be returned to Source Node
     for t in terminals:
-        m.addConstr(z[0, t] == 1)
-        m.addConstr(z[t, 0] == 0)
-    print(m.computeIIS())
+        m.addConstr(f[0, t] == 1)
+        m.addConstr(f[t, 0] == 0)
+    #print(m.computeIIS())
     m.optimize() 
     for edge in edges:
-        if ((m.getVarByName("z"+str(edge))).X > 0.5):
-            print(m.getVarByName("z"+str(edge)))
+        if ((m.getVarByName("f"+str(edge))).X > 0.5):
+            print(m.getVarByName("f"+str(edge)))
     return m
 
 def extractSolution(G, model):
