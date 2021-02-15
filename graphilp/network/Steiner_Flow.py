@@ -38,11 +38,6 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     Capacity = 2000
     
     edges = G.G.edges()
-    for edge in edges:
-        if (edge[::-1] in edges):
-            continue
-        else:
-            G.G.add_edge(*edge[::-1])
 
     # Create Neighbourhood of the Root
     Neighbourhood = []
@@ -53,19 +48,25 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     # create model
     m = Model("Steiner Tree - Flow Formulation")        
     source = 0
+    
     for terminal in terminals:
+        if terminal == root:
+            continue
         G.G.add_edge(source, terminal, Cost = 0)
     
     # create reverse edge for every edge in the graph
     for edge in G.G.edges(data=True):
-        G.G.add_edge(edge[1], edge[0], Cost = edge[2]['Cost'])
+        if ((edge[1], edge[0]) in edges):
+            continue
+        else:
+            G.G.add_edge(edge[1], edge[0], Cost = edge[2]['Cost'])
     
     # Edge variables y
     y = {}
     f = {}
     for edge in G.G.edges():
         y[edge] = m.addVar(vtype = gurobipy.GRB.BINARY, name = "y" + str(edge))
-        f[edge] = m.addVar(vtype = gurobipy.GRB.INTEGER, name = "f" + str(edge))
+        f[edge] = m.addVar(name = "f" + str(edge), lb = 0, ub = Capacity)
     #G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
     # Flow Variables z
     #G.setFlowVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.INTEGER, name = "z"))
@@ -77,7 +78,7 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     edge2var = dict(zip(edges.keys(), edges.values()))
     
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([y[edge] * 1 for edge in edges if (edge[0] != 0)]), GRB.MINIMIZE)
+    m.setObjective(gurobipy.quicksum([y[edge] * 1 for edge in edges]), GRB.MINIMIZE)
 
     for edge in edges:
         # at most one direction per edge can be chosen
@@ -88,7 +89,7 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
         m.addConstr(f[edge] <= y[edge] * Capacity)
     
     # All flow has to end in the Root
-    m.addConstr(gurobipy.quicksum(f[edge] for edge in Neighbourhood) == Terminals)   
+    m.addConstr(gurobipy.quicksum(f[edge] for edge in Neighbourhood) == Terminals - 1)   
 
     # Flow conservation constraint
     for j in nodes:
@@ -106,8 +107,14 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
 
     # Flow is started from Source node and must not be returned to Source Node
     for t in terminals:
+        if t == root:
+            m.addConstr(f[0, t] == 0)
+            m.addConstr(f[t, 0] == 0)
+            continue
         m.addConstr(f[0, t] == 1)
         m.addConstr(f[t, 0] == 0)
+        m.addConstr(y[0, t] == 1)
+        m.addConstr(y[t, 0] == 0)
     #print(m.computeIIS())
     m.optimize() 
     for edge in edges:
