@@ -50,8 +50,6 @@ def createModel(G, terminals = [1,2], weight = 'Cost', root = 1):
     source = 0
     
     for terminal in terminals:
-        if terminal == root:
-            continue
         G.G.add_edge(source, terminal, Cost = 0)
     
     # create reverse edge for every edge in the graph
