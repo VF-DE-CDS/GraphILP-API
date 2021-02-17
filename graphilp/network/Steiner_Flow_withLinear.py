@@ -71,7 +71,7 @@ def createModel(G, terminals = [1,2], weight = 'weight', root = 1):
         y[edge] = m.addVar(vtype = GRB.BINARY, name = "y" + str(edge))
         
         # Variable the determines the flow amount on the edge
-        f[edge] = m.addVar(name = "f" + str(edge), lb = 0, ub = Capacity)
+        f[edge] = m.addVar(vtype = GRB.CONTINUOUS, name = "f" + str(edge), lb = 0, ub = Capacity)
 
     for node in G.G.nodes():
         # Label Variable of the Node
@@ -121,21 +121,23 @@ def createModel(G, terminals = [1,2], weight = 'weight', root = 1):
             m.addConstr(sum(f[edgeOut] for edgeOut in outgoingEdges) - sum(f[edgeIn] for edgeIn in incomingEdges) == 0)
         # Else if a terminal was found, it has to consume a flow of 1
         elif (j in terminals and j != root):
-            m.addConstr(sum(f[edgeIn] for edgeIn in incomingEdges) - sum(f[edgeOut] for edgeOut in outgoingEdges)== 1)
+            m.addConstr(sum(f[edgeIn] for edgeIn in incomingEdges) - sum(f[edgeOut] for edgeOut in outgoingEdges) == 1)
+        # NEW NEW NEW NEW prohibit isolated vertices
+        #m.addConstr(x[j] - sum(y[edgeIn] for edgeIn in incomingEdges) - sum(y[edgeOut] for edgeOut in outgoingEdges) <= 0)
 
     # Flow is started from Root node. Outgoing Flow has to be enough to fill all nodes
     m.addConstr(gurobipy.quicksum(f[edge] for edge in Neighbourhood) == Terminals - 1)   
-    
-    # Flow is started from Root node and must not be returned to Source Node
+
+    # Every Terminal must be selected
     for t in terminals:
         m.addConstr(x[t] == 1)
+    return m 
     
-    #print(m.computeIIS())
-    m.optimize() 
+"""     
     for edge in edges:
         if ((m.getVarByName("f"+str(edge))).X > 0.5):
-            print(m.getVarByName("f"+str(edge)))
-    return m
+            print(m.getVarByName("f"+str(edge))) """
+    
 
 def extractSolution(G, model):
     r""" Get the optimal Steiner tree in G 
