@@ -45,11 +45,15 @@ def createModel(G, terminals = [1,2], weight = 'weight', root = 1):
     m = Model("Steiner Tree - Flow Formulation")        
     
     # create reverse edge for every edge in the graph
-    for edge in G.G.edges(data=True):
+    """for edge in G.G.edges(data=True):
         if ((edge[1], edge[0]) in edges):
             continue
         else:
-            G.G.add_edge(edge[1], edge[0], Cost = edge[2]['Cost'])
+            G.G.add_edge(edge[1], edge[0], Cost = edge[2]['Cost'])"""
+    
+    # create reverse edge for every edge in the graph
+    for edge in G.G.edges():
+        G.G.add_edge(*edge[::-1])
     
     # Create Neighbourhood of the Root
     Neighbourhood = []
