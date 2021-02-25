@@ -2,7 +2,7 @@ from gurobipy import *
 from graphilp.covering import warmstart_vertex_covering as ws
 
 
-def createModel(G, warmstart:bool = False):    
+def createModel(G, wsMaxMatch:bool = False, wsLPApprox:bool = False):    
     r""" Create an ILP for the minimum vertex cover problem
     
     :param G: an unweighted ILPGraph                    
@@ -22,27 +22,32 @@ def createModel(G, warmstart:bool = False):
     """        
    # Create model    
     m = Model("graphilp_min_vertex_cover")    
-    warmstartNodes = set()    
-    # Add variables for edges and nodes    
-    #if (warmstart == True):
-    #    wsNodesHeur = ws.maximalMatching(G)
-    #    wsNodesApprox = ws.createApproximation(G)
-    #    print("Approx Nodes : ", len(wsNodesApprox))
-    #    print("Heuristic Nodes: ",  len(wsNodesApprox)) 
-    #    if (len(wsNodesHeur) < len(wsNodesApprox)):
-    #        warmstartNodes = wsNodesHeur
-    #        print("Chose Heuristic Warmstart")
-    #    else:
-    #        warmstartNodes = wsNodesApprox
-    #        print("Chose Aprrox Warmstart")
-    #warmstartNodes = ws.createApproximation(G)
-    print("Heuristic done")    
+
     node_list = list(G.G.nodes())
     x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
-    for i in node_list:
-        if(i in warmstartNodes):
-            x[i].Start = 1
-    print("Start Nodes Set")
+    
+    if (wsMaxMatch == True or wsLPApprox == True):
+        # Perform Maximal Matching Heuristic if wanted
+        if (wsMaxMatch == True):
+            wsNodesHeur = ws.maxMatch(G)
+            if wsNodesHeur != None:
+                warmstartNodes = set.copy(wsNodesHeur)
+        # Perform LP Approximation Heuristic if wanted
+        if (wsLPApprox == True):
+            wsNodesApprox = ws.approxLP(G)
+            # If both Heuristics were performed they have to be compared to each other.
+            # They can only be compard if the are not None, i.e. both Heuristics have returned a valid solution
+            if wsNodesApprox != None and wsNodesHeur != None:
+                # If the Approximation Heuristic is in fact better, change warmstartNodes to the Approximation solution
+                if (len(wsNodesHeur) > len(wsNodesApprox)):
+                    warmstartNodes = set.copy(wsNodesApprox)
+        try:
+            for i in node_list:
+                if(i in warmstartNodes):
+                    x[i].Start = 1
+        except:
+            print("Something with the Heuristics went wrong. Continuing without Heuristics ")
+    
     m.update()            
 
     m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)
