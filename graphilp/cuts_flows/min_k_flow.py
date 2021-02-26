@@ -77,7 +77,7 @@ def extractSolution(G, model):
         :param G: a weighted ILPGraph
         :param model: a solved Gurobi model for minimum k-flow
             
-        :return: the minimal flow bound k and a dictionary of edges weights realising a flow
+        :return: the minimal flow bound k and a dictionary of edge weights realising a flow
     """
     edge_vars = G.edge_variables
     
