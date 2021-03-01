@@ -4,6 +4,8 @@
 Cuts and Flows
 ***************
 
+Cuts and flows between nodes are related through the famous `max-flow min-cut theorem <https://en.wikipedia.org/wiki/Max-flow_min-cut_theorem>`__. This theorem is implied by linear programming `duality <https://en.wikipedia.org/wiki/Duality_(optimization)>`__.
+
 Bisection
 ---------
 
