@@ -72,7 +72,7 @@ def createModel(G):
     return m
 
 def extractSolution(G, model):
-    """ Get the flow bound and a dictionary of edges weights realising a flow
+    """ Get the flow bound and a dictionary of edge weights realising a flow
     
         :param G: a weighted ILPGraph
         :param model: a solved Gurobi model for minimum k-flow
