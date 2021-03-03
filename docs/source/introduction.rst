@@ -4,11 +4,26 @@
 Introduction
 *************
 
-Many optimisation problems on graphs can be solved by `integer linear programming <https://en.wikipedia.org/wiki/Integer_programming>`_. The following sketch gives an overview of a general approach for translating graph problems to integer linear programs:
+Many optimisation problems on graphs can be solved by `integer linear programming <https://en.wikipedia.org/wiki/Integer_programming>`_ (ILP). The following sketch gives an overview of a general approach for translating graph problems to integer linear programs:
 
 .. image:: graph2ilp.png
 
+In this documentation, we will consistently use the following notation to describe our linear programs:
 
+.. list-table:: Notation
+   :widths: 20 80
+   :header-rows: 0
+
+   * - :math:`x_{v}`
+     - Binary node variables: indicator whether node :math:`v` is part of the solution
+   * - :math:`x_{uv}`
+     - Binary edge variables: indicator whether edge :math:`(u, v)` is part of the solution
+     
+       (depending on the problem, this may encode directed or undirected edges)
+   * - :math:`w_{uv}`
+     - Edge weights: usually from the problem instance, can be any number
+   * - :math:`\ell_v`
+     - Node labels: often used to set up the problem formulation
 
 GraphILP aims at providing ILP formulations for many graph problems and making them easy to use.
 The general idea is to input a graph, select an optimisation problem, and run an optimiser on it.
