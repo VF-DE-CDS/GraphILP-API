@@ -189,7 +189,7 @@ def greedyColoring(G):
     
     :param G: Graph to apply greedy coloring algorithm to
     :type G: ILPGraph
-    :rtype: 2-tuple of dicts
+    :rtype: pair of dicts
     """
     
     if not hasattr(G, 'G_integer_labeled'):
