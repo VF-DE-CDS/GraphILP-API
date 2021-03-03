@@ -5,13 +5,11 @@ from graphilp.network import gen_path_atsp
 def createModel(G,start,end):
     """ Create an ILP for the min metric Path TSP 
         
-        Arguments:
-            G -- a weighted ILPGraph
-            start -- a node of the Graph G, in which the TSP path should start 
-            end -- a node of the Graph G, in which the TSP path should end
+        :param G: a weighted ILPGraph
+        :param start: a node of the Graph G, in which the TSP path should start 
+        :param end: a node of the Graph G, in which the TSP path should end
             
-        Returns:
-            a Gurobi model 
+        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_ 
     """
     
     # Create model
@@ -22,12 +20,10 @@ def createModel(G,start,end):
 def extractSolution(G, model):
     """ Get the optimal tour in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min metric Path TSP 
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for min metric Path TSP 
             
-        Returns:
-            the edges of an optimal tour in G 
+        :return: the edges of an optimal tour in G 
     """
     
     tour = gen_path_atsp.extractSolution(G, model)

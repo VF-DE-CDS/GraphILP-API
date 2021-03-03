@@ -5,11 +5,9 @@ from graphilp.network import gen_path_atsp
 def createModel(G):
     """ Create an ILP for the min asymmetric TSP 
         
-        Arguments:
-            G -- a weighted ILPGraph
+        :param G: a weighted ILPGraph
             
-        Returns:
-            a Gurobi model 
+        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_ 
     """
     
     # Create model
@@ -20,12 +18,10 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get the optimal tour in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min asymmetric TSP 
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for min asymmetric TSP 
             
-        Returns:
-            the edges of an optimal tour in G 
+        :return: the edges of an optimal tour in G 
     """
     
     tour = gen_path_atsp.extractSolution(G, model)
