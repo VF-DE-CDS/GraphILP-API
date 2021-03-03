@@ -4,7 +4,10 @@
 Imports
 *********
 
-Explain that this module contains several import filters for graph formats.
+Internally, GraphILP wraps the `NetworkX <https://networkx.org>`__ classes to represent graphs.
+This makes it particularly easy to import graphs through the functionality provided by this package.
+There are, however, a number of file formats specific to the types of optimisation problems covered by GraphILP.
+This module therefore offers import filters for such file formats.
 
 ILPGraph
 --------

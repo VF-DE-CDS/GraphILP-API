@@ -4,12 +4,27 @@ from itertools import combinations
 import networkx as nx
 
 def createModel(G):
-    """ Create an ILP for the min uncut problem
+    r""" Create an ILP for the min uncut problem
         
     :param G: a weighted ILPGraph                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
-    """
+    
+    ILP:
+        Let :math:`\bar{G} = (V, \bar{E} := \{\{u, v\} \in V\times V \mid \{u, v\} \not\in E\})`
+        be the complement of the input graph :math:`G`.
+    
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \max \sum_{(u,v) \in \bar{E}}x_{uv}\\
+            \text{s.t.} &&\\
+            \forall (u,v) \in \bar{E}: x_{uv} & \leq x_u + x_v & \text{(for every edge, the nodes must be separated )}\\
+            \forall (u,v) \in \bar{E}: x_{uv} & \leq 2 - x_u - x_v & \text{(for every edge, the nodes must be separated )}\\
+            \end{align*}
+
+    """        
     
     # Create model
     m = Model("graphilp_min_uncut")

@@ -2,11 +2,23 @@ from gurobipy import *
 
 
 def createModel(G):    
-    """ Create an ILP for the maximum cut problem
+    r""" Create an ILP for the maximum cut problem
     
     :param G: an ILPGraph                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP: 
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \max \sum_{(u,v) \in E}x_{uv}\\
+            \text{s.t.} &&\\
+            \forall (u,v) \in E: x_{uv} & \leq x_u + x_v & \text{(for every edge, the nodes must be separated )}\\
+            \forall (u,v) \in E: x_{uv} & \leq 2 - x_u - x_v & \text{(for every edge, the nodes must be separated )}\\
+            \end{align*}
+
     """        
     # Create model    
     m = Model("graphilp_max_cut")     
@@ -20,7 +32,7 @@ def createModel(G):
     edges = G.edge_variables
     
     # Create constraints    
-    ## for every edge, the nodes must be seperated    
+    ## for every edge, the nodes must be separated    
     for (u, v) in G.G.edges:                
         m.addConstr( edges[(u, v)]  <= nodes[v] +nodes[u] )
         m.addConstr( edges[(u, v)] <= 2 - nodes[v] - nodes[u] ) 

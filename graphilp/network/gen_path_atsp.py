@@ -1,14 +1,33 @@
 from gurobipy import *
 import networkx as nx
 
-def createGenModel(G, type_obj, metric, start= None, end= None ):
-    """ Create an ILP for the min/max Path asymmetric TSP 
+def createGenModel(G, type_obj, metric, start=None, end=None):
+    r""" Create an ILP for the min/max Path asymmetric TSP 
         
-        Arguments:
-            G -- a weighted ILPGraph
-            
-        Returns:
-            a Gurobi model 
+    :param G: a weighted ILPGraph
+    :param type_obj: choose whether to minimise or maximise the weight of the path
+    :param metric: 'metric' for symmetric problem otherwise asymmetric problem
+    :param start: require the TSP path to start at this node
+    :param end: require the TSP path to end at this node
+
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+        
+    ILP: 
+        Let :math:`s` be the start node (if it is specified) and :math:`e` the end node.
+    
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min / \max \sum_{(i,j) \in E} w_{ij} x_{ij}\\
+            \text{s.t.} &&\\
+            \forall v \in V \setminus \{s, e\}: \sum_{(u, v) \in R}x_{uv} = 1 && \text{(Exactly one outgoing edge.)}\\
+            \forall v \in V \setminus \{s, e\}: \sum_{(v, u) \in R}x_{vu} = 1 && \text{(Exactly one incoming edge.)}\\
+            \sum_{(s, v) \in R}x_{sv} = 1 && \text{(Exactly one outgoing edge from start node.)}\\
+            \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Exactly one incoming edge to end node.)}\\
+            \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Increasing labels along path.)}\\
+            \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Increasing labels along path.)}\\
+            \end{align*}   
     """
     
     # Create model
@@ -72,16 +91,14 @@ def createGenModel(G, type_obj, metric, start= None, end= None ):
 def extractSolution(G, model):
     """ Get the optimal tour in G 
     
-        Arguments:
-            G     -- a weighted ILPGraph
-            model -- a solved Gurobi model for min/max Path asymmetric TSP 
+        :param G: a weighted ILPGraph
+        :param model: a solved Gurobi model for min/max Path asymmetric TSP 
             
-        Returns:
-            the edges of an optimal tour/path in G 
+        :return: the edges of an optimal tour/path in G 
     """
     edge_vars = G.edge_variables
     
-    tour = [      edge  for edge, edge_var in edge_vars.items() if edge_var.X > 0.5]
+    tour = [edge  for edge, edge_var in edge_vars.items() if edge_var.X > 0.5]
     
     return tour
 
