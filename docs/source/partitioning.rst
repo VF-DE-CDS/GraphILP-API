@@ -34,10 +34,10 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
     (6) edge node {} (7)
         edge node {} (8);
 
-   \node[main node,fill=red!50] (9) at (8, 4) {};
-   \node[main node,fill=green!50] (10) at (8, 2.8) {};
-   \node[main node,fill=blue!50] (11) at (7, 2) {};
-   \node[main node,fill=black!50] (12) at (9, 2) {};
+   \node[main node,fill=red!50] (9) at (9, 3.4) {};
+   \node[main node,fill=green!50] (10) at (9, 2) {};
+   \node[main node,fill=blue!50] (11) at (10.2124, 1.3) {};
+   \node[main node,fill=black!50] (12) at (7.7876, 1.3) {};
 
    \path[every node/.style={font=\sffamily\small}]
     (9) edge node {} (10)
