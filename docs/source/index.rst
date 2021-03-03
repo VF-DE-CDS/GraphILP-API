@@ -18,3 +18,4 @@ It also lists a number of examples that are ideal for a quick start with GraphIL
    network
    packing
    partitioning
+   sub_super
