@@ -1,11 +1,32 @@
 from gurobipy import *
 
 def createModel(G):
-    """ Create an ILP for the `minimum k-flow problem <https://en.wikipedia.org/wiki/Nowhere-zero_flow>`_
+    r""" Create an ILP for the `minimum k-flow problem <https://en.wikipedia.org/wiki/Nowhere-zero_flow>`_
         
-        :param G: a weighted ILPGraph
+    :param G: a weighted ILPGraph
+
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+
+    ILP: 
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min k\\
+            \text{s.t.} &&\\
+            \forall v \in V: \sum_{(v,u)\in E} x_{vu} - \sum_{(u,v)\in E} x_{uv} &= 0 & \text{(flow condition)}\\
+            \forall (u,v) \in E: x_{uv}-k &\leq -1 & \text{(flow bounded by k)}\\
+            \forall (u,v) \in E: x_{uv}+k &\geq 1 & \text{(flow bounded by k)}\\
+            \forall (u,v) \in E: 2|E|\sigma_{uv} + x_{uv} &\geq 1 & \text{(nowhere zero)}\\
+            \forall (u,v) \in E: 2|E|(1-\sigma_{uv}) - x_{uv} &\geq 1 & \text{(nowhere zero)}\\
+            \end{align*}
             
-        :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+        We assume an arbitrary orientation of the graph as given by the order of nodes in each edge.
+        Binary sign variables :math:`\sigma_{uv}` indicate whether the flow value on an edge is positive 
+        (:math:`\sigma_{uv}=1`) or negative (:math:`\sigma_{uv}=0`).
+
+    References:
+        Diestel: `Graph Theory <http://diestel-graph-theory.com>`_, Chapter 6.
     """
     
     # Create model
@@ -51,12 +72,12 @@ def createModel(G):
     return m
 
 def extractSolution(G, model):
-    """ Get the flow bound and a dictionary of edges weights realising a flow
+    """ Get the flow bound and a dictionary of edge weights realising a flow
     
         :param G: a weighted ILPGraph
         :param model: a solved Gurobi model for minimum k-flow
             
-        :return: the minimal flow bound k and a dictionary of edges weights realising a flow
+        :return: the minimal flow bound k and a dictionary of edge weights realising a flow
     """
     edge_vars = G.edge_variables
     
