@@ -12,7 +12,7 @@ def createModel(G, terminals, weight = 'weight', cycleBasis: bool = False, nodeC
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
 
-    :return: a Gurobi model
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
     ILP:
         .. math::
