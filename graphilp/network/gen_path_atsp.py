@@ -42,7 +42,7 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
     
     nbr_nodes = G.G.number_of_nodes()
-    
+    nodes = list(G.G.nodes())
     # Add variables for labels
     label_vars = m.addVars(G.G.nodes(), lb = 0, ub = nbr_nodes - 1, vtype=gurobipy.GRB.INTEGER)
     m.update()
@@ -68,15 +68,15 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
                 
     # Create permutations via labels         
     if (start is None) and (end is None):        
-        m.addConstr( label_vars[0]  ==  0 )
+        m.addConstr( label_vars[nodes[0]]  ==  0 )
         for (u,v) in G.G.edges():
-            if (v != 0):
+            if (v != nodes[0]):
                 m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
     else:
         m.addConstr( label_vars[start]  ==  0 )
         m.addConstr( label_vars[end]  ==  nbr_nodes -1 )
         for (u,v) in G.G.edges():
-            if (v != start):
+            if (v != nodes[0]):
                 m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
         
 

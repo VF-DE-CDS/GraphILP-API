@@ -31,7 +31,11 @@ def createModel(G, wsMaxMatch:bool = False, wsLPApprox:bool = False):
         if (wsMaxMatch == True):
             wsNodesHeur = ws.maxMatch(G)
             if wsNodesHeur != None:
+                print("Setting Warmstart Nodes...")
                 warmstartNodes = set.copy(wsNodesHeur)
+                print("Successful!")
+        else:
+            wsNodesHeur = None
         # Perform LP Approximation Heuristic if wanted
         if (wsLPApprox == True):
             wsNodesApprox = ws.approxLP(G)
@@ -41,6 +45,8 @@ def createModel(G, wsMaxMatch:bool = False, wsLPApprox:bool = False):
                 # If the Approximation Heuristic is in fact better, change warmstartNodes to the Approximation solution
                 if (len(wsNodesHeur) > len(wsNodesApprox)):
                     warmstartNodes = set.copy(wsNodesApprox)
+            elif wsNodesApprox != None:
+                warmstartNodes = set.copy(wsNodesApprox)
         try:
             for i in node_list:
                 if(i in warmstartNodes):
