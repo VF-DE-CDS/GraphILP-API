@@ -1,12 +1,9 @@
-# +
 from graphilp.imports import ilpgraph
 from graphilp.imports import networkx as imp_nx
 from graphilp.covering import min_vertexcover
 import networkx as nx 
 from gurobipy import *
 
-
-# -
 
 def maxMatch(G):
     print("Running Maximal Matching Heuristic...")

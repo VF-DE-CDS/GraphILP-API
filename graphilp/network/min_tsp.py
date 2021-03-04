@@ -2,7 +2,7 @@ from gurobipy import *
 import networkx as nx
 from graphilp.network import gen_path_atsp
 
-def createModel(G):
+def createModel(G, start = None, end = None):
     """ Create an ILP for the min metric TSP 
         
         :param G: a weighted ILPGraph
@@ -11,7 +11,7 @@ def createModel(G):
     """
     
     # Create model
-    m = gen_path_atsp.createGenModel(G,'min','metric')
+    m = gen_path_atsp.createGenModel(G,'min','metric', start, end)
     
     return m
 

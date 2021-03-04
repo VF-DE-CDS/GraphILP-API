@@ -122,7 +122,7 @@ def mis_to_networkx(path):
     G.add_edges_from(edges)
 
     return G
-
+    
 # -
 # --
 
