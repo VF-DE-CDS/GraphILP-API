@@ -2,17 +2,25 @@ from gurobipy import *
 from itertools import combinations
 
 def createModel(G):
-    """ Create an ILP for the maximum clique problem
+    r""" Create an ILP for the maximum clique problem
         
     :param G: a weighted bipartite ILPGraph
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
     ILP: 
+        This formulation makes use of the connection between clique and vertex cover in the complement.
+        It excludes as few nodes as possible from a clique but needs to exclude at least one node from each pair
+        not connected by an edge.
+        Vertex cover has a smaller integrality gap.
+    
         .. math::
             :nowrap:
 
             \begin{align*}
+            \min \sum_{v \in V} x_v\\
+            \text{s.t.} &&\\
+            \forall (u, v) \in \bar{E}: x_u + x_v >= 1 && \text{(exclude at least one node from each unconnected pair)}\\
             \end{align*}
     """
     
@@ -28,8 +36,7 @@ def createModel(G):
     # Create constraints
     ## for every pair of nodes, at least one node must cover the edge
     for (u, v) in combinations(G.G.nodes(), 2):
-        is_edge = 1 if (u, v) in G.G.edges() else 0
-        if (is_edge == 0):
+        if (u, v) not in G.G.edges():
             m.addConstr(nodes[u] + nodes[v] >= 1)
 
     # set optimisation objective: minimum vertex cover
