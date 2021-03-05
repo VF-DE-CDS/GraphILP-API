@@ -18,6 +18,10 @@ ILPGraph
    :nosignatures:
    
    ILPGraph
+   ILPGraph.setNXGraph
+   ILPGraph.setEdgeVars
+   ILPGraph.setNodeVars
+   ILPGraph.setLabelVars
    
 Networkx
 --------
@@ -49,7 +53,7 @@ Details
 
 .. automodule:: graphilp.imports.ilpgraph
     :members:
-    
+        
 .. automodule:: graphilp.imports.networkx
     :members:
 
