@@ -21,6 +21,18 @@ def createModel(G):
             \text{s.t.} &&\\
             \forall (u, v) \in \overline{E}: x_u + x_v \geq 1 && \text{(exclude at least one node from each unconnected pair)}\\
             \end{align*}
+            
+    Example:
+        .. list-table::
+           :widths: 50 50
+           :header-rows: 0
+           
+           * - .. image:: example_mapcolouring.png
+             - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_
+
+               Colour a map with as few colours as possible such that 
+
+               no two adjacent areas get the same colour.
     """
     
     # Create model
