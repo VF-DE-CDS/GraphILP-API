@@ -12,7 +12,9 @@ Clique
 A clique is a fully connected graph. Hence, the fully connected graph :math:`K_n` is also called an :math:`n`-clique.
 The maximum clique problem is asking for the largest :math:`n` such that a given a has an :math:`n`-clique as a subgraph.
 
-.. automodule:: graphilp.sub_super.max_clique
+Packing version
+
+.. automodule:: graphilp.sub_super.max_clique_pack
    :noindex:
 
 .. autosummary::
@@ -20,8 +22,10 @@ The maximum clique problem is asking for the largest :math:`n` such that a given
    
    createModel
    extractSolution
+   
+Covering version
 
-.. automodule:: graphilp.sub_super.max_cliquev2
+.. automodule:: graphilp.sub_super.max_clique_cover
    :noindex:
 
 .. autosummary::
@@ -33,9 +37,9 @@ The maximum clique problem is asking for the largest :math:`n` such that a given
 Details
 -------
 
-.. automodule:: graphilp.sub_super.max_clique
+.. automodule:: graphilp.sub_super.max_clique_pack
     :members:
 
-.. automodule:: graphilp.sub_super.max_cliquev2
+.. automodule:: graphilp.sub_super.max_clique_cover
     :members:
    
