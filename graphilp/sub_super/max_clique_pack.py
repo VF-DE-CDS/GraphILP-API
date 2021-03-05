@@ -4,8 +4,8 @@ from itertools import combinations
 def createModel(G):
     r""" Create an ILP for the maximum clique problem
         
-    :param G: a weighted bipartite :py:class:`ILPGraph`
-
+    :param G: a weighted bipartite :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
     ILP: 
