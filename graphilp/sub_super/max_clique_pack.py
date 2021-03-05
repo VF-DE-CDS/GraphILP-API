@@ -4,7 +4,7 @@ from itertools import combinations
 def createModel(G):
     r""" Create an ILP for the maximum clique problem
         
-    :param G: a weighted bipartite :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -15,7 +15,7 @@ def createModel(G):
             \begin{align*}
             \max \sum_{v \in V} x_v\\
             \text{s.t.} &&\\
-            \forall (u, v) \in \bar{E}: x_u + x_v <= 1 && \text{(ensure every pair of nodes is connected)}\\
+            \forall (u, v) \in \overline{E}: x_u + x_v \leq 1 && \text{(ensure every pair of nodes is connected)}\\
             \end{align*}
     """
     

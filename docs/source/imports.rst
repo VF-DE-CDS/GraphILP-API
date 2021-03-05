@@ -11,6 +11,9 @@ This module therefore offers import filters for such file formats.
 
 ILPGraph
 --------
+
+The ILPGraph class takes care of both the graph instance used in an optimisation problem and the variables of the integer linear program used to solve it.
+
 .. automodule:: graphilp.imports.ilpgraph
    :noindex:
 
