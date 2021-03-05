@@ -4,7 +4,7 @@ from itertools import combinations
 def createModel(G):
     r""" Create an ILP for the maximum clique problem
         
-    :param G: a weighted bipartite ILPGraph
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -12,7 +12,6 @@ def createModel(G):
         This formulation makes use of the connection between clique and vertex cover in the complement.
         It excludes as few nodes as possible from a clique but needs to exclude at least one node from each pair
         not connected by an edge.
-        Vertex cover has a smaller integrality gap.
     
         .. math::
             :nowrap:
@@ -20,7 +19,7 @@ def createModel(G):
             \begin{align*}
             \min \sum_{v \in V} x_v\\
             \text{s.t.} &&\\
-            \forall (u, v) \in \bar{E}: x_u + x_v >= 1 && \text{(exclude at least one node from each unconnected pair)}\\
+            \forall (u, v) \in \overline{E}: x_u + x_v \geq 1 && \text{(exclude at least one node from each unconnected pair)}\\
             \end{align*}
     """
     
