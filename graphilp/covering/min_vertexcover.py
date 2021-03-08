@@ -20,10 +20,11 @@ def createModel(G, wsMaxMatch:bool = False, wsLPApprox:bool = False):
             \forall \{k,j\} \in E: & x_k + x_j \geq 1 & \text{(at least one vertex in each edge is covered)}
             \end{align*}
     """        
-   # Create model    
+    # Create model    
     m = Model("graphilp_min_vertex_cover")    
 
     node_list = list(G.G.nodes())
+    # Adding binary variables. 1 if the node is chosen in the solution, 0 otherwise
     x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
     
     if (wsMaxMatch == True or wsLPApprox == True):
