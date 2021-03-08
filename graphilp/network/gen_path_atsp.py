@@ -53,10 +53,12 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
     # degree condition
     if ((start is None) and (end is None)):
         for node in G.G.nodes():
+            # Only one outgoing connection from every node
             m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 1)
+            # Only one incoming connection to every node
             m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)            
     else:
-        for node in G.G.nodes():
+        for node in G.G.nodes():     
             if node != start:
                 m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)
             if node != end:
@@ -74,9 +76,9 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
                 m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
     else:
         m.addConstr( label_vars[start]  ==  0 )
-        m.addConstr( label_vars[end]  ==  nbr_nodes -1 )
+        m.addConstr( label_vars[end]  ==  nbr_nodes - 1 )
         for (u,v) in G.G.edges():
-            if (v != nodes[0]):
+            if (v != start):
                 m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
         
 
