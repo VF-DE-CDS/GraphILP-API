@@ -24,7 +24,7 @@ Edge dominating set
 
 An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
 
-.. image:: illustration_edge_dom.png
+.. image:: images/illustration_edge_dom.png
     :height: 200
 
 .. automodule:: graphilp.covering.min_edge_dom
@@ -41,7 +41,7 @@ Vertex cover
 
 A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset V` of the vertex set such that each edge :math:`\{u, v\} \in E` at least one of its vertices is in :math:`S`: :math:`\{u,v\} \cap S \neq \emptyset`. 
 
-.. image:: illustration_covering.png
+.. image:: images/illustration_covering.png
     :height: 200
 
 .. automodule:: graphilp.covering.min_vertexcover

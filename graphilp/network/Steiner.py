@@ -40,7 +40,7 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
                :widths: 50 50
                :header-rows: 0
 
-               * - .. image:: example_steiner.png
+               * - .. image:: images/example_steiner.png
                  - `Steiner trees <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/SteinerTreesOnStreetmap.ipynb>`_
 
                    Find the shortest tree connecting a given set of nodes in a graph.
