@@ -54,9 +54,9 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
     if ((start is None) and (end is None)):
         for node in G.G.nodes():
             # Only one outgoing connection from every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 1)
+            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges(node)]) == 1)
             # Only one incoming connection to every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)            
+            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.in_edges(node)]) == 1)            
     else:
         for node in G.G.nodes():     
             if node != start:
