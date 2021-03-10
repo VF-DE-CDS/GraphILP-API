@@ -17,27 +17,64 @@ def nearNeighHeur(distance, cities):
     length = length + distance[position][0]
     return tour, length
 
+
+def iterateInner(distance, tour, length, cities, i):
+    for j in range(i + 2, cities):
+        newTour = twoOptSwap(i, j, tour)
+        newLength = findTourLength(newTour, distance)
+        if (newLength < length):
+            curTour = newTour
+            bestLength = newLength
+            return curTour, bestLength, True
+
+    return tour, length, False
+
+def iterateOuter(distance, tour, length, cities):
+    newTour = list.copy(tour)
+    bestLength = length
+    for i in range(1, cities - 2):
+        newTour, bestLength, newSolFound = iterateInner(distance, tour, length, cities, i)
+
+        if newSolFound:
+            return newTour, bestLength, True
+        else:
+            continue
+    return newTour, bestLength, False
+
 def twoOptImprov(distance, tour, length, cities):
-    maximprove = 10000
-    while maximprove > 0:
-        maximprove = 0
-        for i in range(cities-2):
-            for j in range(i+2,cities):
-                delta = distance[tour[i]][tour[i+1]]+distance[tour[j]][tour[j+1]]-distance[tour[i]][tour[j]]-distance[tour[i+1]][tour[j+1]]
-            for k in range(j-i-1):
-                delta=delta+distance[tour[j-k-1]][tour[j-k]]-distance[tour[j-k]][tour[j-k-1]]    
-            if delta > maximprove:
-                best_i = i
-                best_j = j
-                maximprove = delta
-            if maximprove > 0:
-                next_tour = []
-                for k in range(best_i+1):
-                    next_tour.append(tour[k])
-                for k in range(best_j-best_i):
-                    next_tour.append(tour[best_j-k])
-                for k in range(cities-best_j):
-                    next_tour.append(tour[best_j+k+1]) 
-                length = length - maximprove
-                tour = next_tour
-    return tour, length
+    newTour = list.copy(tour)
+    bestLength = length
+    
+    while True:
+        newTour, bestLength, newSolFound = iterateOuter(distance, newTour, bestLength, cities)
+        print(bestLength)
+        if newSolFound:
+            continue
+        else:
+            break
+    
+    return newTour, bestLength
+    
+def twoOptSwap(i, j, tour):
+    # Take all cities up to i and include them in normal order
+    next_tour = list.copy(tour[:i+1])
+
+    # Reverse the tour from i to j
+    reversedCities = list.copy(tour[i+1:j+1][::-1])
+
+    # Simply add up the remaining cities in the normal order
+    remainingTour = list.copy(tour[j+1:])
+
+    next_tour.extend(reversedCities)
+    next_tour.extend(remainingTour)
+
+    return next_tour
+
+
+def findTourLength(tour, distance):
+    tourLength = 0
+    for i in range(0, len(tour)-1):
+        pos = tour[i]
+        succ = tour[i+1]
+        tourLength = tourLength + distance[pos][succ]
+    return tourLength   
