@@ -31,20 +31,20 @@ def createGenModel(G, type_obj, metric):
 
     # Create constraints
     # degree condition
-    if ((start is None) and (end is None)):
-        for node in G.G.nodes():
-            # Only one outgoing connection from every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 1)
-            # Only one incoming connection to every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)   
-            if (node, 1) in edges:
-                m.addConstr(-label_vars[node] + (nbr_nodes - 3) * edges[(node,1)] + sum(edges[(j, node)] for j in range(2, nbr_nodes) if ((j, node) in edges and j != node))  <= -1 )
-            else:
-                m.addConstr(-label_vars[node] +  sum(edges[(j, node)] for j in range(2, nbr_nodes) if ((j, node) in edges and j != node))  <= -1 )
-            if (1, node) in edges:
-                m.addConstr(label_vars[node] + (nbr_nodes - 3) * edges[(1,node)] + sum(edges[(node, j)] for j in range(2, nbr_nodes) if ((node, j) in edges and j != node))  <= nbr_nodes - 1)
-            else:
-                m.addConstr(label_vars[node] + sum(edges[(node, j)] for j in range(2, nbr_nodes) if ((node, j) in edges and j != node))  <= nbr_nodes - 1)
+    for node in G.G.nodes():
+        # Only one outgoing connection from every node
+        m.addConstr(gurobipy.quicksum([edges[e] for e in G.G.edges(node)]) == 1)
+        # Only one incoming connection to every node
+        m.addConstr(gurobipy.quicksum([edges[e] for e in G.G.in_edges(node)]) == 1)
+        
+        if (node, 1) in edges:
+            m.addConstr(-label_vars[node] + (nbr_nodes - 3) * edges[(node,1)] + sum(edges[(j, node)] for j in range(2, nbr_nodes) if ((j, node) in edges and j != node))  <= -1 )
+        else:
+            m.addConstr(-label_vars[node] +  sum(edges[(j, node)] for j in range(2, nbr_nodes) if ((j, node) in edges and j != node))  <= -1 )
+        if (1, node) in edges:
+            m.addConstr(label_vars[node] + (nbr_nodes - 3) * edges[(1,node)] + sum(edges[(node, j)] for j in range(2, nbr_nodes) if ((node, j) in edges and j != node))  <= nbr_nodes - 1)
+        else:
+            m.addConstr(label_vars[node] + sum(edges[(node, j)] for j in range(2, nbr_nodes) if ((node, j) in edges and j != node))  <= nbr_nodes - 1)
 
     for (u,v) in G.G.edges():
         if (u >= 2 and v >= 2):
