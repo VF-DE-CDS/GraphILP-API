@@ -36,7 +36,6 @@ def createGenModel(G, type_obj, metric):
         m.addConstr(gurobipy.quicksum([edges[e] for e in G.G.edges(node)]) == 1)
         # Only one incoming connection to every node
         m.addConstr(gurobipy.quicksum([edges[e] for e in G.G.in_edges(node)]) == 1)
-        
         if (node, 1) in edges:
             m.addConstr(-label_vars[node] + (nbr_nodes - 3) * edges[(node,1)] + sum(edges[(j, node)] for j in range(2, nbr_nodes) if ((j, node) in edges and j != node))  <= -1 )
         else:
