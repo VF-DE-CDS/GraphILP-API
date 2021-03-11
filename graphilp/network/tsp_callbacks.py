@@ -6,15 +6,18 @@ edge2var = None
 def callbackCycle(model, where):
     global edge2var
     if where == gurobipy.GRB.Callback.MIPSOL:
+        print("In Callback")
         activeEdges = model.cbGetSolution(model._x)
         edges = []
+        cycles = []
         for k, v in activeEdges.items():
             if (0 < v):
                 edges.append(k)
-
         G2 = nx.Graph()
         G2.add_edges_from(edges)
-        cycles = nx.cycle_basis(G2)
+        conComp = nx.connected_components(G2)
+        for comp in conComp:
+            cycles.append(comp)
 
         neededEdges = []
         neededEdgesRev = []
@@ -35,9 +38,11 @@ def callbackCycle(model, where):
                         for nodeTwo in cycle:
                             neededEdges.append((nodeOne, nodeTwo))
                             neededEdgesRev.append((nodeTwo, nodeOne))
+            
             model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdges) >= 1)
             model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdgesRev) >= 1)
     return
+
 def createGenModel(G, type_obj, metric, start=None, end=None):
     global edge2var
     r""" Create an ILP for the min/max Path asymmetric TSP 
@@ -75,18 +80,16 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
         G_d = G.G.to_directed()
         G_r = G_d.reverse(copy=True)
         G.G = nx.compose(G_d, G_r)
-    
+        
     # Add variables for edges   
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
-    edge2var = G.edge_variables
-    nbr_nodes = G.G.number_of_nodes()
-    nodes = list(G.G.nodes())
-    # Add variables for labels
-    label_vars = m.addVars(G.G.nodes(), lb = 0, ub = nbr_nodes - 1, vtype=gurobipy.GRB.INTEGER)
     m.update()
-    
+
+    edge2var = G.edge_variables
     edges = G.edge_variables
-    
+    var2edge = dict(zip(edges.values(), edges.keys()))
+    nbr_nodes = G.G.number_of_nodes()
+
     # Create constraints
     # degree condition
     if ((start is None) and (end is None)):
@@ -112,14 +115,16 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
         m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MINIMIZE)
     if type_obj == 'max': 
         m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MAXIMIZE)
-    
 
-    m._u = label_vars
     m._x = G.edge_variables
 
     m.Params.lazyConstraints = 1
     m.optimize(callbackCycle)
 
+    sol = m.getVars()
+    for s in sol:
+        if s.x == 1:
+            print(var2edge[s])
     return m
 
 def extractSolution(G, model):
