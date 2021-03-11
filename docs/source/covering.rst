@@ -69,7 +69,7 @@ An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in
 Vertex cover
 ------------
 
-A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset V` of the vertex set such that each edge :math:`\{u, v\} \in E` at least one of its vertices is in :math:`S`: :math:`\{u,v\} \cap S \neq \emptyset`. 
+A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset V` of the vertex set such that for each edge :math:`\{u, v\} \in E` at least one of its vertices is in :math:`S`: :math:`\{u,v\} \cap S \neq \emptyset`. 
 
 .. image:: images/illustration_covering.png
     :height: 200
@@ -81,7 +81,6 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
    :nosignatures:
    
    createModel
-   createModelWeighted
    extractSolution
    
 Warmstarts
