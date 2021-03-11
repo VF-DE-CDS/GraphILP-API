@@ -60,3 +60,9 @@ The best way to get startet with GraphILP is through one of our examples:
        A simple example finding the minimal number of colours needed
        
        to colour circle graphs such that neighbouring nodes get different colours.
+
+   * - .. image:: images/example_mindomset.png
+     - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Dominating%20queens.ipynb>`_
+     
+       Find how many queens are needed to cover all squares on an :math:`n\times n` chessboard.
+
