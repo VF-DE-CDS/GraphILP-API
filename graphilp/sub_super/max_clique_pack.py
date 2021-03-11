@@ -2,11 +2,21 @@ from gurobipy import *
 from itertools import combinations
 
 def createModel(G):
-    """ Create an ILP for the maximum clique problem
+    r""" Create an ILP for the maximum clique problem
         
-    :param G: a weighted bipartite ILPGraph
-
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+
+    ILP: 
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \max \sum_{v \in V} x_v\\
+            \text{s.t.} &&\\
+            \forall (u, v) \in \overline{E}: x_u + x_v \leq 1 && \text{(ensure every pair of nodes is connected)}\\
+            \end{align*}
     """
     
     # Create model
@@ -21,8 +31,8 @@ def createModel(G):
     # Create constraints
     ## for every pair of nodes, they can only be in the max clique when there is an edge between them
     for (u, v) in combinations(G.G.nodes(), 2):
-        is_edge = 1 if (u, v) in G.G.edges() else 0
-        m.addConstr(nodes[u] + nodes[v] <= 1 + is_edge)
+        if (u, v) not in G.G.edges():
+            m.addConstr(nodes[u] + nodes[v] <= 1)
 
     # set optimisation objective: maximum weight matching (sum of weights of chosen edges)
     m.setObjective( gurobipy.quicksum(nodes), GRB.MAXIMIZE)
