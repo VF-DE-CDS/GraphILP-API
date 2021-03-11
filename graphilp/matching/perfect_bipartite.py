@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from gurobipy import *
 
-def createModel(G, A, direction=GRB.MAXIMIZE):
+def createModel(G, A, weight='weight', direction=GRB.MAXIMIZE):
     r""" Create an ILP for maximum/minimum bipartite perfect matching
         
         :param G: a weighted bipartite ILPGraph
         :param A: subset of the vertex set of G giving the bipartition (each edge has exactly one end in A)
+        :param weight: name of the weight parameter in the edge dictionary of the graph
         :param direction: GRB.MAXIMIZE for maximum weight matching, GRB.MINIMIZE for minimum weight matching
             
         :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
@@ -64,7 +65,7 @@ def createModel(G, A, direction=GRB.MAXIMIZE):
             m.addConstr(gurobipy.quicksum([edge_var for edge, edge_var in edges.items() if v in edge]) == 1)
             
     # set optimisation objective: maximum/minimum weight matching (sum of weights of chosen edges)
-    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge]['weight'] for edge, edge_var in edges.items()]), direction)
+    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), direction)
     
     return m
 
