@@ -85,13 +85,14 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
    
 Warmstarts
 ==========
-.. automodule:: graphilp.covering.warmstart_vertex_covering
+.. automodule:: graphilp.covering.warmstart_vertexcover
    :noindex:
 
 .. autosummary::
    :nosignatures:
 
    createApproximation
+   maximalMatching
 
 Details
 ------------
@@ -105,5 +106,5 @@ Details
 .. automodule:: graphilp.covering.min_vertexcover
   :members:    
   
-.. automodule:: graphilp.covering.warmstart_vertex_covering
+.. automodule:: graphilp.covering.warmstart_vertexcover
   :members:      
