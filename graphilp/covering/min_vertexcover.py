@@ -1,75 +1,12 @@
 from gurobipy import *
-from graphilp.covering import warmstart_vertex_covering as ws
 
 
-def createModel(G, warmstart:bool = False):    
-    r""" Create an ILP for the minimum vertex cover problem
-    
-    :param G: an unweighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                   
-    :param warmstart: choose whether to use a warmstart
-    
-    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
-    
-    ILP:
-        .. math::
-            :nowrap:
-
-            \begin{align*}
-            \min \sum_{v\in V} x_v\\
-            \text{s.t.}&&\\
-            \forall \{k,j\} \in E: & x_k + x_j \geq 1 & \text{(at least one vertex in each edge is covered)}
-            \end{align*}
-    """        
-   # Create model    
-    m = Model("graphilp_min_vertex_cover")    
-    warmstartNodes = set()    
-    # Add variables for edges and nodes    
-    #if (warmstart == True):
-    #    wsNodesHeur = ws.maximalMatching(G)
-    #    wsNodesApprox = ws.createApproximation(G)
-    #    print("Approx Nodes : ", len(wsNodesApprox))
-    #    print("Heuristic Nodes: ",  len(wsNodesApprox)) 
-    #    if (len(wsNodesHeur) < len(wsNodesApprox)):
-    #        warmstartNodes = wsNodesHeur
-    #        print("Chose Heuristic Warmstart")
-    #    else:
-    #        warmstartNodes = wsNodesApprox
-    #        print("Chose Aprrox Warmstart")
-    #warmstartNodes = ws.createApproximation(G)
-    print("Heuristic done")    
-    node_list = list(G.G.nodes())
-    x = m.addVars(G.G.nodes(), vtype = GRB.BINARY)
-    for i in node_list:
-        if(i in warmstartNodes):
-            x[i].Start = 1
-    print("Start Nodes Set")
-    m.update()            
-
-    m.setObjective(sum(x[i] for i in node_list), GRB.MINIMIZE)
-    # Create constraints    
-    ## for every edge, at least one vertex must be in a vertex cover of G    
-    for (u, v) in G.G.edges():            
-        m.addConstr(x[int(u)] + x[int(v)] >= 1 )    
-    
-    m.optimize()
-    return x
-
-def extractSolution(G, model):    
-    """ Get a list of vertices comprising a vertex cover  
-    
-    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`           
-    :param model: a solved Gurobi model for minimum vertex cover                    
-    
-    :return: a list of vertices comprising a minimum vertex cover
-    """    
-    vertex_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
-    
-    return vertex_nodes
-
-def createModelWeighted(G):
+def createModel(G, weight='weight', warmstart = []):
     r""" Create an ILP for the minimum vertex cover problem 
     
-    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`   
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
+    :param weight: name of the weight parameter in the node dictionary of the graph
+    :param warmstart: a list of vertices forming a vertex cover of G
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_    
 
@@ -89,14 +26,9 @@ def createModelWeighted(G):
     
     # Add variables for edges and nodes    
     G.setNodeVars(m.addVars(G.G.nodes(), vtype=gurobipy.GRB.BINARY))   
-    
-    node_list = G.G.nodes()
-    
-    weights = []
-    for node in node_list(data=True):
-        weights.append(node[1]['prize'])
     m.update()    
     
+    weights = [G.G.edges[edge].get(weight, 1) for edge in G.G.edges()]    
     nodes = G.node_variables  
     
     # Create constraints    
@@ -104,7 +36,28 @@ def createModelWeighted(G):
     for (u, v) in G.G.edges:                
         m.addConstr(nodes[u] + nodes[v] >= 1 )    
         
-    # set optimisation objective: minimize cardinality of the vertex cover   
-    m.setObjective( gurobipy.quicksum(nodes*weights), GRB.MINIMIZE)      
+    # set optimisation objective: minimize total node weight of the vertex cover   
+    m.setObjective( gurobipy.quicksum([node_var * G.G.nodes()[node].get(weight, 1) 
+                                       for node, node_var in nodes.items()]), 
+                   GRB.MINIMIZE)      
+    
+    # set warmstart
+    if len(warmstart) > 0:
+        for node in nodes:
+            nodes[node].Start = node in warmstart
+        m.update()
 
     return m
+
+
+def extractSolution(G, model):    
+    """ Get a list of vertices comprising a vertex cover  
+    
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`           
+    :param model: a solved Gurobi model for minimum vertex cover                    
+    
+    :return: a list of vertices comprising a minimum vertex cover
+    """    
+    vertex_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
+    
+    return vertex_nodes
