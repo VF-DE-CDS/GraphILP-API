@@ -5,7 +5,7 @@ from graphilp.covering import warmstart_vertex_covering as ws
 def createModel(G, warmstart:bool = False):    
     r""" Create an ILP for the minimum vertex cover problem
     
-    :param G: an unweighted ILPGraph                    
+    :param G: an unweighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                   
     :param warmstart: choose whether to use a warmstart
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
@@ -57,7 +57,7 @@ def createModel(G, warmstart:bool = False):
 def extractSolution(G, model):    
     """ Get a list of vertices comprising a vertex cover  
     
-    :param G: an ILPGraph            
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`           
     :param model: a solved Gurobi model for minimum vertex cover                    
     
     :return: a list of vertices comprising a minimum vertex cover
@@ -69,7 +69,7 @@ def extractSolution(G, model):
 def createModelWeighted(G):
     r""" Create an ILP for the minimum vertex cover problem 
     
-    :param G: a weighted ILPGraph   
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`   
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_    
 

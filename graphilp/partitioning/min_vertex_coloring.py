@@ -54,13 +54,13 @@ def createModel(G, **kwargs):
            :widths: 50 50
            :header-rows: 0
 
-           * - .. image:: example_mapcolouring.png
+           * - .. image:: images/example_mapcolouring.png
              - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_
 
                Colour a map with as few colours as possible such that 
 
                no two adjacent areas get the same colour.
-           * - .. image:: example_vertexcolour.png
+           * - .. image:: images/example_vertexcolour.png
              - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/min_vertex_coloring_example.ipynb>`_
 
                A simple example finding the minimal number of colours needed
@@ -189,7 +189,7 @@ def greedyColoring(G):
     
     :param G: Graph to apply greedy coloring algorithm to
     :type G: ILPGraph
-    :rtype: 2-tuple of dicts
+    :rtype: pair of dicts
     """
     
     if not hasattr(G, 'G_integer_labeled'):
