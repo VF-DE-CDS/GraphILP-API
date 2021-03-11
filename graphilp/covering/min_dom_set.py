@@ -4,7 +4,7 @@ from gurobipy import *
 def createModel(G):    
     r""" Create an ILP for the minimum dominating set problem 
     
-    :param G: an ILPGraph                    
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -39,7 +39,7 @@ def createModel(G):
 def extractSolution(G, model):    
     """ Get a list of edges comprising a dominating set  
     
-    :param G: an ILPGraph            
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`           
     :param model: a solved Gurobi model for minimum dominating set                   
     
     :return: a list of nodes comprising a minimum dominating set
