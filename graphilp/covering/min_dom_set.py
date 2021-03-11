@@ -17,6 +17,16 @@ def createModel(G):
             \text{s.t.}&&\\
             \forall v \in V:& \sum_{a\in \bigcup_{v\in e} e  }  x_a \geq 1 & \text{(each node is covered by a neighbour)}  
             \end{align*} 
+
+    Example:
+        .. list-table:: 
+           :widths: 50 50
+           :header-rows: 0
+
+           * - .. image:: images/example_mindomset.png
+             - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Dominating%20queens.ipynb>`_
+
+               Find how many queens are needed to cover all squares on an :math:`n\times n` chessboard.
     """        
     # Create model    
     m = Model("graphilp_min_dominating_set")     
