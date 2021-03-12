@@ -21,6 +21,15 @@ def createModel(G, weight='weight', direction=GRB.MAXIMIZE):
             \forall (u,v) \in E: x_{uv} & \leq 2 - x_u - x_v & \text{(for every edge, the nodes must be separated )}\\
             \end{align*}
 
+    Example:
+        .. list-table:: 
+           :widths: 50 50
+           :header-rows: 0
+
+           * - .. image:: images/example_binarisation.png
+             - `Maximum weight cuts <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Binarisation.ipynb>`_
+
+               Use minimum weight cuts for image binarisation.
     """        
     # Create model    
     m = Model("graphilp_max_cut")     

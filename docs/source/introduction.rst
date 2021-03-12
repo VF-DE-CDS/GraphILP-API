@@ -66,3 +66,7 @@ The best way to get startet with GraphILP is through one of our examples:
      
        Find how many queens are needed to cover all squares on an :math:`n\times n` chessboard.
 
+   * - .. image:: images/example_binarisation.png
+     - `Maximum weight cuts <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Binarisation.ipynb>`_
+     
+       Use minimum weight cuts for image binarisation.
