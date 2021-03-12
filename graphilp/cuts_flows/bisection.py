@@ -2,23 +2,30 @@ from gurobipy import *
 import math
 
 
-def createModel(G, direction=GRB.MAXIMIZE):    
+def createModel(G, slack=0, weight='weight', direction=GRB.MAXIMIZE):    
     r""" Create an ILP for the minimum/maximum bisection problem
     
-    :param G: an ILPGraph                    
-    :param direction: GRB.MAXIMIZE for maximum weight matching, GRB.MINIMIZE for minimum weight matching
+    Bisect the graph into two partitions of equal size (allowing some slack) such that
+    the sum of the weights of the edges removed to bisect the graph is minimal/maximal.
+    
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
+    :param slack: allow imbalance between the two partitions by slack many nodes 
+    :param weight: name of the weight parameter in the edge dictionary of the graph
+    :param direction: GRB.MAXIMIZE for maximum weight bisection, GRB.MINIMIZE for minimum weight bisection
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
+        Let :math:`s` denote the slack allowed in the partition size.
+        
         .. math::
             :nowrap:
             
             \begin{align*}
             & \min / \max_{\{u,v\} \in E} \sum x_{u,v}\\
             & \text{s.t.} &\\
-            & \sum_{v \in V} x_v \leq \lceil |V|/2 \rceil & \text{(lower bound size of one partition)}\\
-            & \sum_{v \in V} x_v \geq \lfloor |V|/2 \rfloor & \text{(upper bound size of one partition)}\\
+            & \sum_{v \in V} x_v \leq \lceil |V|/2 \rceil + s & \text{(lower bound size of one partition)}\\
+            & \sum_{v \in V} x_v \geq \lfloor |V|/2 \rfloor - s & \text{(upper bound size of one partition)}\\
             & \forall \{u,v\} \in E: x_{u, v} \leq x_u + x_v & \text{(no edge between partitions)}\\
             & \forall \{u,v\} \in E: x_{u, v} \leq 2 - x_u - x_v & \text{(no edge between partitions)}\\
             \end{align*}    
@@ -40,8 +47,8 @@ def createModel(G, direction=GRB.MAXIMIZE):
 
     # Create constraints
     # balanced solutions are needed
-    m.addConstr(gurobipy.quicksum(nodes) <= bound_upper)
-    m.addConstr(gurobipy.quicksum(nodes) >= bound_lower)
+    m.addConstr(gurobipy.quicksum(nodes) <= bound_upper + slack)
+    m.addConstr(gurobipy.quicksum(nodes) >= bound_lower - slack)
 
     ## for every edge, the nodes must be separated    
     for (u, v) in G.G.edges():                
@@ -49,7 +56,8 @@ def createModel(G, direction=GRB.MAXIMIZE):
         m.addConstr(edges[(u, v)] <= 2 - nodes[v] - nodes[u]) 
    
     # set optimisation objective: minimize/maximize the cardinality of the number of edges in the cut   
-    m.setObjective(gurobipy.quicksum(edges), direction)   
+    m.setObjective(gurobipy.quicksum([G.G.edges[edge][weight] * edge_var for edge, edge_var in edges.items()]),
+                   direction)   
 
     return m
 

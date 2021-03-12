@@ -13,6 +13,8 @@ Cuts and flows between nodes are related through the famous `max-flow min-cut th
 Bisection
 ---------
 
+Graph bisection deals with the question of how to cut edges in a connected graph so that the resulting graph has two connected components. Typically, there are restrictions to the type of the resulting connected components such as that their sizes should be as close to each other as possible. The optimisation objective is usually the sum of the weights of those edges that are removed to bisect the graph.
+
 .. automodule:: graphilp.cuts_flows.bisection
    :noindex:
 
