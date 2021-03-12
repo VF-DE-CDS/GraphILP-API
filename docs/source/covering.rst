@@ -85,6 +85,9 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
    
 Warmstarts
 ==========
+
+The methods in this section provide approximate solutions to the vertex cover problem constituting admissible solutions from which to start the exact optimisation.
+
 .. automodule:: graphilp.covering.warmstart_vertexcover
    :noindex:
 
