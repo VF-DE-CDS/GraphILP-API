@@ -6,7 +6,7 @@ import networkx as nx
 def createModel(G):
     r""" Create an ILP for the min uncut problem
         
-    :param G: a weighted ILPGraph                    
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -41,7 +41,7 @@ def createModel(G):
     m.update()        
     
     # Create constraints
-    ## for every edge, the nodes must be seperated in the complement graph
+    ## for every edge, the nodes must be separated in the complement graph
     for (u, v) in GC.edges():
             m.addConstr( edges[(u, v)]  <= nodes[v] +nodes[u] )
             m.addConstr( edges[(u, v)] <= 2 - nodes[v] - nodes[u] ) 
@@ -54,7 +54,7 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get a list of vertices comprising a maximum cut of the complement graph
     
-        :param G: a weighted ILPGraph
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
         :model: a solved Gurobi model for minimum uncut problem
             
         :return: a list of vertices comprising a cut and a solution to the minimum uncut problem
