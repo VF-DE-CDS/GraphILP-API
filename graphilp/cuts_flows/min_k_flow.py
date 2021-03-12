@@ -3,7 +3,7 @@ from gurobipy import *
 def createModel(G):
     r""" Create an ILP for the `minimum k-flow problem <https://en.wikipedia.org/wiki/Nowhere-zero_flow>`_
         
-    :param G: a weighted ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -74,7 +74,7 @@ def createModel(G):
 def extractSolution(G, model):
     """ Get the flow bound and a dictionary of edge weights realising a flow
     
-        :param G: a weighted ILPGraph
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
         :param model: a solved Gurobi model for minimum k-flow
             
         :return: the minimal flow bound k and a dictionary of edge weights realising a flow
