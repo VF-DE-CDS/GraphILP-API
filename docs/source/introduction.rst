@@ -69,4 +69,4 @@ The best way to get startet with GraphILP is through one of our examples:
    * - .. image:: images/example_binarisation.png
      - `Maximum weight cuts <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Binarisation.ipynb>`_
      
-       Use minimum weight cuts for image binarisation.
+       Use maximum weight cuts for image binarisation.
