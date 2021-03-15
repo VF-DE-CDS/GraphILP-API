@@ -128,19 +128,22 @@ def read_tsplib(file_name):
     This function parses an XML file defining a TSP (from TSPLIB
     http://www.iwr.uni-heidelberg.de/groups/comopt/software/TSPLIB95/)
     and returns the Adjacency Matrix that cna be then used to construct a PyGMO.problem.tsp
+    
     Args:
             file_name (string): The XML file to be opened for parsing.
+            
     Returns:
             adj_mat (double): Adjacency Matrix, 0 per diagonal.
+            
     Raises:
-    IOError:
-            The input file was not found.
-    TypeError:
-            At least one of the attributes in an edge
-            of the XML file is missing or of the wrong type.
-    xml.etree.ElementTreeParseError:
-            There was an error parsing the file.
-            See: https://docs.python.org/2.7/library/xml.etree.elementtree.html
+        IOError:
+                The input file was not found.
+        TypeError:
+                At least one of the attributes in an edge
+                of the XML file is missing or of the wrong type.
+        xml.etree.ElementTreeParseError:
+                There was an error parsing the file.
+                See: https://docs.python.org/2.7/library/xml.etree.elementtree.html
     """
     import xml.etree.ElementTree as ET
     try:
