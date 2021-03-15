@@ -26,6 +26,20 @@ General matching
    
    createModel
    extractSolution
+   
+Perfect matching
+----------------
+
+A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in graph is a matching in which each vertex of the graph is covered by an edge of the matching.
+
+.. automodule:: graphilp.matching.perfect
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
 
 Bipartite matching
 ------------------
@@ -45,6 +59,9 @@ Details
 -------
 
 .. automodule:: graphilp.matching.maxweight
+   :members:
+
+.. automodule:: graphilp.matching.perfect
    :members:
 
 .. automodule:: graphilp.matching.perfect_bipartite
