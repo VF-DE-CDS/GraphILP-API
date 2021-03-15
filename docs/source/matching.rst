@@ -30,6 +30,8 @@ General matching
 Bipartite matching
 ------------------
 
+For `bipartite <https://en.wikipedia.org/wiki/Bipartite_graph>`__ graphs, matching is usually much easier than for general graphs. The natural ILP for bipartite perfect matching is in fact a linear program: the integrality constraints are fulfilled automatically.
+
 .. automodule:: graphilp.matching.perfect_bipartite
    :noindex:
 
