@@ -29,3 +29,6 @@ class ILPGraph:
         :param variables: a dictionary with variable names as keys and gurobipy variables as values
         """
         self.label_variables = variables
+    
+    def setFlowVars(self, variables):
+        self.flow_variables = variables

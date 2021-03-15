@@ -1,7 +1,50 @@
 from gurobipy import *
 import networkx as nx
 
+edge2var = None
+
+def callbackCycle(model, where):
+    global edge2var
+    if where == gurobipy.GRB.Callback.MIPSOL:
+        print("In Callback")
+        activeEdges = model.cbGetSolution(model._x)
+        edges = []
+        cycles = []
+        for k, v in activeEdges.items():
+            if (0 < v):
+                edges.append(k)
+        G2 = nx.Graph()
+        G2.add_edges_from(edges)
+        conComp = nx.connected_components(G2)
+        for comp in conComp:
+            cycles.append(comp)
+
+        neededEdges = []
+        neededEdgesRev = []
+        try:
+            listLenghts = [len(x) for x in cycles]
+            minLenIndex = listLenghts.index(min(listLenghts))
+            smallestCycle = cycles[minLenIndex]
+        except:
+            pass
+        # Remove cycles if there are more than 1 
+        if len(cycles) > 1:
+            # Get all the edges from the first cycle to all others by joining the both nodepairs.
+            for idx, cycle in enumerate(cycles):
+                if  (idx == minLenIndex):
+                    continue
+                else:
+                    for nodeOne in smallestCycle:
+                        for nodeTwo in cycle:
+                            neededEdges.append((nodeOne, nodeTwo))
+                            neededEdgesRev.append((nodeTwo, nodeOne))
+            
+            model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdges) >= 1)
+            model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdgesRev) >= 1)
+    return
+
 def createGenModel(G, type_obj, metric, start=None, end=None):
+    global edge2var
     r""" Create an ILP for the min/max Path asymmetric TSP 
         
     :param G: a weighted ILPGraph
@@ -37,26 +80,25 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
         G_d = G.G.to_directed()
         G_r = G_d.reverse(copy=True)
         G.G = nx.compose(G_d, G_r)
-    
+        
     # Add variables for edges   
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
-    
-    nbr_nodes = G.G.number_of_nodes()
-    nodes = list(G.G.nodes())
-    # Add variables for labels
-    label_vars = m.addVars(G.G.nodes(), lb = 0, ub = nbr_nodes - 1, vtype=gurobipy.GRB.INTEGER)
     m.update()
-    
+
+    edge2var = G.edge_variables
     edges = G.edge_variables
-    
+    var2edge = dict(zip(edges.values(), edges.keys()))
+    nbr_nodes = G.G.number_of_nodes()
+
     # Create constraints
     # degree condition
     if ((start is None) and (end is None)):
         for node in G.G.nodes():
             # Only one outgoing connection from every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges(node)]) == 1)
+            m.addConstr(gurobipy.quicksum( edges[e] for e in G.G.edges(node)) == 1)
             # Only one incoming connection to every node
-            m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.in_edges(node)]) == 1)            
+            m.addConstr(gurobipy.quicksum( edges[e] for e in G.G.in_edges(node)) == 1)    
+            m.addConstr(edges[(node, node)] == 0)        
     else:
         for node in G.G.nodes():     
             if node != start:
@@ -67,27 +109,22 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
                 m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 0)
             if node == end:
                 m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 0)
-                
-    # Create permutations via labels         
-    if (start is None) and (end is None):        
-        m.addConstr( label_vars[nodes[0]]  ==  0 )
-        for (u,v) in G.G.edges():
-            if (v != nodes[0]):
-                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
-    else:
-        m.addConstr( label_vars[start]  ==  0 )
-        m.addConstr( label_vars[end]  ==  nbr_nodes - 1 )
-        for (u,v) in G.G.edges():
-            if (v != start):
-                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
-        
 
     # set optimisation objective: find the min / max round tour in G
     if type_obj == 'min': 
         m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MINIMIZE)
     if type_obj == 'max': 
         m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MAXIMIZE)
-    
+
+    m._x = G.edge_variables
+
+    m.Params.lazyConstraints = 1
+    m.optimize(callbackCycle)
+
+    sol = m.getVars()
+    for s in sol:
+        if s.x == 1:
+            print(var2edge[s])
     return m
 
 def extractSolution(G, model):
