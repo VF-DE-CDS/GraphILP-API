@@ -9,8 +9,6 @@ def read(G):
     
     return result
 
-def readSetSystem
-
 def col_file_to_networkx(path):
     """
     Creates a networkx object given a path to a .col file.
