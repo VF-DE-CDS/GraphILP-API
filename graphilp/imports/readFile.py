@@ -127,7 +127,7 @@ def read_tsplib(file_name):
     """
     This function parses an XML file defining a TSP (from TSPLIB
     http://www.iwr.uni-heidelberg.de/groups/comopt/software/TSPLIB95/)
-    and returns the Adjacency Matrix that cna be then used to construct a PyGMO.problem.tsp
+    and returns the Adjacency Matrix that can be then used to construct a PyGMO.problem.tsp
     
     Args:
             file_name (string): The XML file to be opened for parsing.
