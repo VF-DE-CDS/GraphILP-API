@@ -6,20 +6,22 @@ import scipy.sparse as sp
 from imports import ilpsetsystem as ilpss
 from covering import set_packing as setp
 
-def calculateSetEfficiencies(sets, chosenSets, setSizes):
+def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
     costEfficiencies = dict()
-    cardChosen = len(sets) - len(chosenSets)
+    cardinChosen = numNodes - len(chosenNodes)
     for i in range(len(sets)):
-        costEfficiencies[i] = sets[i]['weight'] / setSizes[i]
+        costEfficiencies[i] = sets[i]['weight'] / cardinChosen
     return costEfficiencies
 
 path ="/home/tsauter/GraphILP/GraphILP-API/graphilp/examples/setcoverTestInstances/scpd1.txt"
-setSizes = dict()
-setSize = 0
 chosenSets = []
 costEfficiencies = dict()
-containedNodes = dict()
+containingSets = dict()
 chosenNodes = set()
+numSets = 3
+numNodes = 3
+setSizes = np.zeros(numSets)
+containedNodes = dict()
 
 cover_matrix = np.array([[ 0.,  0.,   1],
        [ 1,  0.,  0.],
@@ -31,20 +33,25 @@ universe = {0, 1, 2}
 
 for i in range(len(cover_matrix)):
     # Set of the Nodes that are contained in the current solution. Important set that determines
-    containedNodes[i] = set()
+    containingSets[i] = set()
     for j in range (len(cover_matrix[i])):
+        if ( i == 0):
+            containedNodes[j] = set()
         if cover_matrix[i][j] > 0:
-            setSize = setSize + 1
-            containedNodes[i].add(j)
-    setSizes[i] = setSize
-    setSize = 0
-  
+            containingSets[i].add(j)
+            setSizes[j] += 1
+            containedNodes[j].add(i)
+
+setSizes = setSizes.tolist() 
+print(containedNodes)
+
 while universe != chosenNodes:
-    costEff = calculateSetEfficiencies(sets, chosenSets, setSizes)
+    costEff = calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets)
     for i in range(len(sets)):
         if i in chosenSets:
             costEff[i] = 10000
     minSet = min(costEff.keys(), key=(lambda k: costEff[k]))
+    
     chosenNodes = containedNodes[minSet].union(chosenNodes)
     chosenSets.append(minSet)
     
