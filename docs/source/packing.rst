@@ -61,9 +61,24 @@ An independet set in the vertex set of a graph is a subset of the vertices in wh
    
    createModel
    extractSolution
+   
+Clique packing
+--------------
+
+.. automodule:: graphilp.packing.clique_packing
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
 
 Details
 -------
 
 .. automodule:: graphilp.packing.max_indset
+    :members:
+
+.. automodule:: graphilp.packing.clique_packing
     :members:
