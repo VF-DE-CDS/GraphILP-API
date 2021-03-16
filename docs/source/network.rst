@@ -32,7 +32,18 @@ Linear-size constraint system
    
    createModel
    extractSolution   
+
+Flow-based constraint system
+=============================
+.. automodule:: graphilp.network.Steiner_Flow
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
    
+   createModel
+   extractSolution
+
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
 
@@ -78,6 +89,15 @@ Asymmetric TSP
    :nosignatures:
    
    createModel
+   extractSolution
+   
+.. automodule:: graphilp.network.atsp_DT_formulation 
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   createGenModel
    extractSolution
 
 .. automodule:: graphilp.network.gen_path_atsp
@@ -154,6 +174,9 @@ Details
 
 .. automodule:: graphilp.network.Steiner_Linear
    :members:   
+   
+.. automodule:: graphilp.network.Steiner_Flow   
+   :members:   
 
 .. automodule:: graphilp.network.PCST
    :members:   
@@ -165,6 +188,9 @@ Details
    :members:   
    
 .. automodule:: graphilp.network.min_atsp
+   :members:
+
+.. automodule:: graphilp.network.atsp_DT_formulation
    :members:
 
 .. automodule:: graphilp.network.gen_path_atsp

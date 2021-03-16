@@ -7,8 +7,6 @@ def createGenModel(G, type_obj, metric):
     :param G: a weighted ILPGraph
     :param type_obj: choose whether to minimise or maximise the weight of the path
     :param metric: 'metric' for symmetric problem otherwise asymmetric problem
-    :param start: require the TSP path to start at this node
-    :param end: require the TSP path to end at this node
     """
 
     # Create model
