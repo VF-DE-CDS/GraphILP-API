@@ -61,12 +61,14 @@ def stp_to_networkx(path):
 
     with open(path, "rt") as input_file:
         lines = input_file.readlines()
+        
     edges = []
     terminals = []
 
     for line in lines:
         # Remove + characters. This is not always necessary
         line = re.sub(' +', ' ', line)
+        
         # Found a new Edge
         if line.startswith('E '):
             # Extracting information(startingNode endingNode Distance)
@@ -83,29 +85,32 @@ def stp_to_networkx(path):
     # Create a new NetworkX Graph object
     G = nx.Graph()
 
-    # Fill the graph with our edges. This method automatically fills in the Nodes as well.
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
 
     return G, terminals
 
 def mis_to_networkx(path):
     """
-    Creates a networkx object given a path to a .mis file.
-    A .is file contains edges and nodes. The first line depicts the starting node. 
-    Each line starting with an "e" is followed by both edge's points.
+    Creates a NetworkX Graph from a .mis file (ASCII DIMACS graph format).
     
-    :param path: path to .mis file
+    This is used for maximum independet set benchmarking data 
+    from `BHOSLIB <http://sites.nlsde.buaa.edu.cn/~kexu/benchmarks/graph-benchmarks.htm>`__.
+    
+    :param path: path to .edges file
     :type path: str
-    :rtype: networkx undirected graph
+    :returns: a `NetworkX Graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     """
 
     with open(path, "rt") as input_file:
         lines = input_file.readlines()
+        
     edges = []
 
     for line in lines:
         # Remove + characters. This is not always necessary
         line = re.sub(' +', ' ', line)
+        
         # Found a new Edge
         if line.startswith('e '):
             # Extracting information(startingNode endingNode Distance)
@@ -115,9 +120,10 @@ def mis_to_networkx(path):
             tuple_data = tuple(int(p) for p in parts)
             edges.append((tuple_data[0], tuple_data[1]))
 
-    # Create a new NetworkX Object, i.e. Graph
+    # Create a new NetworkX Graph object
     G = nx.Graph()
-    # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
+    
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
 
     return G
