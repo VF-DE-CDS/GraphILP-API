@@ -26,8 +26,11 @@ The ILPGraph class takes care of both the graph instance used in an optimisation
    ILPGraph.setNodeVars
    ILPGraph.setLabelVars
    
-Networkx
+NetworkX
 --------
+
+`NetworkX <https://networkx.org>`__ is a Python package for the creation, manipulation, and study of the structure, dynamics, and functions of complex networks.
+GraphILP is using NetworkX objects both to represent graphs internally and as an interface to provide problem instances.
    
 .. automodule:: graphilp.imports.networkx
    :noindex:
@@ -38,8 +41,11 @@ Networkx
    read
    col_file_to_networkx
       
-stp format
-----------
+Graph file formats
+------------------
+
+Many useful benchmark instances for optimisation problems on graphs are available from a variety of sources.
+In this section, we provide import filters to create NetworkX Graph objects from various specialised file formats.
 
 .. automodule:: graphilp.imports.readFile
    :noindex:
