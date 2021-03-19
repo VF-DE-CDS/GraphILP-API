@@ -29,7 +29,6 @@ def createModel(SetCover, A, k):
     
     # set weight vector 
     obj = np.array([val['weight'] for _set,val in SetCover.U.items()])
-    print(obj)
     # Add constraints for covering
     m.addConstr(A @ x >= y, name="cover")
     

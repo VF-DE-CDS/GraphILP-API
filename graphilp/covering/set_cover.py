@@ -25,7 +25,6 @@ def createModel(SetCover, A):
     
     # Add  vector b for the right-hand side
     b = np.ones((len_b,), dtype=int)
-    
     # set weight vector 
     obj = np.array([val['weight'] for _set,val in SetCover.S.items()])
     
