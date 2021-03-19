@@ -57,12 +57,35 @@ In this section, we provide import filters to create NetworkX Graph objects from
    stp_to_networkx
    mis_to_networkx
 
+ILPSetSystem
+------------
+
+The ILPSetSystem class takes care of both the set system instance used in an optimisation problem and the variables of the integer linear program used to solve it.
+
+A set system (or undirected `hypergraph <https://en.wikipedia.org/wiki/Hypergraph>`__) consists of a universe :math:`U` generalising the vertex set of a graph and a generalised edge set called the system of the graph. Each element of the system is a subset of the universe and hence generalises the notion of an edge which is a two element subset of the universe.
+
+.. automodule:: graphilp.imports.ilpsetsystem
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   ILPSetSystem
+   ILPSetSystem.setUniverse
+   ILPSetSystem.setSystem
+   ILPSetSystem.setIncMatrix
+   ILPSetSystem.setSystemVars
+   ILPSetSystem.setUniverseVars
+   
 Details
 -------
 
 .. automodule:: graphilp.imports.ilpgraph
     :members:
-        
+
+.. automodule:: graphilp.imports.ilpsetsystem
+    :members:
+
 .. automodule:: graphilp.imports.networkx
     :members:
 
