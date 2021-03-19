@@ -5,24 +5,15 @@ import re
 from scipy.sparse import csc_matrix
 import numpy as np
 
-
-# # +
-# Doing the conversion and Import of a STP Files
-def read(G):
-
-    result = ILPGraph()
-    result.setNXGraph(G)
-
-    return result
-
 def edges_to_networkx(path):
     """
-    Creates a networkx object given a path to an .edges file.
-    A .edges file contains edges. Nodes are later on extracted by NetworkX
+    Creates a NetworkX Graph from an .edges file (`Network Repository format <http://networkrepository.com>`__).
+    
+    Network Repository is a large collection of network graph data for research and benchmarking.
     
     :param path: path to .edges file
     :type path: str
-    :rtype: networkx undirected graph
+    :returns: a `NetworkX Graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     """
 
     with open(path, "rt") as input_file:
@@ -40,11 +31,13 @@ def edges_to_networkx(path):
         # Parse the data into tuples and from Array of Integer and append to list of all edges
         tuple_data = tuple(int(p) for p in parts[:2])
         edges.append((tuple_data[0], tuple_data[1]))
-    # Create a new NetworkX Object, i.e. Graph
+        
+    # Create a new NetworkX Graph object
     G = nx.Graph()
 
-    # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
+    
     return G
 
 
