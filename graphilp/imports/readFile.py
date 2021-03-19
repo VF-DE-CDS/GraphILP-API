@@ -1,7 +1,8 @@
 # + endofcell="--"
 import sys
+sys.path.append("..")
 sys.path.append("../..")
-from graphilp.imports import ilpgraph
+from imports import ilpgraph
 import networkx as nx
 import re
 from scipy.sparse import csc_matrix
@@ -54,7 +55,7 @@ def stp_to_networkx(path):
     """
     Creates a networkx object given a path to a .stp file.
     A .stp file contains edges and nodes. The first line depicts the starting node. 
-    Each line starting with an "E" is followed by both edge's points and it's distance(?).
+    Each line starting with an "E" is followed by both edge's points and it's distance.
     Each line starting with a "T" is followed by a Terminal.
     
     :param path: path to .stp file
@@ -94,7 +95,7 @@ def stp_to_networkx(path):
 def mis_to_networkx(path):
     """
     Creates a networkx object given a path to a .mis file.
-    A .stp file contains edges and nodes. The first line depicts the starting node. 
+    A .is file contains edges and nodes. The first line depicts the starting node. 
     Each line starting with an "e" is followed by both edge's points.
     
     :param path: path to .mis file
@@ -246,8 +247,8 @@ def read_set_cover(path):
                     if element != '' and element != '\n':
                         sparseMatrix[curRow][int(element) - 1] = 1
                         readElements += 1
-        
-    return sparseMatrix
+
+    return sparseMatrix, sets
         
 # -
 # --
