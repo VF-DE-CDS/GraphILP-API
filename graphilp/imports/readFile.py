@@ -1,8 +1,5 @@
 # + endofcell="--"
-import sys
-sys.path.append("..")
-sys.path.append("../..")
-from imports import ilpgraph
+from graphilp.imports import ilpgraph
 import networkx as nx
 import re
 from scipy.sparse import csc_matrix
@@ -53,14 +50,20 @@ def edges_to_networkx(path):
 
 def stp_to_networkx(path):
     """
-    Creates a networkx object given a path to a .stp file.
-    A .stp file contains edges and nodes. The first line depicts the starting node. 
-    Each line starting with an "E" is followed by both edge's points and it's distance.
-    Each line starting with a "T" is followed by a Terminal.
+    Creates a NetworkX Graph from an .stp file (`SteinLib format <http://steinlib.zib.de/format.php>`__).
+    
+    `SteinLib <http://steinlib.zib.de/steinlib.php>`__ is a collection of Steiner tree 
+    problems in graphs and variants.
+    
+    The format description can be found `here <http://steinlib.zib.de/format.php>`__ on the SteinLib pages.
     
     :param path: path to .stp file
     :type path: str
-    :rtype: networkx undirected graph
+    :returns: a `NetworkX Graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+        and a list of terminals
+    
+    Example:
+        G, terminals = stp_to_networkx("steinlib_instance.stp")
     """
 
     with open(path, "rt") as input_file:
@@ -84,10 +87,10 @@ def stp_to_networkx(path):
         if line.startswith('T '):
             terminals.append(int(line.rstrip().split(" ")[1]))
 
-    # Create a new NetworkX Object, i.e. Graph
+    # Create a new NetworkX Graph object
     G = nx.Graph()
 
-    # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
+    # Fill the graph with our edges. This method automatically fills in the Nodes as well.
     G.add_edges_from(edges)
 
     return G, terminals
@@ -130,20 +133,23 @@ def read_tsplib(file_name):
     """
     This function parses an XML file defining a TSP (from TSPLIB
     http://www.iwr.uni-heidelberg.de/groups/comopt/software/TSPLIB95/)
-    and returns the Adjacency Matrix that cna be then used to construct a PyGMO.problem.tsp
+    and returns the Adjacency Matrix that can be then used to construct a PyGMO.problem.tsp
+    
     Args:
             file_name (string): The XML file to be opened for parsing.
+            
     Returns:
             adj_mat (double): Adjacency Matrix, 0 per diagonal.
+            
     Raises:
-    IOError:
-            The input file was not found.
-    TypeError:
-            At least one of the attributes in an edge
-            of the XML file is missing or of the wrong type.
-    xml.etree.ElementTreeParseError:
-            There was an error parsing the file.
-            See: https://docs.python.org/2.7/library/xml.etree.elementtree.html
+        IOError:
+                The input file was not found.
+        TypeError:
+                At least one of the attributes in an edge
+                of the XML file is missing or of the wrong type.
+        xml.etree.ElementTreeParseError:
+                There was an error parsing the file.
+                See: https://docs.python.org/2.7/library/xml.etree.elementtree.html
     """
     import xml.etree.ElementTree as ET
     try:
@@ -252,7 +258,3 @@ def read_set_cover(path):
         
 # -
 # --
-
-
-
-
