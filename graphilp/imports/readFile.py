@@ -5,24 +5,15 @@ import re
 from scipy.sparse import csc_matrix
 import numpy as np
 
-
-# # +
-# Doing the conversion and Import of a STP Files
-def read(G):
-
-    result = ILPGraph()
-    result.setNXGraph(G)
-
-    return result
-
 def edges_to_networkx(path):
     """
-    Creates a networkx object given a path to an .edges file.
-    A .edges file contains edges. Nodes are later on extracted by NetworkX
+    Creates a NetworkX Graph from an .edges file (`Network Repository format <http://networkrepository.com>`__).
+    
+    Network Repository is a large collection of network graph data for research and benchmarking.
     
     :param path: path to .edges file
     :type path: str
-    :rtype: networkx undirected graph
+    :returns: a `NetworkX Graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     """
 
     with open(path, "rt") as input_file:
@@ -40,11 +31,13 @@ def edges_to_networkx(path):
         # Parse the data into tuples and from Array of Integer and append to list of all edges
         tuple_data = tuple(int(p) for p in parts[:2])
         edges.append((tuple_data[0], tuple_data[1]))
-    # Create a new NetworkX Object, i.e. Graph
+        
+    # Create a new NetworkX Graph object
     G = nx.Graph()
 
-    # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
+    
     return G
 
 
@@ -68,12 +61,14 @@ def stp_to_networkx(path):
 
     with open(path, "rt") as input_file:
         lines = input_file.readlines()
+        
     edges = []
     terminals = []
 
     for line in lines:
         # Remove + characters. This is not always necessary
         line = re.sub(' +', ' ', line)
+        
         # Found a new Edge
         if line.startswith('E '):
             # Extracting information(startingNode endingNode Distance)
@@ -90,29 +85,32 @@ def stp_to_networkx(path):
     # Create a new NetworkX Graph object
     G = nx.Graph()
 
-    # Fill the graph with our edges. This method automatically fills in the Nodes as well.
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
 
     return G, terminals
 
 def mis_to_networkx(path):
     """
-    Creates a networkx object given a path to a .mis file.
-    A .is file contains edges and nodes. The first line depicts the starting node. 
-    Each line starting with an "e" is followed by both edge's points.
+    Creates a NetworkX Graph from a .mis file (ASCII DIMACS graph format).
     
-    :param path: path to .mis file
+    This is used for maximum independet set benchmarking data 
+    from `BHOSLIB <http://sites.nlsde.buaa.edu.cn/~kexu/benchmarks/graph-benchmarks.htm>`__.
+    
+    :param path: path to .edges file
     :type path: str
-    :rtype: networkx undirected graph
+    :returns: a `NetworkX Graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     """
 
     with open(path, "rt") as input_file:
         lines = input_file.readlines()
+        
     edges = []
 
     for line in lines:
         # Remove + characters. This is not always necessary
         line = re.sub(' +', ' ', line)
+        
         # Found a new Edge
         if line.startswith('e '):
             # Extracting information(startingNode endingNode Distance)
@@ -122,13 +120,38 @@ def mis_to_networkx(path):
             tuple_data = tuple(int(p) for p in parts)
             edges.append((tuple_data[0], tuple_data[1]))
 
-    # Create a new NetworkX Object, i.e. Graph
+    # Create a new NetworkX Graph object
     G = nx.Graph()
-    # Fill the Graph with our edges. This method automatically fills in the Nodes as well.
+    
+    # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
 
     return G
+
+def col_file_to_networkx(path):
+    """
+    Creates a networkx object given a path to a .col file.
+    A .col file only contains edges. Each line starting with an "e" is followed by both edge's points.
     
+    :param path: path to .col file
+    :type path: str
+    :rtype: networkx undirected graph
+    """
+    
+    edges_list = []
+    
+    with open(path) as f:
+        for line in f.readlines():
+            if line.startswith('e'):
+                line = line.replace('/n', '')
+                line_splitted = line.split()
+                edge = (line_splitted[1], line_splitted[2])
+                edges_list.append(edge)
+    
+    G = nx.Graph()
+    G.add_edges_from(edges_list)
+    return G
+
 def read_tsplib(file_name):
     """
     This function parses an XML file defining a TSP (from TSPLIB

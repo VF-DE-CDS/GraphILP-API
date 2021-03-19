@@ -88,7 +88,7 @@ Warmstarts
 
 The methods in this section provide approximate solutions to the vertex cover problem constituting admissible solutions from which to start the exact optimisation.
 
-.. automodule:: graphilp.covering.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
    :noindex:
 
 .. autosummary::
@@ -109,5 +109,5 @@ Details
 .. automodule:: graphilp.covering.min_vertexcover
   :members:    
   
-.. automodule:: graphilp.covering.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
   :members:      
