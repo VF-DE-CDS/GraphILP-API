@@ -2,6 +2,8 @@
 from graphilp.imports import ilpgraph
 import networkx as nx
 import re
+from scipy.sparse import csc_matrix
+import numpy as np
 
 
 # # +
@@ -96,7 +98,7 @@ def stp_to_networkx(path):
 def mis_to_networkx(path):
     """
     Creates a networkx object given a path to a .mis file.
-    A .stp file contains edges and nodes. The first line depicts the starting node. 
+    A .is file contains edges and nodes. The first line depicts the starting node. 
     Each line starting with an "e" is followed by both edge's points.
     
     :param path: path to .mis file
@@ -212,7 +214,47 @@ def _print_matrix(mat, show_all=False):
         numpy.set_printoptions(threshold='nan')
 
     print(numpy.array(mat))
+    
+def read_set_cover(path):
+    sets = dict()
+    curSet = 0
+    curRow = 0
+    readElements = 0
+    curRowLength = 0
+    
+    with open(path, "rt") as input_file:
+        lines = input_file.readlines()
+    
+    line = lines[0].split(" ")
+    numNodes = int(line[1])
+    numSets = int(line[2])
+    sparseMatrix = csc_matrix((numNodes, numSets), dtype = np.int8).toarray()
+    lines.pop(0)
+
+    for line in lines:
+        # Split After Spaces
+        curLine = line.split(" ")
+        if curSet < numSets:
+            for element in curLine:
+                if element != '' and element != '\n':
+                    sets[curSet] = dict(weight = int(element))
+                    curSet += 1
+            continue
+        # Arrived at the other section, we got a new column now, gotta skip this line
+        else:
+            if (curRow == 0 and curRowLength == 0):
+                curRowLength = int(curLine[1])
+            if readElements >= curRowLength:
+                curRow += 1
+                curRowLength = int(curLine[1])
+                readElements = 0
+            else:
+                for element in curLine:
+                    if element != '' and element != '\n':
+                        sparseMatrix[curRow][int(element) - 1] = 1
+                        readElements += 1
+
+    return sparseMatrix, sets
+        
 # -
 # --
-
-
