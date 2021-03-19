@@ -1,1 +1,0 @@
-All examples are taken from http://sites.nlsde.buaa.edu.cn/~kexu/benchmarks/graph-benchmarks.htm as well as from http://networkrepository.com/networks.php
