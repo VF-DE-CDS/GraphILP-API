@@ -23,6 +23,7 @@ def iterateOuter(distance, tour, length, cities):
     return newTour, bestLength, False
 
 def getSol(distance, tour, length, cities):
+    # Main function of the model.
     newTour = list.copy(tour)
     bestLength = length
     
