@@ -33,17 +33,6 @@ Linear-size constraint system
    createModel
    extractSolution   
 
-Flow-based constraint system
-=============================
-.. automodule:: graphilp.network.Steiner_Flow
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
 
@@ -175,9 +164,6 @@ Details
 .. automodule:: graphilp.network.Steiner_Linear
    :members:   
    
-.. automodule:: graphilp.network.Steiner_Flow   
-   :members:   
-
 .. automodule:: graphilp.network.PCST
    :members:   
    
