@@ -12,7 +12,14 @@ def getHeuristic(G, terminals, weight='weight'):
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     
-    :returns: list of edges and lower bound
+    :return: a list of edges forming the approximate solution and a lower bound on the solution
+    
+    Example:
+        .. code-block:: 
+        
+            warmstart, lower_bound = steiner_metric_closure.getHeuristic(G, terminals)
+
+            m = createModel(G, terminals, weight='length', warmstart=warmstart, lower_bound=lower_bound)
     """
     
     # create a graph (called the metric closure) with all terminals as vertices,
