@@ -9,6 +9,7 @@ def getHeuristic(G, terminals, weight='weight'):
     This is a 2-approximation to the Steiner tree problem and hence also gives a lower bound.
     
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
+    :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     
     :returns: list of edges and lower bound
