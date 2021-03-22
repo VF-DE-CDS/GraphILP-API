@@ -199,6 +199,19 @@ Metric TSP
    createModel
    extractSolution
 
+Heuristics 
+==========
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
+.. automodule:: graphilp.network.heuristics.tsp_christofides
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+    getHeuristic
    
 Details
 ------------
@@ -250,3 +263,6 @@ Details
 
 .. automodule:: graphilp.network.min_tsp
    :members:
+   
+.. automodule:: graphilp.network.heuristics.tsp_christofides 
+   :members:      
