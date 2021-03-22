@@ -9,37 +9,55 @@ var2edge = None
 edge2var = None
 
 def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
-                cycleBasis:bool = False, nodeColoring: bool = False):    
+                warmstart = [], lower_bound = None):    
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem. 
     
-    :param G: an ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_   
     
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+    
+        model.optimize(callback = :obj:`callback_cycle`)
+
     ILP: 
+        Let :math:`T_f` be the set of forced terminals required to be part of the solution.
+        Further, let :math:`p_v` be the prize associated with each vertex :math:`v`.
+    
         .. math::
             :nowrap:
 
             \begin{align*}
-            \max \sum_{i \in V} p_i x_i- \sum_{(i,j) \in E} w_{ij} x_{ij}\\
+            \max \sum_{v \in V} p_v x_v- \sum_{\{u,v\} \in E} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
-            x_{ij} + x_{ji} \leq 1 && \text{(restrict edges to one direction)}\\
-            x_r = 1 && \text{(require root to be chosen)}\\
-            \sum x_i - \sum x_{ij} = 1 && \text{(enforce circle when graph is not connected)}\\
-            2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
-            n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
-            n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \forall \{u,v\}\in E: x_{uv} + x_{vu} \leq 1 && \text{(restrict edges to one direction)}\\
+            \forall t \in T_f: x_t = 1 && \text{(require forced terminals to be chosen)}\\
+            \sum_{v\in V} x_v - \sum_{\{u,v\}\in E} x_{uv} = 1 && \text{(enforce circle when graph is not connected)}\\
+            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
+            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
             \end{align*}
+            
+        The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)` 
+        coming up in a solution candidate:
+        
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \sum_{\{u, v\} \in C} x_{uv} < \ell(C) && \text{(forbid including complete cycle)}
+            \end{align*}            
     """     
     global var2edge
     global edge2var
     print(nodeColoring)
     # Create model
-    m = Model("Steiner Tree")  
+    m = Model("Prize Steiner Tree")  
     m.Params.LazyConstraints = 1
     
     # Add variables for edges and nodes
@@ -57,7 +75,7 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
     
     # set objective: minimise the sum of the weights of edges selected for the solution
     m.setObjective(gurobipy.quicksum([G.G.nodes[node].get(prize, 0) * node_var for node, node_var in nodes.items()])
-                   - gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), 
+                   - gurobipy.quicksum([edge_var * G.G.edges[edge].get(weight, 1) for edge, edge_var in edges.items()]), 
                    GRB.MAXIMIZE)
 
     # equality constraints for terminals (each terminal needs to be chosen, i.e. set it's value to 1)
@@ -84,7 +102,7 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
     return m
 
 def callback_cycle(model, where):
-    """ Callback insert constraints to forbid cycles in solution candidates
+    """ Callback inserts constraints to forbid cycles in solution candidates
     """
     if where == gurobipy.GRB.Callback.MIPSOL: 
         # check for cycles whenever a new solution candidate is found

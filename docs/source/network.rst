@@ -77,6 +77,7 @@ Prize Collecting Steiner Tree (PCST)
    
    createModel
    extractSolution
+   callback_cycle   
 
 Linear-size constraint system
 =============================
