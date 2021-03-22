@@ -28,6 +28,9 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
    
 Linear-size constraint system
 =============================
+
+Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+
 .. automodule:: graphilp.network.Steiner_Linear
    :noindex:
 
@@ -50,6 +53,10 @@ Flow-based constraint system
    
 Heuristics 
 ==========
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
 .. automodule:: graphilp.network.heuristics.steiner_metric_closure
    :noindex:
 

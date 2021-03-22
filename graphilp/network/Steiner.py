@@ -18,7 +18,7 @@ def createModel(G, terminals, weight='weight', warmstart=[], lower_bound=None):
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
-    :param warmstart: a list of edges forming a connected subgraph of G connecting all terminals
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
