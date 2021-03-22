@@ -12,7 +12,7 @@ def getHeuristic(G, terminals, weight='weight'):
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     
-    :return: a list of edges forming the approximate solution and a lower bound on the solution
+    :return: a list of edges forming the approximate solution and a lower bound on the optimal solution
     
     Example:
         .. code-block:: 
