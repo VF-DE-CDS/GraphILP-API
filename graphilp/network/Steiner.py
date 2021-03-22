@@ -8,31 +8,49 @@ var2edge = None
 # a dictionary translating edge names to edge variables for the callback
 edge2var = None
 
-def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeColoring: bool = False):    
+def createModel(G, terminals, weight='weight', warmstart=[], lower_bound=None):    
     r""" Create an ILP for the minimum Steiner tree problem in graphs.
 
-    Some more text.
-    
-    :param G: an ILPGraph
+    This formulation enforces a cycle in the solution if it is not connected.
+    A callback will detect cycles and add constraints to explicity forbid them.
+    Together, this ensures that the solution is a tree.
+        
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
         
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+    
+        model.optimize(callback = :obj:`callback_cycle`)
+
     ILP:
+        Let :math:`T` be the set of terminals.
+    
         .. math::
             :nowrap:
 
             \begin{align*}
-            \min \sum_{(i,j) \in E} w_{ij} x_{ij}\\
+            \min \sum_{(u,v) \in E} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
-            x_{ij} + x_{ji} \leq 1 && \text{(restrict edges to one direction)}\\
-            x_r = 1 && \text{(require root to be chosen)}\\
-            \sum x_i - \sum x_{ij} = 1 && \text{(enforce circle when graph is not connected)}\\
-            2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
-            n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
-            n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
+            \sum_{v\in V} x_v - \sum_{\{u,v\}\in E} x_{uv} = 1 && \text{(enforce cycle when graph is not connected)}\\
+            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
+            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
+            \end{align*}
+            
+        The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)` 
+        coming up in a solution candidate:
+        
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \sum_{\{u, v\} \in C} x_{uv} < \ell(C) && \text{(forbid including complete cycle)}
             \end{align*}
 
     Example:
@@ -66,7 +84,7 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     edge2var = edges
     
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
+    m.setObjective(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
 
     # equality constraints for terminals (each terminal needs to be chosen, i.e. set it's value to 1)
     for node, node_var in nodes.items():
@@ -87,12 +105,42 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
         edge_vars = [edge_var for edge, edge_var in edges.items() if (node==edge[0]) or (node==edge[1])]
         m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
         
-    m.update()
+    # set lower bound
+    if lower_bound:
+        m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
 
+    m.update()
+        
+    # set warmstart
+    if len(warmstart) > 0:
+        
+        # Initialise warmstart by excluding all edges and vertices from solution:
+        for edge_var in edges.values():
+            edge_var.Start = 0
+            
+        for node_var in nodes.values():
+            node_var.Start = 0
+            
+        # Include all edges and vertices from the warmstart in the solution:
+        for edge in warmstart:
+            if edge in edges:
+                edges[edge].Start = 1
+            else:
+                edges[(edge[1], edge[0])].Start = 1
+                
+            nodes[edge[0]].Start = 1
+            nodes[edge[1]].Start = 1
+        
+    m.update()
+    
     return m
 
 def callback_cycle(model, where):
-    """ Callback insert constraints to forbid cycles in solution candidates
+    """ Callback inserts constraints to forbid cycles in solution candidates
+    
+    :param model: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    :param where: a Gurobi callback parameter indicating from which step of the optimisation the callback
+        originated
     """
     if where == gurobipy.GRB.Callback.MIPSOL: 
         # check for cycles whenever a new solution candidate is found
@@ -119,10 +167,10 @@ def callback_cycle(model, where):
 def extractSolution(G, model):
     r""" Get the optimal Steiner tree in G 
     
-        :param G: a weighted ILPGraph
-        :param model: a solved Gurobi model for the minimum Steiner tree problem
-            
-        :return: the edges of an optimal Steiner tree connecting all terminals in G
+    :param G: a weighted ILPGraph
+    :param model: a solved Gurobi model for the minimum Steiner tree problem
+
+    :return: the edges of an optimal Steiner tree connecting all terminals in G
     """
     solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
 
