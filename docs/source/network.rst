@@ -6,6 +6,8 @@ Networks
 
 Graphs are very well-suited as models for networks. Typical questions in this area aim at the distribution of some commodity through a network. Such commodities could be water in a pipe network, bandwidth in a communications network, or goods in a supply chain.
 
+.. _steiner tree problem:
+
 Steiner Tree Problem
 --------------------
 
@@ -13,6 +15,9 @@ The `Steiner Tree Problem in graphs <https://en.wikipedia.org/wiki/Steiner_tree_
 
 Cycle-based constraint system
 =============================
+
+This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
+
 .. automodule:: graphilp.network.Steiner
    :noindex:
 
@@ -21,9 +26,13 @@ Cycle-based constraint system
    
    createModel
    extractSolution
+   callback_cycle
    
 Linear-size constraint system
 =============================
+
+Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+
 .. automodule:: graphilp.network.Steiner_Linear
    :noindex:
 
@@ -32,9 +41,42 @@ Linear-size constraint system
    
    createModel
    extractSolution   
+   
+Flow-based constraint system
+=============================
+.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution   
+   
+Heuristics 
+==========
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
+.. automodule:: graphilp.network.heuristics.steiner_metric_closure
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+    getHeuristic
+
 
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
+
+The Prize Collecting Steiner Tree Problem is similar to the :ref:`Steiner Tree Problem` in that a lowest weight network spanning a given set of vertices is desired. However, each vertex comes with a prize value that is counted against the edge weights and it is a part of the problem to select a subset of the vertex set that optimises the total prize against the total cost of the network.
+
+Cycle-based constraint system
+=============================
+
+This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
 
 .. automodule:: graphilp.network.PCST
    :noindex:
@@ -44,9 +86,12 @@ Prize Collecting Steiner Tree (PCST)
    
    createModel
    extractSolution
+   callback_cycle   
 
 Linear-size constraint system
 =============================
+
+Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
 .. automodule:: graphilp.network.PCST_Linear
    :noindex:
@@ -62,7 +107,10 @@ Travelling Salesman Problem (TSP)
 
 Asymmetric TSP
 ==============
-.. automodule:: graphilp.network.max_atsp
+
+In the asymmetric case, the underlying graph is directed and the distance from A to B may different from the distance from B to A.
+
+.. automodule:: graphilp.network.atsp
    :noindex:
    
 .. autosummary::
@@ -71,15 +119,6 @@ Asymmetric TSP
    createModel
    extractSolution
 
-.. automodule:: graphilp.network.min_atsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-   
 .. automodule:: graphilp.network.atsp_DT_formulation 
    :noindex:
 
@@ -95,19 +134,12 @@ Asymmetric TSP
 .. autosummary::
    :nosignatures:
    
-   createGenModel
-   extractSolution
-   
-.. automodule:: graphilp.network.max_patsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
    createModel
    extractSolution
-
-.. automodule:: graphilp.network.min_patsp
+   
+Path ATSP
+   
+.. automodule:: graphilp.network.patsp
    :noindex:
 
 .. autosummary::
@@ -118,7 +150,10 @@ Asymmetric TSP
 
 Metric TSP
 ==============   
-.. automodule:: graphilp.network.max_ptsp
+
+Path TSP
+
+.. automodule:: graphilp.network.ptsp
    :noindex:
 
 .. autosummary::
@@ -127,7 +162,7 @@ Metric TSP
    createModel
    extractSolution
 
-.. automodule:: graphilp.network.min_ptsp
+.. automodule:: graphilp.network.tsp
    :noindex:
 
 .. autosummary::
@@ -136,24 +171,19 @@ Metric TSP
    createModel
    extractSolution
 
-.. automodule:: graphilp.network.max_tsp
+Heuristics 
+==========
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
+.. automodule:: graphilp.network.heuristics.tsp_christofides
    :noindex:
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
 
-.. automodule:: graphilp.network.min_tsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-
+    getHeuristic
    
 Details
 ------------
@@ -163,6 +193,12 @@ Details
 
 .. automodule:: graphilp.network.Steiner_Linear
    :members:   
+
+.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+   :members:   
+   
+.. automodule:: graphilp.network.heuristics.steiner_metric_closure   
+   :members:   
    
 .. automodule:: graphilp.network.PCST
    :members:   
@@ -170,32 +206,23 @@ Details
 .. automodule:: graphilp.network.PCST_Linear
    :members:   
 
-.. automodule:: graphilp.network.max_atsp
+.. automodule:: graphilp.network.atsp
    :members:   
    
-.. automodule:: graphilp.network.min_atsp
-   :members:
-
 .. automodule:: graphilp.network.atsp_DT_formulation
    :members:
 
 .. automodule:: graphilp.network.gen_path_atsp
    :members:
 
-.. automodule:: graphilp.network.max_patsp
+.. automodule:: graphilp.network.patsp
    :members:
 
-.. automodule:: graphilp.network.min_patsp
+.. automodule:: graphilp.network.ptsp
    :members:
 
-.. automodule:: graphilp.network.max_ptsp
+.. automodule:: graphilp.network.tsp
    :members:
 
-.. automodule:: graphilp.network.min_ptsp
-   :members:
-
-.. automodule:: graphilp.network.max_tsp
-   :members:
-
-.. automodule:: graphilp.network.min_tsp
-   :members:
+.. automodule:: graphilp.network.heuristics.tsp_christofides 
+   :members:      
