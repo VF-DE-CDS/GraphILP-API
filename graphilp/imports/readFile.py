@@ -1,5 +1,7 @@
 # + endofcell="--"
-from graphilp.imports import ilpgraph
+import sys
+sys.path.append("..")
+from imports import ilpgraph
 import networkx as nx
 import re
 from scipy.sparse import csc_matrix
