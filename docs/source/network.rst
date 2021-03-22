@@ -6,6 +6,8 @@ Networks
 
 Graphs are very well-suited as models for networks. Typical questions in this area aim at the distribution of some commodity through a network. Such commodities could be water in a pipe network, bandwidth in a communications network, or goods in a supply chain.
 
+.. _steiner tree problem:
+
 Steiner Tree Problem
 --------------------
 
@@ -69,6 +71,13 @@ Constant factor approximations also imply a lower bound on the solution.
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
 
+The Prize Collecting Steiner Tree Problem is similar to the :ref:`Steiner Tree Problem` in that a lowest weight network spanning a given set of vertices is desired. However, each vertex comes with a prize value that is counted against the edge weights and it is a part of the problem to select a subset of the vertex set that optimises the total prize against the total cost of the network.
+
+Cycle-based constraint system
+=============================
+
+This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
+
 .. automodule:: graphilp.network.PCST
    :noindex:
 
@@ -81,6 +90,8 @@ Prize Collecting Steiner Tree (PCST)
 
 Linear-size constraint system
 =============================
+
+Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
 .. automodule:: graphilp.network.PCST_Linear
    :noindex:
