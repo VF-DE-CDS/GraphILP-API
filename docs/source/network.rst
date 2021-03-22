@@ -107,7 +107,10 @@ Travelling Salesman Problem (TSP)
 
 Asymmetric TSP
 ==============
-.. automodule:: graphilp.network.max_atsp
+
+In the asymmetric case, the underlying graph is directed and the distance from A to B may different from the distance from B to A.
+
+.. automodule:: graphilp.network.atsp
    :noindex:
    
 .. autosummary::
@@ -116,15 +119,6 @@ Asymmetric TSP
    createModel
    extractSolution
 
-.. automodule:: graphilp.network.min_atsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-   
 .. automodule:: graphilp.network.atsp_DT_formulation 
    :noindex:
 
@@ -140,19 +134,12 @@ Asymmetric TSP
 .. autosummary::
    :nosignatures:
    
-   createGenModel
-   extractSolution
-   
-.. automodule:: graphilp.network.max_patsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
    createModel
    extractSolution
-
-.. automodule:: graphilp.network.min_patsp
+   
+Path ATSP
+   
+.. automodule:: graphilp.network.patsp
    :noindex:
 
 .. autosummary::
@@ -163,7 +150,10 @@ Asymmetric TSP
 
 Metric TSP
 ==============   
-.. automodule:: graphilp.network.max_ptsp
+
+Path TSP
+
+.. automodule:: graphilp.network.ptsp
    :noindex:
 
 .. autosummary::
@@ -172,25 +162,7 @@ Metric TSP
    createModel
    extractSolution
 
-.. automodule:: graphilp.network.min_ptsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-
-.. automodule:: graphilp.network.max_tsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
-
-.. automodule:: graphilp.network.min_tsp
+.. automodule:: graphilp.network.tsp
    :noindex:
 
 .. autosummary::
@@ -234,35 +206,23 @@ Details
 .. automodule:: graphilp.network.PCST_Linear
    :members:   
 
-.. automodule:: graphilp.network.max_atsp
+.. automodule:: graphilp.network.atsp
    :members:   
    
-.. automodule:: graphilp.network.min_atsp
-   :members:
-
 .. automodule:: graphilp.network.atsp_DT_formulation
    :members:
 
 .. automodule:: graphilp.network.gen_path_atsp
    :members:
 
-.. automodule:: graphilp.network.max_patsp
+.. automodule:: graphilp.network.patsp
    :members:
 
-.. automodule:: graphilp.network.min_patsp
+.. automodule:: graphilp.network.ptsp
    :members:
 
-.. automodule:: graphilp.network.max_ptsp
+.. automodule:: graphilp.network.tsp
    :members:
 
-.. automodule:: graphilp.network.min_ptsp
-   :members:
-
-.. automodule:: graphilp.network.max_tsp
-   :members:
-
-.. automodule:: graphilp.network.min_tsp
-   :members:
-   
 .. automodule:: graphilp.network.heuristics.tsp_christofides 
    :members:      
