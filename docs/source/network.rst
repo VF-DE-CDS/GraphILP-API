@@ -13,6 +13,9 @@ The `Steiner Tree Problem in graphs <https://en.wikipedia.org/wiki/Steiner_tree_
 
 Cycle-based constraint system
 =============================
+
+This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
+
 .. automodule:: graphilp.network.Steiner
    :noindex:
 
@@ -21,6 +24,7 @@ Cycle-based constraint system
    
    createModel
    extractSolution
+   callback_cycle
    
 Linear-size constraint system
 =============================
@@ -32,6 +36,28 @@ Linear-size constraint system
    
    createModel
    extractSolution   
+   
+Flow-based constraint system
+=============================
+.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution   
+   
+Heuristics 
+==========
+.. automodule:: graphilp.network.heuristics.steiner_metric_closure
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+    getHeuristic
+
 
 Prize Collecting Steiner Tree (PCST)
 ------------------------------------
@@ -162,6 +188,12 @@ Details
    :members:
 
 .. automodule:: graphilp.network.Steiner_Linear
+   :members:   
+
+.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+   :members:   
+   
+.. automodule:: graphilp.network.heuristics.steiner_metric_closure   
    :members:   
    
 .. automodule:: graphilp.network.PCST

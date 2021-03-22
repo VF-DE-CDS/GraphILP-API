@@ -8,14 +8,23 @@ var2edge = None
 # a dictionary translating edge names to edge variables for the callback
 edge2var = None
 
-def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeColoring: bool = False):    
+def createModel(G, terminals, weight='weight', warmstart=[], lower_bound=None):    
     r""" Create an ILP for the minimum Steiner tree problem in graphs.
 
-    Some more text.
+    This formulation enforces a cycle in the solution if it is not connected.
+    A callback will detect cycles and add constraints to explicity forbid them.
+    Together, this ensures that the solution is a tree.
     
-    :param G: an ILPGraph
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+    
+        model.optimize(callback = :obj:`callback_cycle`)
+    
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
+    :param warmstart: a list of edges forming a connected subgraph of G connecting all terminals
+    :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
         
@@ -66,7 +75,7 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
     edge2var = edges
     
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
+    m.setObjective(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
 
     # equality constraints for terminals (each terminal needs to be chosen, i.e. set it's value to 1)
     for node, node_var in nodes.items():
@@ -87,12 +96,42 @@ def createModel(G, terminals, weight='weight', cycleBasis: bool = False, nodeCol
         edge_vars = [edge_var for edge, edge_var in edges.items() if (node==edge[0]) or (node==edge[1])]
         m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
         
-    m.update()
+    # set lower bound
+    if lower_bound:
+        m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
 
+    m.update()
+        
+    # set warmstart
+    if len(warmstart) > 0:
+        
+        # Initialise warmstart by excluding all edges and vertices from solution:
+        for edge_var in edges.values():
+            edge_var.Start = 0
+            
+        for node_var in nodes.values():
+            node_var.Start = 0
+            
+        # Include all edges and vertices from the warmstart in the solution:
+        for edge in warmstart:
+            if edge in edges:
+                edges[edge].Start = 1
+            else:
+                edges[(edge[1], edge[0])].Start = 1
+                
+            nodes[edge[0]].Start = 1
+            nodes[edge[1]].Start = 1
+        
+    m.update()
+    
     return m
 
 def callback_cycle(model, where):
-    """ Callback insert constraints to forbid cycles in solution candidates
+    """ Callback inserts constraints to forbid cycles in solution candidates
+    
+    :param model: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    :param where: a Gurobi callback parameter indicating from which step of the optimisation the callback
+        originated
     """
     if where == gurobipy.GRB.Callback.MIPSOL: 
         # check for cycles whenever a new solution candidate is found
@@ -119,10 +158,10 @@ def callback_cycle(model, where):
 def extractSolution(G, model):
     r""" Get the optimal Steiner tree in G 
     
-        :param G: a weighted ILPGraph
-        :param model: a solved Gurobi model for the minimum Steiner tree problem
-            
-        :return: the edges of an optimal Steiner tree connecting all terminals in G
+    :param G: a weighted ILPGraph
+    :param model: a solved Gurobi model for the minimum Steiner tree problem
+
+    :return: the edges of an optimal Steiner tree connecting all terminals in G
     """
     solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
 
