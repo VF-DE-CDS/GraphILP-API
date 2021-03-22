@@ -14,12 +14,7 @@ def createModel(G, terminals, weight='weight', warmstart=[], lower_bound=None):
     This formulation enforces a cycle in the solution if it is not connected.
     A callback will detect cycles and add constraints to explicity forbid them.
     Together, this ensures that the solution is a tree.
-    
-    Callbacks:
-        This model uses callbacks which need to be included when calling Gurobi's optimize function:
-    
-        model.optimize(callback = :obj:`callback_cycle`)
-    
+        
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
@@ -28,20 +23,34 @@ def createModel(G, terminals, weight='weight', warmstart=[], lower_bound=None):
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
         
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+    
+        model.optimize(callback = :obj:`callback_cycle`)
+
     ILP:
+        Let :math:`T` be the set of terminals.
+    
         .. math::
             :nowrap:
 
             \begin{align*}
-            \min \sum_{(i,j) \in E} w_{ij} x_{ij}\\
+            \min \sum_{(u,v) \in E} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
-            x_{ij} + x_{ji} \leq 1 && \text{(restrict edges to one direction)}\\
-            x_r = 1 && \text{(require root to be chosen)}\\
-            \sum x_i - \sum x_{ij} = 1 && \text{(enforce circle when graph is not connected)}\\
-            2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
-            n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
-            n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
+            \sum_{v\in V} x_v - \sum_{\{u,v\}\in E} x_{uv} = 1 && \text{(enforce cycle when graph is not connected)}\\
+            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
+            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
+            \end{align*}
+            
+        The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)` 
+        coming up in a solution candidate:
+        
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \sum_{\{u, v\} \in C} x_{uv} < \ell(C) && \text{(forbid including complete cycle)}
             \end{align*}
 
     Example:
