@@ -19,7 +19,7 @@ def createModel(G, weight='weight', direction=GRB.MAXIMIZE):
             \max / \min \sum_{\{i, j\} \in E} w_{ij} x_{ij}\\
             \text{s.t.} &&\\
             \forall \{u, v\} \in E: x_{uv} = n/2&& 
-            \text{(choosing an edge implies choosing both of its vertices)}\\
+            \text{(} n/2 \text{ edges in matching)}\\
             \forall v \in V: \sum_{\{u,v\} \in E} x_{uv} \leq 1 && 
             \text{(at most one edge adjacent to each vertex)}\\
             \end{align*} 
