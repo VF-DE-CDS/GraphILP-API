@@ -56,16 +56,25 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
    createModel
    extractSolution
 
-Warmstarts
+Heuristics
 ----------
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
+.. automodule:: graphilp.partitioning.heuristics.vertex_coloring_greedy
+   :noindex:
 
 .. autosummary::
    :nosignatures:
 
-   createWarmstart
+    getHeuristic
 
 Details
 =======
 
 .. automodule:: graphilp.partitioning.min_vertex_coloring
+   :members:
+   
+.. automodule:: graphilp.partitioning.heuristics.vertex_coloring_greedy
    :members:
