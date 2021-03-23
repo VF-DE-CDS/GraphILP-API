@@ -1,21 +1,19 @@
 # +
 import sys, os
 sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath('../../..'))
 import numpy as np
 import scipy.sparse as sp
 from imports import ilpsetsystem as ilpss
 from imports import readFile
+import graphilp.covering.heuristics.coverHelpers as covHelp
 
-def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
-    costEfficiencies = dict()
-    cardinChosen = numNodes - len(chosenNodes)
-    for i in range(len(sets)):
-        costEfficiencies[i] = (sets[i]['weight'] / setSizes[i]) / cardinChosen
-    return costEfficiencies
+
 
 def getHeurSol(coverMatrix, k, sets, numNodes, weightUniverse = None):
     """
         Returns the Heuristic Solution calculated by a greedy approximation algorithm for the k - coverage Problem.
+        The k - coverage problem greedily finds the maximum amount of Nodes we can cover with k sets.
         
         :param coverMatrix: Cover / Incidence Matrix defining the edges of the Graph
         :param k: Maximum Sets to use
@@ -31,38 +29,22 @@ def getHeurSol(coverMatrix, k, sets, numNodes, weightUniverse = None):
         universe = set(i for i in range(numNodes))
     else:
         universe = weightUniverse
+    
     chosenSets = []
     costEfficiencies = dict()
-    containingSets = dict()
     chosenNodes = set()
     numSets = len(sets)
-    numNodes = len(universe)
-    setSizes = np.zeros(numSets)
-    containedNodes = dict()
-
+    universe = set(i for i in range(numNodes))
     
 
-    for i in range(len(coverMatrix)):
-        # Set of the Nodes that are contained in the current solution. Important set that determines
-        containingSets[i] = set()
-        for j in range (len(coverMatrix[i])):
-            if ( i == 0):
-                containedNodes[j] = set()
-            if coverMatrix[i][j] > 0:
-                containingSets[i].add(j)
-                setSizes[j] += 1
-                containedNodes[j].add(i)
+    containingSets, containedNodes, setSizes = covHelp.extract(coverMatrix, numSets)
 
-    setSizes = setSizes.tolist()
 
+    # Iterate over the whole universe, i.e. the nodes in the model
     while universe != chosenNodes:
-        costEff = calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets)
-        for i in range(len(sets)):
-            if i in chosenSets:
-                costEff[i] = 10000
-        minSet = min(costEff.keys(), key=(lambda k: costEff[k]))
-        chosenNodes = containedNodes[minSet].union(chosenNodes)
-        chosenSets.append(minSet)
+        chosenSets, chosenNodes = covHelp.getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes, containedNodes)
+        
+        # Break if the maximum amount of sets allowed to be chosen is reached.
         if (k <= len(chosenSets)):
             break
     return chosenSets, chosenNodes

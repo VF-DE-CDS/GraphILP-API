@@ -2,29 +2,30 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(SetSystem, A, W):
+def createModel(S, A, W):
     """ Greate an ILP for the knapsack problem
     
-        Arguments:
-         SetSystemstem     -- a weighted ILPSetSystem
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param A: TODO
+    :param W: TODO
 
-        Returns:
-            Gurobi model for knapsack problem
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP:
     """
     
     # Create model
-    m = Model("setsystemilp_max_kapsack")  
+    m = Model("graphilp_max_knapsack")  
     
     # Add variables
-    len_S = len(SetSystem.S)
-    len_U = len(SetSystem.U)
+    len_S = len(S.S)
+    len_U = len(S.U)
     x = m.addMVar(shape=len_S, vtype=GRB.BINARY, name="x")
-    SetSystem.setSystemVars( x)
+    S.setSystemVars(x)
     m.update()
     
-    
     # set weight vector 
-    obj = np.array([val['value'] for _set,val in SetSystem.S.items()])
+    obj = np.array([val['value'] for _set,val in S.S.items()])
     
     # Add constraints for covering
     m.addConstr(A @ x <= W, name="packing")
@@ -34,17 +35,15 @@ def createModel(SetSystem, A, W):
     
     return m
 
-def extractSolution(SetSystem, model):
-    """ Get a list of sets comprising a set packing
+def extractSolution(S, model):
+    """ TODO
     
-        Arguments:
-            SetCover     -- a weighted ILPSetSystem
-            model        -- a solved Gurobi model for weighted set packing
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param model: a solved Gurobi model for the knapsack problem
             
-        Returns:
-            a list of sets comprising a set packing
+    :return: TODO
     """
-    iterate = list(range (  len(SetSystem.S) ) )
-    knapsack = [list(SetSystem.S.keys())[i] for i in iterate if SetSystem.system_variables.X[i] > 0.5 ]
+    iterate = list(range(len(S.S)))
+    knapsack = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]
     
     return knapsack
