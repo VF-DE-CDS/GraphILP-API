@@ -54,6 +54,10 @@ The best way to get startet with GraphILP is through one of our examples:
      - `Steiner trees <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/SteinerTreesOnStreetmap.ipynb>`_
      
        Find the shortest tree connecting a given set of nodes in a graph.
+   * - .. image:: images/example_tsp_art.png
+     - `TSP art <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/TSP%20Art.ipynb>`_
+     
+       Transform an image into line art that can be drawn without lifting the pencil.
    * - .. image:: images/example_vertexcolour.png
      - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/min_vertex_coloring_example.ipynb>`_
      

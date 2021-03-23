@@ -49,7 +49,7 @@ Packing problems on graphs deal with the question of how to identify as many dis
 
 
 Independent set
----------------
+===============
 
 An independet set in the vertex set of a graph is a subset of the vertices in which no pair of vertices is connected by an edge.
 
@@ -63,7 +63,7 @@ An independet set in the vertex set of a graph is a subset of the vertices in wh
    extractSolution
    
 Clique packing
---------------
+==============
 
 .. automodule:: graphilp.packing.clique_packing
    :noindex:
@@ -74,11 +74,26 @@ Clique packing
    createModel
    extractSolution
 
+Set packing
+===========
+
+.. automodule:: graphilp.packing.set_packing
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+
 Details
--------
+=======
 
 .. automodule:: graphilp.packing.max_indset
     :members:
 
 .. automodule:: graphilp.packing.clique_packing
     :members:
+    
+.. automodule:: graphilp.packing.set_packing
+    :members:    
