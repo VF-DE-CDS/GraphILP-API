@@ -1,5 +1,4 @@
 # +
-from graphilp.imports import ilpgraph
 import sys
 sys.path.append("..")
 from imports import ilpgraph

@@ -43,7 +43,7 @@ def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
         costEfficiencies[i] = (sets[i]['weight'] / setSizes[i]) / cardinNotChosen
     return costEfficiencies
 
-def getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes):
+def getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes, containedNodes):
     # Get the update Cost Efficiency for every Set
     costEff = calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets)
     
