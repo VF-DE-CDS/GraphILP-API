@@ -88,15 +88,22 @@ Heuristics
 
 The methods in this section provide approximate solutions to the vertex cover problem constituting admissible solutions from which to start the exact optimisation.
 
-.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.vertexcover_maximal_matching
    :noindex:
 
 .. autosummary::
    :nosignatures:
 
-   createApproximation
-   maximalMatching
-   
+   getHeuristic
+
+.. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   getHeuristic
+
 Knapsack
 ========
 
@@ -145,7 +152,10 @@ Details
 .. automodule:: graphilp.covering.min_vertexcover
   :members:    
   
-.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.vertexcover_maximal_matching
+  :members:      
+  
+.. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
   :members:      
   
 .. automodule:: graphilp.covering.knapsack
