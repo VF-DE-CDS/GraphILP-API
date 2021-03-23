@@ -2,18 +2,20 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(SetCover, A, k):
+def createModel(S, A, k):
     """ Greate an ILP for the k-coverage problem
     
-        Arguments:
-            SetSystem     -- a weighted ILPSetSystem
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param A: TODO
+    :param k: TODO
 
-        Returns:
-            Gurobi model for weighted set packing
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP:
     """
     
     # Create model
-    m = Model("setsystemilp_max_set_packing")  
+    m = Model("graphilp_k_coverage")  
     
     # Add variables
     len_S = len(SetCover.S)
@@ -41,17 +43,15 @@ def createModel(SetCover, A, k):
     
     return m
 
-def extractSolution(SetCover, model):
-    """ Get a list of sets comprising a set packing
+def extractSolution(S, model):
+    """ TODO
     
-        Arguments:
-            SetCover     -- a weighted ILPSetSystem
-            model        -- a solved Gurobi model for weighted set packing
-            
-        Returns:
-            a list of sets comprising a set packing
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param model: a solved Gurobi model for k coverage
+
+    :return: TODO
     """
-    iterate = list(range (  len(SetCover.S) ) )
-    set_cover = [list(SetCover.S.keys())[i] for i in iterate if SetCover.system_variables.X[i] > 0.5 ]
+    iterate = list(range(len(S.S)))
+    set_cover = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]
     
     return set_coverdef 
