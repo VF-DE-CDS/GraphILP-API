@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-# + endofcell="--"
+# +
+from graphilp.imports import ilpgraph
 import sys
 sys.path.append("..")
 from imports import ilpgraph
-=======
-# +
-from graphilp.imports import ilpgraph
->>>>>>> 46fc2f6c779a6e1b3c6c4240571e821ea4f3fdb5
 import networkx as nx
 import re
 from scipy.sparse import csc_matrix
