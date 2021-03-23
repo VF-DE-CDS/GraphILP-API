@@ -1,12 +1,11 @@
 # +
 import sys, os
 sys.path.append(os.path.abspath('..'))
-sys.path.append(os.path.abspath('../../..'))
 import numpy as np
 import scipy.sparse as sp
 from imports import ilpsetsystem as ilpss
 from imports import readFile
-import graphilp.covering.heuristics.coverHelpers as covHelp
+from covering.heuristics import coverHelpers as covHelp
 
 
 
