@@ -162,7 +162,7 @@ Path ATSP
    extractSolution
 
 Metric TSP
-========== 
+----------
 
 .. automodule:: graphilp.network.tsp
    :noindex:
@@ -174,7 +174,7 @@ Metric TSP
    extractSolution
 
 Path TSP
---------
+^^^^^^^^
 
 .. automodule:: graphilp.network.ptsp
    :noindex:
@@ -198,7 +198,15 @@ Constant factor approximations also imply a lower bound on the solution.
    :nosignatures:
 
     getHeuristic
-   
+
+.. automodule:: graphilp.network.heuristics.tsp_nearest_neighbour
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+    getHeuristic
+
 Details
 =======
 
@@ -240,3 +248,6 @@ Details
 
 .. automodule:: graphilp.network.heuristics.tsp_christofides 
    :members:      
+   
+.. automodule:: graphilp.network.heuristics.tsp_nearest_neighbour
+   :members:       
