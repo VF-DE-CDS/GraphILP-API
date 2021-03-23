@@ -1,7 +1,8 @@
 .. _contents:
 
+******************************************
 Integer linear programs for graph problems
-==========================================
+******************************************
 
 GraphILP is a Python API to automatically cast graph-related optimisation problems into integer linear programming (ILP) instances.
 See the :ref:`introduction` to get an idea of the relationship between optimisation problems on graphs and ILPs.

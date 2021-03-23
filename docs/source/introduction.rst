@@ -31,7 +31,7 @@ The general idea is to input a graph, select an optimisation problem, and run an
 We are currently supporting `Gurobi <https://www.gurobi.com>`_ as an underlying ILP solver and interfacing through its Python API.
 
 Examples
---------
+========
 The best way to get startet with GraphILP is through one of our examples:
 
 .. list-table:: List of examples
