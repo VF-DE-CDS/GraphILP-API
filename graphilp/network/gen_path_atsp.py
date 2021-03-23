@@ -1,7 +1,8 @@
 from gurobipy import *
 import networkx as nx
 
-def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=None, end=None):
+def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=None, end=None, 
+                warmstart=[]):
     r""" Create an ILP for the min/max path asymmetric TSP 
         
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
@@ -10,6 +11,7 @@ def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=Non
     :param weight: name of the weight parameter in the edge dictionary of the graph
     :param start: require the TSP path to start at this node
     :param end: require the TSP path to end at this node
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
         
@@ -41,21 +43,28 @@ def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=Non
     m = Model("graphilp_path_atsp")
     
     if metric == 'metric':
-        G_d = G.G.to_directed()
-        G_r = G_d.reverse(copy=True)
-        G.G = nx.compose(G_d, G_r)
+        G.G = G.G.to_directed()
+        G.G.add_edges_from([(v,u) for (u,v) in G.G.edges()])
     
     # Add variables for edges   
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
     
     nbr_nodes = G.G.number_of_nodes()
     nodes = list(G.G.nodes())
+    
     # Add variables for labels
     label_vars = m.addVars(G.G.nodes(), lb = 0, ub = nbr_nodes - 1, vtype=gurobipy.GRB.INTEGER)
+    G.setLabelVars(label_vars)
+    
     m.update()
     
     edges = G.edge_variables
     
+    if len(warmstart) > 0:
+        initial_node = warmstart[0][0]
+    else:
+        initial_node = nodes[0]
+
     # Create constraints
     # degree condition
     if ((start is None) and (end is None)):
@@ -74,23 +83,44 @@ def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=Non
                 m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 0)
             if node == end:
                 m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 0)
-                
+
     # Create permutations via labels         
     if (start is None) and (end is None):        
-        m.addConstr( label_vars[nodes[0]]  ==  0 )
+        m.addConstr(label_vars[initial_node] == 0)
         for (u,v) in G.G.edges():
-            if (v != nodes[0]):
-                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
+            if (v != initial_node):
+                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)] <= nbr_nodes - 1)
     else:
-        m.addConstr( label_vars[start]  ==  0 )
-        m.addConstr( label_vars[end]  ==  nbr_nodes - 1 )
+        m.addConstr(label_vars[start] == 0)
+        m.addConstr(label_vars[end] == nbr_nodes - 1)
         for (u,v) in G.G.edges():
             if (v != start):
-                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)]  <= nbr_nodes - 1 )
+                m.addConstr(label_vars[u] - label_vars[v] + nbr_nodes * edges[(u,v)] <= nbr_nodes - 1)
         
-
     # set optimisation objective: find the min / max round tour in G
     m.setObjective(quicksum([edges[(u,v)] * w[weight] for (u,v,w) in G.G.edges(data=True)]), direction)
+
+    m.update()
+    
+    # set warmstart
+    if len(warmstart) > 0:
+        
+        # initialise warmstart by excluding all edges and vertices from solution
+        for edge_var in edges.values():
+            edge_var.Start = 0
+            
+        for label_var in label_vars.values():
+            label_var.Start = 0
+        
+        # set edges and labels along warmstart tour
+        pos = 0
+        
+        for edge in warmstart:
+            edges[edge].Start = 1
+            label_vars[edge[0]].Start = pos
+            pos += 1
+
+    m.update()
     
     return m
 

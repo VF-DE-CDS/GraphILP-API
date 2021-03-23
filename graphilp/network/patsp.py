@@ -2,7 +2,7 @@ from gurobipy import *
 import networkx as nx
 from graphilp.network import gen_path_atsp
 
-def createModel(G, start, end, direction=GRB.MAXIMIZE, weight='weight'):
+def createModel(G, start, end, direction=GRB.MAXIMIZE, weight='weight', warmstart=[]):
     """ Create an ILP for the min/max asymmetric path TSP 
         
     Uses :py:func:`graphilp.network.gen_path_atsp.createModel` to set up the problem.
@@ -12,12 +12,13 @@ def createModel(G, start, end, direction=GRB.MAXIMIZE, weight='weight'):
     :param end: a vertex of the graph G in which the ATSP path should end
     :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour
     :param weight: name of the weight parameter in the edge dictionary of the graph
+    :param warmstart: a list of edges forming a tree in G connecting all terminals    
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_ 
     """
     
     # Create model
-    m = gen_path_atsp.createModel(G, direction, '', weight=weight, start=start, end=end)
+    m = gen_path_atsp.createModel(G, direction, '', weight=weight, start=start, end=end, warmstart=warmstart)
     
     return m
 
