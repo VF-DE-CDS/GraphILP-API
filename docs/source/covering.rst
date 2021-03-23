@@ -7,7 +7,7 @@ Covering
 Covering problems in graphs ask for substructures in the graph such that all other elements of the graph are adjacent to this substructure. For example, in a minimal vertex cover we look for a subset of the vertex set such that all other vertices are connected to the selected ones by an edge.
 
 Dominating set
--------------------
+==============
 A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset V` of the vertex set such that each vertex :math:`v \in V` is connected to a vertex :math:`s \in S` by an edge :math:`\{s,v\} \in E`. 
 
 .. tikz:: A minimum dominating set (red vertices) of the Petersen graph.
@@ -50,7 +50,7 @@ A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :m
    extractSolution
 
 Edge dominating set
--------------------
+===================
 
 An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
 
@@ -67,7 +67,7 @@ An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in
    extractSolution
 
 Vertex cover
-------------
+============
 
 A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset V` of the vertex set such that for each edge :math:`\{u, v\} \in E` at least one of its vertices is in :math:`S`: :math:`\{u,v\} \cap S \neq \emptyset`. 
 
@@ -83,22 +83,65 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
    createModel
    extractSolution
    
-Warmstarts
-==========
+Heuristics
+----------
 
 The methods in this section provide approximate solutions to the vertex cover problem constituting admissible solutions from which to start the exact optimisation.
 
-.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.vertexcover_maximal_matching
    :noindex:
 
 .. autosummary::
    :nosignatures:
 
-   createApproximation
-   maximalMatching
+   getHeuristic
+
+.. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   getHeuristic
+
+Knapsack
+========
+
+.. automodule:: graphilp.covering.knapsack
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+   
+k-Covering
+==========
+
+.. automodule:: graphilp.covering.k_cover
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+
+Set cover
+=========
+
+.. automodule:: graphilp.covering.set_cover
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
 
 Details
-------------
+=======
 
 .. automodule:: graphilp.covering.min_dom_set
   :members:
@@ -109,5 +152,17 @@ Details
 .. automodule:: graphilp.covering.min_vertexcover
   :members:    
   
-.. automodule:: graphilp.covering.heuristics.warmstart_vertexcover
+.. automodule:: graphilp.covering.heuristics.vertexcover_maximal_matching
   :members:      
+  
+.. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
+  :members:      
+  
+.. automodule:: graphilp.covering.knapsack
+  :members:      
+   
+.. automodule:: graphilp.covering.k_cover
+  :members:      
+
+.. automodule:: graphilp.covering.set_cover
+  :members: 

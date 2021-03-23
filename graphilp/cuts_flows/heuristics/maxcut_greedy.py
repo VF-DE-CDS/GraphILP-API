@@ -1,11 +1,11 @@
 # +
 import networkx as nx
 
-def getHeurSol(G):
+def getHeurSol(G, weight='weight'):
     """
         Max Cut Greedy Heuristic
         
-        :params G: A networkx Graph
+        :params G: A weighted networkx Graph
         :type G: Networkx Graph
         :rtype: Amount of edges in the Max Cut
     """
@@ -15,14 +15,14 @@ def getHeurSol(G):
     maxCut = 0
 
     for node in G.nodes():
-        neighbors = G.neighbors(node)
+        neighbors = G[node]
         neighInA = 0
         neighInB = 0
-        for neighbor in neighbors:
-            if neighbor in A:
-                neighInA += 1
-            elif neighbor in B:
-                neighInB += 1
+        for k, v in neighbors.items():
+            if k in A:
+                neighInA += v['weight']
+            elif k in B:
+                neighInB += v['weight']
         if neighInA > neighInB:
             B.add(node)
         else:
@@ -30,7 +30,7 @@ def getHeurSol(G):
 
     edgesBetween = nx.edge_boundary(G, A, B)
     for edge in edgesBetween:
-        maxCut += 1
+        maxCut += G.edges[edge]['weight']
     return maxCut
     
 # -
