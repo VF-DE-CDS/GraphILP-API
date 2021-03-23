@@ -9,12 +9,12 @@ Graphs are very well-suited as models for networks. Typical questions in this ar
 .. _steiner tree problem:
 
 Steiner Tree Problem
---------------------
+====================
 
 The `Steiner Tree Problem in graphs <https://en.wikipedia.org/wiki/Steiner_tree_problem#Steiner_tree_in_graphs_and_variants>`__ asks for the shortest connection of a subset of the node set. This subset is usually called the set of terminals. While this problem is easy when all nodes are terminals (minimum spanning tree) or when there are only two terminals (shortest path), it is NP-hard otherwise. This means that unless P=NP, we expect any algorithm to become very slow for large instances. For this reason, we provide different formulations of the problem which may be more or less suitable for solving different types of instances.
 
 Cycle-based constraint system
-=============================
+-----------------------------
 
 This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
 
@@ -29,7 +29,7 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
    callback_cycle
    
 Linear-size constraint system
-=============================
+-----------------------------
 
 Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
@@ -43,7 +43,7 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
    extractSolution   
    
 Flow-based constraint system
-=============================
+-----------------------------
 .. automodule:: graphilp.network.Steiner_Linear_with_Flow
    :noindex:
 
@@ -54,7 +54,7 @@ Flow-based constraint system
    extractSolution   
    
 Heuristics 
-==========
+----------
 
 Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
 Constant factor approximations also imply a lower bound on the solution.
@@ -69,12 +69,12 @@ Constant factor approximations also imply a lower bound on the solution.
 
 
 Prize Collecting Steiner Tree (PCST)
-------------------------------------
+====================================
 
 The Prize Collecting Steiner Tree Problem is similar to the :ref:`Steiner Tree Problem` in that a lowest weight network spanning a given set of vertices is desired. However, each vertex comes with a prize value that is counted against the edge weights and it is a part of the problem to select a subset of the vertex set that optimises the total prize against the total cost of the network.
 
 Cycle-based constraint system
-=============================
+-----------------------------
 
 This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
 
@@ -89,7 +89,7 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
    callback_cycle   
 
 Linear-size constraint system
-=============================
+-----------------------------
 
 Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
@@ -103,16 +103,23 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
    extractSolution
    
 Travelling Salesman Problem (TSP)
----------------------------------
+=================================
+
+The `travelling salesman problem <https://en.wikipedia.org/wiki/Travelling_salesman_problem>`__ is one of the most well-known problems of combinatorial optimisation. Given a list of cities (nodes in a graph) and distances between all pairs of cities (weighted edges in a graph), a solution to this problem is a shortest to going through all cities but visiting no city twice.
+
+Depending on whether the tour needs to start where it began and on the properties of the distances (for example they can be required to give a metric) there are many variants of the problem.
 
 Asymmetric TSP
-==============
+--------------
 
-In the asymmetric case, the underlying graph is directed and the distance from A to B may different from the distance from B to A.
+In the asymmetric case, the underlying graph is directed and the distance from A to B may be different from the distance from B to A.
 
-.. automodule:: graphilp.network.atsp
+Generic
+^^^^^^^
+
+.. automodule:: graphilp.network.gen_path_atsp
    :noindex:
-   
+
 .. autosummary::
    :nosignatures:
    
@@ -128,16 +135,22 @@ In the asymmetric case, the underlying graph is directed and the distance from A
    createGenModel
    extractSolution
 
-.. automodule:: graphilp.network.gen_path_atsp
-   :noindex:
+ATSP
+^^^^
 
+.. automodule:: graphilp.network.atsp
+   :noindex:
+   
 .. autosummary::
    :nosignatures:
    
    createModel
    extractSolution
+
+
    
 Path ATSP
+^^^^^^^^^
    
 .. automodule:: graphilp.network.patsp
    :noindex:
@@ -149,18 +162,7 @@ Path ATSP
    extractSolution
 
 Metric TSP
-==============   
-
-Path TSP
-
-.. automodule:: graphilp.network.ptsp
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-   
-   createModel
-   extractSolution
+========== 
 
 .. automodule:: graphilp.network.tsp
    :noindex:
@@ -171,8 +173,20 @@ Path TSP
    createModel
    extractSolution
 
+Path TSP
+--------
+
+.. automodule:: graphilp.network.ptsp
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+
 Heuristics 
-==========
+----------
 
 Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
 Constant factor approximations also imply a lower bound on the solution.
@@ -186,7 +200,7 @@ Constant factor approximations also imply a lower bound on the solution.
     getHeuristic
    
 Details
-------------
+=======
 
 .. automodule:: graphilp.network.Steiner
    :members:
