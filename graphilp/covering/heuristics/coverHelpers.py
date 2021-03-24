@@ -41,9 +41,16 @@ def extract(coverMatrix, numSets):
     return containingSets, containedNodes, setSizes 
 
 
-# Calculate the "Efficiency" of each set. The efficiency is defined by the average weight of each node in a set divided
-# by the amount of the nodes that are not yet in the solution.
+
 def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
+    """Calculate the "Efficiency" of each set. The efficiency is defined by the average weight of each node in a set divided
+       by the amount of the nodes that are not yet in the solution.
+       
+       :param numNodes: Amount of Nodes in the Universe
+       :param chosenNodes: Chosen Nodes in the solution
+       :param setSizes: Size of each Set
+       :param sets: Set and it's contained Nodes
+       """
     costEfficiencies = dict()
     cardinNotChosen = numNodes - len(chosenNodes)
     for i in range(len(sets)):
@@ -51,7 +58,8 @@ def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
     return costEfficiencies
 
 def getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes, containedNodes):
-    # Get the update Cost Efficiency for every Set
+    """Calculating the next next set that should be added to the chosenSets (Greedy Approach)
+    """
     costEff = calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets)
     
     # If the set has already been chosen, artificially set the efficiency of this set very high

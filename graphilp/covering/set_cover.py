@@ -4,12 +4,23 @@ import scipy.sparse as sp
 from gurobipy import *
 
 def createModel(S, A):
-    """ Greate an ILP for the weighted set cover problem
-
+    """ Greate an ILP for the k-coverage problem
+    
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param A: TODO
+    :param A: Sparse covering matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
 
-    :returns: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    
+    ILP:
+        .. math::
+            :nowrap:
+                \begin{align*}
+                \min \sum_{s \in S} x_{s} \\
+                \text{s.t.} &&\\
+                \forall e \in E: \sum_{S:e \in S}x_{s} \leq 1 && \text{(cover every element of the universe)}\\
+                \forall s \in S: x_{s} \in \{0,1\} && \text{(exactly one outgoing edge)}\\
+                \sum_{(s, v) \in E}x_{sv} = 1 && \text{(every set is either in the set cover (1), otherwise 0)}\\
+                \end{align*}
     """
     
     # Create model

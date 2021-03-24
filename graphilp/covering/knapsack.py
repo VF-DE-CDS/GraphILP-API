@@ -5,9 +5,9 @@ import numpy as np
 def createModel(S, A, W):
     """ Greate an ILP for the knapsack problem
     
-    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param A: TODO
-    :param W: TODO
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`.
+    :param A: Sparse weight matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
+    :param W: Size of each Knapsack
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
