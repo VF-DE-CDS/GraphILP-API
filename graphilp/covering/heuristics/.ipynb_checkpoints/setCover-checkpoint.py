@@ -1,68 +1,45 @@
 # +
 import sys, os
-sys.path.append(os.path.abspath('..'))
 sys.path.append(os.path.abspath('../..'))
 import numpy as np
 import scipy.sparse as sp
 from imports import ilpsetsystem as ilpss
+from . import coverHelpers as covHelp
 
-def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
-    costEfficiencies = dict()
-    cardinChosen = numNodes - len(chosenNodes)
-    
-    for i in range(len(sets)):
-        costEfficiencies[i] = (sets[i]['weight'] / setSizes[i]) / cardinChosen
-    return costEfficiencies
-
-def getHeurSol(coverMatrix, sets, numNodes):
+def getHeurSol(coverMatrix, sets, weightedUniverse, k = None):
     """
-        Returns the Heuristic Solution calculated by a greedy approximation algorithm for the k - coverage Problem.
+        Returns the Heuristic Solution calculated by a greedy approximation algorithm for the SetCoverage Problem.
+        If paramter k is specified, the Problem turns into a k - coverage problem. A k - coverage Problem Heuristic 
+        greedily finds the maximum amount of Nodes we can cover with k sets.
         
-        :param coverMatrix: Cover / Incidence Matrix defining the edges of the Graph
+        :param coverMatrix: Cover Matrix defining which Node is contained in which set
         :param k: Maximum Sets to use
         :param sets: Sets that cover Nodes
-        :params universe: List of Nodes
+        :params weightUniverse: List of Weighted Nodes that are to be covered
         :type coverMatrix: List of List
-        :type k: int
-        :type sets: Dict of int:dict. The value needs to specifiy a weight.
+        :type k: int, optional
+        :type sets: Dict of int:dict pairs. The value needs to specifiy a weight.
         :type universe: list of int
-        :rtype: chosen Sets as list of indeces
+        :return: A list of the Sets covering the chosen Nodes
+        :rtype: list of int, list of int
     """
     
     chosenSets = []
     costEfficiencies = dict()
-    containingSets = dict()
     chosenNodes = set()
     numSets = len(sets)
-    setSizes = np.zeros(numSets)
-    containedNodes = dict()
-    universe = set(i for i in range(numNodes))
+    numNodes = len(weightedUniverse)
     
+    # Extract the essential information we need from the Cover Matrix
+    containingSets, containedNodes, setSizes = covHelp.extract(coverMatrix, numSets)
+    if k == None:
+        k = numNodes
+        
+    while weightedUniverse != chosenNodes and k > len(chosenSets):
+        chosenSets, chosenNodes = covHelp.getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes, containedNodes)
+    
+    return chosenSets, chosenNodes
 
-    for i in range(len(coverMatrix)):
-        # Set of the Nodes that are contained in the current solution. Important set that determines
-        containingSets[i] = set()
-        for j in range (len(coverMatrix[i])):
-            if ( i == 0):
-                containedNodes[j] = set()
-            if coverMatrix[i][j] > 0:
-                containingSets[i].add(j)
-                setSizes[j] += 1
-                containedNodes[j].add(i)
-
-    setSizes = setSizes.tolist()
-    while universe != chosenNodes:
-        costEff = calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets)
-        for i in range(len(sets)):
-            if i in chosenSets:
-                costEff[i] = 10000
-        minSet = min(costEff.keys(), key=(lambda k: costEff[k]))
-        chosenNodes = containedNodes[minSet].union(chosenNodes)
-        chosenSets.append(minSet)
-    return chosenSets
-
-if __name__ == '__main__':
-    getHeurSol("/home/tsauter/GraphILP/GraphILP-API/graphilp/examples/setcoverTestInstances/scpd1.txt")
 # -
 
 

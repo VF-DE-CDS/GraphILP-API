@@ -1,11 +1,18 @@
 # +
 import numpy as np
-# Iterate through the cover matrix, i.e. a matrix where a value i,j is 1 if node i is covered by set j and 0 otherwise
-# Save information about which node is stored where etc.
+
 def extract(coverMatrix, numSets):
     """
-    Extracts the information which node is stored in which set and which set contains which node.
+    Extracts the information from the cover Matrix.
+    I.e. which node is stored in which set and which set contains which node.
     Also extracts the size of each set.
+    
+    :param coverMatrix: Cover Matrix defining which Node is contained in which set 
+    :param numSets: Total amount of Sets
+    :type coverMatrix: list of list of int
+    :type numSets: int
+    :return: sets containing each node, nodes contained in each set, amount of Nodes contained in each set 
+    :rtype: list of lists of int, list of lists of int, list of int
     """
     containingSets = dict()
     containedNodes = dict()
