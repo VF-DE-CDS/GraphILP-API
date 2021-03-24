@@ -53,8 +53,11 @@ def getHeuristic(G, tour, length, cities):
     reversing the tour between and including the nodes and including it back into the tour.
     
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
-    :param list: a list of edges describing a tour
+    :param tour: a list of edges describing a tour
     :param length: Length of the tour
+    :param cities: The amount of cities to be visited
+    :type G: :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    :type tour: :py:class:`~networkx
         
     """
     # Main function of the model.
