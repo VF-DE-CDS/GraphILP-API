@@ -8,13 +8,15 @@ def getHeuristic(G, weight='weight'):
     
     :return: a list of edges forming the approximate solution and its length
     """
-    current = 0
+    first = list(G.G.nodes())[0]
+    current = first
     length = 0.0
-    visited = set([0])
+    visited = set([current])
     tour = []
 
     while len(visited) < G.G.number_of_nodes():
-        neighbours = [(w[weight], i, j) for i, j, w in G.G.edges(current, data=True) if j not in visited]
+        neighbours = [(w.get(weight,1), i, j) for i, j, w in G.G.edges(current, data=True) if j not in visited]
+        
         argmax = neighbours.index(min(neighbours))
         next_step = neighbours[argmax]
 
@@ -25,7 +27,7 @@ def getHeuristic(G, weight='weight'):
         length += next_step[0]
         
     # close the tour
-    tour.append((tour[-1][1], 0))
+    tour.append((tour[-1][1], first))
     length += G.G.edges[tour[-1]][weight]
     
     return tour, length
