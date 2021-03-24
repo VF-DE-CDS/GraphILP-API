@@ -7,7 +7,7 @@ Partitioning
 `Graph partitioning <https://en.wikipedia.org/wiki/Graph_partition>`__ deals with ways to partition the vertex set or the edge set of a graph into mutually exclusive groups. These may be used to reduce problems on large graphs to problems on smaller graphs derived from the parts of the partition.
 
 Vertex colouring
-----------------
+================
 
 A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph is an assignment of colours to the vertices such that adjacent vertices get different colours. A minimal vertex colouring is such a colouring using the minimal possible number of colours. For example, trees can be coloured using only two colours whereas a complete graph on :math:`n` vertices needs exactly :math:`n` colours.
 
@@ -56,16 +56,25 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
    createModel
    extractSolution
 
-Warmstarts
-==========
+Heuristics
+----------
+
+Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
+Constant factor approximations also imply a lower bound on the solution.
+
+.. automodule:: graphilp.partitioning.heuristics.vertex_coloring_greedy
+   :noindex:
 
 .. autosummary::
    :nosignatures:
 
-   createWarmstart
+    getHeuristic
 
 Details
--------
+=======
 
 .. automodule:: graphilp.partitioning.min_vertex_coloring
+   :members:
+   
+.. automodule:: graphilp.partitioning.heuristics.vertex_coloring_greedy
    :members:

@@ -7,13 +7,13 @@ Sub- and supergraphs
 Many questions in graph theory are asking revolving around the relationship between a graph and its sub-structures. Optimisation problems typically ask for the largest subgraph of a given type like a clique or a planar graph. They may also ask for the minimal modification necessary to ensure the existence of such a subgraph.
 
 Clique
-------
+======
 
 A clique is a fully connected graph. Hence, the fully connected graph :math:`K_n` is also called an :math:`n`-clique.
 The maximum clique problem is asking for the largest :math:`n` such that a given graph has an :math:`n`-clique as a subgraph.
 
 Packing version
-===============
+---------------
 
 The packing version of the integer linear program for max clique is using a straight-forward formulation that tries to find as many vertices as possible such that every pair of selected vertices is connected by an edge.
 
@@ -31,7 +31,7 @@ The :ref:`covering version <covering_version>` below has a tighter integrality g
 .. _covering_version:
 
 Covering version
-================
+----------------
 
 The covering version of the integer linear program for max clique is using the connection between clique and vertex cover in the complement. It excludes as few nodes as possible from a clique but needs to exclude at least one node from each pair not connected by an edge. Vertex cover has an `integrality gap <https://en.wikipedia.org/wiki/Vertex_cover#ILP_formulation>`__ of 2.
 
@@ -82,7 +82,7 @@ The covering version of the integer linear program for max clique is using the c
    extractSolution
    
 Details
--------
+=======
 
 .. automodule:: graphilp.sub_super.max_clique_pack
     :members:

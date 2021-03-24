@@ -10,7 +10,7 @@ There are, however, a number of file formats specific to the types of optimisati
 This module therefore offers import filters for such file formats.
 
 ILPGraph
---------
+========
 
 The ILPGraph class takes care of both the graph instance used in an optimisation problem and the variables of the integer linear program used to solve it.
 
@@ -27,7 +27,7 @@ The ILPGraph class takes care of both the graph instance used in an optimisation
    ILPGraph.setLabelVars
    
 NetworkX
---------
+========
 
 `NetworkX <https://networkx.org>`__ is a Python package for the creation, manipulation, and study of the structure, dynamics, and functions of complex networks.
 GraphILP is using NetworkX objects both to represent graphs internally and as an interface to provide problem instances.
@@ -41,7 +41,7 @@ GraphILP is using NetworkX objects both to represent graphs internally and as an
    read
       
 Graph file formats
-------------------
+==================
 
 Many useful benchmark instances for optimisation problems on graphs are available from a variety of sources.
 In this section, we provide import filters to create NetworkX Graph objects from various specialised file formats.
@@ -59,7 +59,7 @@ In this section, we provide import filters to create NetworkX Graph objects from
    read_set_cover
 
 ILPSetSystem
-------------
+============
 
 The ILPSetSystem class takes care of both the set system instance used in an optimisation problem and the variables of the integer linear program used to solve it.
 
@@ -79,7 +79,7 @@ A set system (or undirected `hypergraph <https://en.wikipedia.org/wiki/Hypergrap
    ILPSetSystem.setUniverseVars
    
 Details
--------
+=======
 
 .. automodule:: graphilp.imports.ilpgraph
     :members:
