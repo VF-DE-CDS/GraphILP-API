@@ -16,7 +16,7 @@ An extensive discussion of matchings can be found in
 * Lovász, Plummer: `Matching Theory <https://www.ams.org/publications/authors/books/postpub/chel-367>`__.
 
 General matching
-----------------
+================
 
 .. automodule:: graphilp.matching.maxweight
    :noindex:
@@ -28,7 +28,7 @@ General matching
    extractSolution
    
 Perfect matching
-----------------
+================
 
 A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in graph is a matching in which each vertex of the graph is covered by an edge of the matching.
 
@@ -42,7 +42,7 @@ A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in graph
    extractSolution
 
 Bipartite matching
-------------------
+==================
 
 For `bipartite <https://en.wikipedia.org/wiki/Bipartite_graph>`__ graphs, matching is usually much easier than for general graphs. The natural ILP for bipartite perfect matching is in fact a linear program: the integrality constraints are fulfilled automatically.
 
@@ -56,7 +56,7 @@ For `bipartite <https://en.wikipedia.org/wiki/Bipartite_graph>`__ graphs, matchi
    extractSolution
 
 Details
--------
+=======
 
 .. automodule:: graphilp.matching.maxweight
    :members:
