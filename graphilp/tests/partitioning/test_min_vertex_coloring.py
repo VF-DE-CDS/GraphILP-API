@@ -31,3 +31,6 @@ m_odd.optimize()
 color_assignment_odd, node_to_col_odd = extractSolution(G_odd, m_odd)
 # odd cylces need by three colours
 assert(len(set(node_to_col_odd.values())) == 3)
+# -
+
+
