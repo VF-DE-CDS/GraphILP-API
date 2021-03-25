@@ -20,7 +20,7 @@ def getHeurSol(coverMatrix, sets, universe, k = None):
         :type k: int, optional
         :type sets: Dict of int:dict pairs. The value needs to specifiy a weight.
         :type universe: list of int
-        :return: A list of the Sets covering the chosen Nodes
+        :return: A list of the Sets covering the chosen Nodes, A list of Nodes contained in the solution
         :rtype: list of int, list of int
     """
     
@@ -28,13 +28,17 @@ def getHeurSol(coverMatrix, sets, universe, k = None):
     costEfficiencies = dict()
     chosenNodes = set()
     numSets = len(sets)
-    numNodes = len(weightedUniverse)
+    numNodes = len(universe)
     
     # Extract the essential information we need from the Cover Matrix
     containingSets, containedNodes, setSizes = covHelp.extract(coverMatrix, numSets)
+    
+    # If no k is specified, we are handling a set covering problem
     if k == None:
         k = numNodes
         
+    # Greedily choose sets to include in the solution either until all Nodes are covered or until the maximum amount of Sets
+    # used to cover are reached
     while universe != chosenNodes and k > len(chosenSets):
         chosenSets, chosenNodes = covHelp.getNextSet(chosenSets, chosenNodes, sets, numNodes, setSizes, containedNodes)
     

@@ -1,7 +1,5 @@
 # +
-import sys
-sys.path.append("..")
-from imports import ilpgraph
+from graphilp.imports import ilpgraph
 import networkx as nx
 import re
 from scipy.sparse import csc_matrix
@@ -155,9 +153,20 @@ def col_file_to_networkx(path):
     return G
     
 def read_set_cover(path):
-    """ TODO
+    """ Reads an instance of a setCover Problem instance taken from the OR - Library
+    http://people.brunel.ac.uk/~mastjjb/jeb/orlib/scpinfo.html
+    Columns are Sets, Rows are Nodes contained in the Sets
     
-    :param path: path to ??? file
+    Formatting of such a file with a cost vector c is as follows
+    Row 1 : number of rows (m), number of columns (n)
+    Row 2 onwards: the cost of each column c(j),j=1,...,n
+                                
+    Next section:
+    Row 1: the amount of columns which cover cover the row i 
+    Row 2 onwards: list of the columns which cover row i
+    
+    
+    :param path: path to .txt file
     
     :returns: sparse matrix and sets
     """
@@ -170,30 +179,48 @@ def read_set_cover(path):
     with open(path, "rt") as input_file:
         lines = input_file.readlines()
     
+    # Split first line by spaces
     line = lines[0].split(" ")
+    
+    # Information about total number of nodes and sets are contained in the first line
     numNodes = int(line[1])
     numSets = int(line[2])
+    
+    # Creating empty array
     sparseMatrix = csc_matrix((numNodes, numSets), dtype = np.int8).toarray()
+    
+    # Pop so we don't have to skip it in the first step of the loop
     lines.pop(0)
 
     for line in lines:
         # Split After Spaces
         curLine = line.split(" ")
+        # As long as we are in the first section, read out the costs of the sets
         if curSet < numSets:
+            # Each element/column is a set
             for element in curLine:
+                # Only extract numeric values and no special characters
                 if element != '' and element != '\n':
+                    # Create a new entry in the dictionary including the weight of the set
                     sets[curSet] = dict(weight = int(element))
                     curSet += 1
             continue
-        # Arrived at the other section, we got a new column now, gotta skip this line
+            
+        # Arrived at the other section, i.e. the section where detailed information about every set is given
         else:
+            # Amount of Sets that contain node i is always stored in the first row of node i's section 
             if (curRow == 0 and curRowLength == 0):
                 curRowLength = int(curLine[1])
+            # curRowLength doesn't denote the actual length of the  row in the text file.
+            # It rather specifies the amount of elements which have to be read in total
+            # Since the information iteself is split over many lines, we have to keep track of the total amount of 
+            # elements read.
             if readElements >= curRowLength:
                 curRow += 1
                 curRowLength = int(curLine[1])
                 readElements = 0
             else:
+                # Add every element to the sparse matrix containing 
                 for element in curLine:
                     if element != '' and element != '\n':
                         sparseMatrix[curRow][int(element) - 1] = 1

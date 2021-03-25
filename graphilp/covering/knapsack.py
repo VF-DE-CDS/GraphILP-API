@@ -3,12 +3,14 @@ from gurobipy import *
 import numpy as np
 
 def createModel(S, A, W):
-    """ Greate an ILP for the knapsack problem
+    r""" Greate an ILP for the knapsack problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`.
-    :param A: Sparse weight matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
+    :param A: Sparse weight matrix compressed by rows. 
     :param W: Size of each Knapsack
-
+    
+    TODO 
+    
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
@@ -36,12 +38,13 @@ def createModel(S, A, W):
     return m
 
 def extractSolution(S, model):
-    """ TODO
+    r""" Get a list of items contained in the solution.
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param model: a solved Gurobi model for the knapsack problem
             
-    :return: TODO
+    :return: Items contained in the knapsack solution
+    :rtype: list of indeces
     """
     iterate = list(range(len(S.S)))
     knapsack = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]

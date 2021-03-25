@@ -4,7 +4,7 @@ import scipy.sparse as sp
 from gurobipy import *
 
 def createModel(S, A):
-    """ Greate an ILP for the k-coverage problem
+    r""" Greate an ILP for the k-coverage problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param A: Sparse covering matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
@@ -52,7 +52,8 @@ def extractSolution(S, model):
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param model: a solved Gurobi model for weighted set packing
             
-    :return: a list of sets comprising a set cover
+    :return: Sets of the optimal Set cover solution
+    :rtype: list of indeces
     """
     iterate = list(range (len(S.S)))
     set_cover = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]
