@@ -42,6 +42,17 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
    createModel
    extractSolution   
    
+There is also a version of this constraint system with somewhat stronger conditions on the labels:
+   
+.. automodule:: graphilp.network.Steiner_Linear_tightened
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution   
+   
 Flow-based constraint system
 -----------------------------
 .. automodule:: graphilp.network.Steiner_Linear_with_Flow
@@ -214,6 +225,9 @@ Details
    :members:
 
 .. automodule:: graphilp.network.Steiner_Linear
+   :members:   
+
+.. automodule:: graphilp.network.Steiner_Linear_tightened
    :members:   
 
 .. automodule:: graphilp.network.Steiner_Linear_with_Flow
