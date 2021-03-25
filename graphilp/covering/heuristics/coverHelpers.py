@@ -43,13 +43,15 @@ def extract(coverMatrix, numSets):
 
 
 def calculateSetEfficiencies(numNodes, chosenNodes, setSizes, sets):
-    """Calculate the "Efficiency" of each set. The efficiency is defined by the average weight of each node in a set divided
+    """Calculate the Efficiency of each set. The efficiency is defined by the average weight of each node in a set divided
        by the amount of the nodes that are not yet in the solution.
        
        :param numNodes: Amount of Nodes in the Universe
        :param chosenNodes: Chosen Nodes in the solution
        :param setSizes: Size of each Set
-       :param sets: Set and it's contained Nodes
+       :param sets: Set and its contained Nodes
+       :return: Efficiency of each set
+       :rtype: list of floats
        """
     costEfficiencies = dict()
     cardinNotChosen = numNodes - len(chosenNodes)

@@ -7,6 +7,7 @@ def getHeuristic(G):
     :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
     
     :return: a list of vertices forming a vertex cover of G
+    :rtype: list of int (i.e. indeces)
     """
     
     warmstart = []

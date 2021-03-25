@@ -7,7 +7,7 @@ def createModel(S, A, k):
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param A: Sparse covering matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
-    :param k: Maximum amount of Sets included in solution
+    :param k: Maximum amount of Sets in solution
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -29,19 +29,19 @@ def createModel(S, A, k):
     m = Model("graphilp_k_coverage")  
     
     # Add variables
-    len_S = len(SetCover.S)
-    len_U = len(SetCover.U)
+    len_S = len(S.S)
+    len_U = len(S.U)
     x = m.addMVar(shape=len_S, vtype=GRB.BINARY, name="x")
-    SetCover.setSystemVars(x)
+    S.setSystemVars(x)
     m.update()
     
     # Add vector b for the right-hand side
     y = m.addMVar(shape=len_U, vtype=GRB.BINARY, name="y")
-    SetCover.setUniverseVars(y)
+    S.setUniverseVars(y)
     m.update()
     
     # set weight vector 
-    obj = np.array([val['weight'] for _set,val in SetCover.U.items()])
+    obj = np.array([val['weight'] for _set,val in S.U.items()])
     
     # Add constraints for covering
     m.addConstr(A @ x >= y, name="cover")
@@ -56,12 +56,13 @@ def createModel(S, A, k):
     return m
 
 def extractSolution(S, model):
-    """ TODO
+    """ Get a list of sets comprising the k - Cover
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param model: a solved Gurobi model for k coverage
 
-    :return: TODO
+    :return: List of sets contained in the solution of the k - cover
+    :rtype: list of int
     """
     iterate = list(range(len(S.S)))
     set_cover = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]

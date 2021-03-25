@@ -105,8 +105,7 @@ def createModel(G, terminals, weight = 'weight', warmstart=[], lower_bound=None)
         for edge, edge_var in edges.items():
             # If the node is startpoint or endpoint of the edge, add the edge
             # to the array of edge variables
-            # Since the edges variable containt both directions, we can write this much short than
-            # in the previous formulation
+            # Edge variables can contain both directions
             if (node == edge[0] or node == edge[1]):
                 edge_vars.append(edge_var)
         m.addConstr(node_var - quicksum(edge_vars) <= 0)

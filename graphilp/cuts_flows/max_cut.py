@@ -62,6 +62,7 @@ def extractSolution(G, model):
     :param model: a solved Gurobi model for min/max weight cut                    
     
     :return: a list of vertices comprising a minimum/maximum weight cut of G
+    :rtype: list of int (i.e. indeces)
     """    
     cut_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
     
