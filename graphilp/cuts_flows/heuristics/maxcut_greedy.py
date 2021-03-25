@@ -7,7 +7,8 @@ def getHeurSol(G, weight='weight'):
         
         :params G: A weighted networkx Graph
         :type G: Networkx Graph
-        :rtype: Amount of edges in the Max Cut
+        :return: Total weight of edges in Max - Cut solution
+        :rtype: int
     """
     
     A = set()

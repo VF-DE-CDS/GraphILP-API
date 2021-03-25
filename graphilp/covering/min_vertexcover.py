@@ -56,7 +56,8 @@ def extractSolution(G, model):
     :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`           
     :param model: a solved Gurobi model for minimum vertex cover                    
     
-    :return: a list of vertices comprising a minimum vertex cover
+    :return: Vertices of minimum Vertex Cover
+    :rtype: list of int (denoting indeces)
     """    
     vertex_nodes = [node for node, node_var in G.node_variables.items() if node_var.X > 0.5]        
     
