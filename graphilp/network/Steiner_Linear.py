@@ -18,7 +18,7 @@ def createModel(G, terminals, weight = 'weight', warmstart=[], lower_bound=None)
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
     ILP:
-        Let :math:`n = |V|` be the number of vertices in G and :math:`T` the set of terminals.
+        Let :math:`n = |V|` be the number of vertices in :math:`G` and :math:`T` the set of terminals.
         Further, let :math:`\overrightarrow{E} := \{(u, v), (v, u) \mid \{u, v\} \in E\}` 
         be the directed edge set used in the internal representation.
     
@@ -26,7 +26,7 @@ def createModel(G, terminals, weight = 'weight', warmstart=[], lower_bound=None)
             :nowrap:
 
             \begin{align*}
-            \min \sum_{(uvj) \in E} w_{uv} x_{uv}\\
+            \min \sum_{(u,v) \in \overrightarrow{E}} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
             \forall \{u,v\} \in E: x_{uv} + x_{vu} \leq 1 && \text{(restrict edges to one direction)}\\
             \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
@@ -163,7 +163,7 @@ def createModel(G, terminals, weight = 'weight', warmstart=[], lower_bound=None)
             nodes[e[0]].Start = 1
             nodes[e[1]].Start = 1
         
-    m.update()
+        m.update()
         
     return m
 
