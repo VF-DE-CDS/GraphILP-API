@@ -2,7 +2,7 @@
 from gurobipy import *
 import networkx as nx
 
-def createModel(G, terminals, root, weight = 'weight', cycleBasis: bool = False, nodeColoring: bool = False):    
+def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBasis: bool = False, nodeColoring: bool = False):    
     r""" Create an ILP for the linear Steiner Problem. 
     
     The model can be seen in Paper Chapter 3.0. This model
@@ -59,16 +59,18 @@ def createModel(G, terminals, root, weight = 'weight', cycleBasis: bool = False,
             G.G.add_edge(*edge[::-1])
     
     # Create Neighbourhood of the Root
-    Neighbourhood = []
+    fromRoot = []
+    inRoot = []
     for edge in G.G.edges():
         if edge[0] == root:
-            Neighbourhood.append(edge)
+            fromRoot.append(edge)
+            inRoot.append(edge[::-1])
 
     G.setNodeVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.BINARY))
     G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
 
     G.setLabelVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.INTEGER, lb = 1, ub = n))
-    G.setFlowVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.CONTINUOUS, lb = 0))
+    G.flow_variables = m.addVars(G.G.edges(), vtype = gurobipy.GRB.INTEGER, lb = 0)
     
     m.update()  
 
@@ -117,27 +119,34 @@ def createModel(G, terminals, root, weight = 'weight', cycleBasis: bool = False,
         if edge_var_rev != None:
             m.addConstr( n * edge_var_rev + labels[edge[1]] - labels[edge[0]] >= 1 - n*(1 - edge_var))
             m.addConstr( n * edge_var + labels[edge[0]] - labels[edge[1]] >= 1 - n*(1 - edge_var_rev))
-            
-    # Flow is started from Root node. Outgoing Flow has to be enough to fill all nodes
-    m.addConstr(gurobipy.quicksum(flow[edge] for edge in Neighbourhood) >= Terminals)  
-    
-    # Flow amount must not exceed edge's capacity. If the edge is not chosen, the flow has to always be 0.
-    for edge in G.G.edges(data=True):
-        m.addConstr(flow[(edge[0],edge[1])] <= edges[(edge[0], edge[1])] * edge[2]['Capacity'])
 
     # if edge is chosen, both adjacent nodes need to be chosen
     for edge, edge_var in edges.items():
         m.addConstr(2*edge_var - nodes[edge[0]] - nodes[edge[1]] <= 0)
 
+        
+    # Flow is started from Root node. Outgoing Flow has to be enough to fill all nodes
+    m.addConstr(gurobipy.quicksum(flow[edge] for edge in fromRoot) == Terminals - 1)   
+    
+    
+    # Flow amount must not exceed edge's capacity. If the edge is not chosen, the flow has to always be 0.
+    for edge in G.G.edges(data=True):
+        m.addConstr(flow[(edge[0],edge[1])] <= edges[(edge[0], edge[1])] * edge[2]['Capacity'] + minCapacity)
+    
+    # No flow is allowed to the root
+    for edge in inRoot:
+        m.addConstr(flow[edge] == 0)
+    
     # Flow conservation constraints
     for node in G.G.nodes(data=True):
-        # Getting all Edges that go away from the Node, i.e. the Node is the startpoint of the edge
+        # Getting all Edges that leave away from the Node, i.e. the Node is the startpoint of the edge
         outgoingEdges = [edge for edge in G.G.edges() if edge[0] == node[0]]
         # And all incoming edges, i.e. Node is the endpoint of the edge
         incomingEdges = [edge for edge in G.G.edges() if edge[1] == node[0]]
         
         if node[0] != root:
             m.addConstr(sum(flow[edgeIn] for edgeIn in incomingEdges) - sum(flow[edgeOut] for edgeOut in outgoingEdges) == node[1]['Weight'])
+    
     return m
 
 

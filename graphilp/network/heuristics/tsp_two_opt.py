@@ -46,7 +46,7 @@ def findTourLength(tour, G):
     return tourLength   
 
 
-def getHeuristic(G, tour, length, cities):
+def getHeuristic(G, tour, length):
     """ 2 Opt - Improvement Heuristic for the Traveling Salesman Problem
     
     Improve a tour, e.g. one returned from a Nearest Neighbour Heuristic. Do this by picking two nodes,
@@ -64,6 +64,7 @@ def getHeuristic(G, tour, length, cities):
     
     # Extracting the nodes of the tour in order to be able to perform 2 - OPT
     # Starting node
+    cities = len(G.G.nodes())
     tourForm = [tour[0][0]]
     for i in range(1, len(tour)):
         tourForm.append(tour[i][0])
@@ -76,7 +77,6 @@ def getHeuristic(G, tour, length, cities):
     
     while True:
         newTour, bestLength, newSolFound = iterateOuter(G.G, newTour, bestLength, cities)
-        print(bestLength)
         if newSolFound:
             continue
         else:
