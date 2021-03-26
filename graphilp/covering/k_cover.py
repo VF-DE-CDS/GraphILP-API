@@ -2,6 +2,7 @@
 from gurobipy import *
 import numpy as np
 
+<<<<<<< HEAD
 def createModel(S, k):
     """ Greate an ILP for the k-coverage problem
     
@@ -12,17 +13,17 @@ def createModel(S, k):
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
-    
         .. math::
             :nowrap:
-                \begin{align*}
-                \min \sum_{s \in S} x_{s} \\
-                \text{s.t.} &&\\
-                \forall e \in U: \sum_{S:e \in S}x_{s} \geq 1 && \text{(cover every element of the universe)}\\
-                \forall s \in S: x_{s} \in \{0,1\} && \text{(exactly one outgoing edge)}\\
-                \sum_{(s, v) \in E}x_{sv} = 1 && \text{(every set is either in the set cover (1), otherwise 0)}\\
-                \sum_{s \in S} x_{s} \leq k && \text{(Use maximum k sets)}\\
-                \end{align*}
+            
+            \begin{align*}
+            \min \sum_{s \in S} x_{s} \\
+            \text{s.t.} &&\\
+            \forall e \in U: \sum_{S:e \in S}x_{s} \geq 1 && \text{(cover every element of the universe)}\\
+            \forall s \in S: x_{s} \in \{0,1\} && \text{(exactly one outgoing edge)}\\
+            \sum_{(s, v) \in E}x_{sv} = 1 && \text{(every set is either in the set cover (1), otherwise 0)}\\
+            \sum_{s \in S} x_{s} \leq k && \text{(Use maximum k sets)}\\
+            \end{align*}
     """
     
     # Create model
