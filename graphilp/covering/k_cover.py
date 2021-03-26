@@ -2,7 +2,7 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(S, A, k):
+def createModel(S, k):
     """ Greate an ILP for the k-coverage problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
@@ -31,6 +31,7 @@ def createModel(S, A, k):
     # Add variables
     len_S = len(S.S)
     len_U = len(S.U)
+    A = S.M
     x = m.addMVar(shape=len_S, vtype=GRB.BINARY, name="x")
     S.setSystemVars(x)
     m.update()
