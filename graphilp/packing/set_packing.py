@@ -1,11 +1,11 @@
-# +
 from gurobipy import *
 import numpy as np
 
-def createModel(S):
+def createModel(S, warmstart=[]):
     r""" Create an ILP for the weighted set packing problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -27,24 +27,32 @@ def createModel(S):
     m = Model("graphilp_max_set_packing")  
     
     # Add variables
-    len_x = len(S.S)
-    len_b = len(S.U)
-    A = S.M
-    x = m.addMVar(shape=len_x, vtype=GRB.BINARY, name="x")
+    x = m.addMVar(shape=len(S.S), vtype=GRB.BINARY, name="x")
     S.setSystemVars(x)
     m.update()
     
     # Add vector b for the right-hand side
-    b = np.ones((len_b,), dtype=int)
+    b = np.ones((len(S.U),), dtype=int)
     
     # set weight vector 
     obj = np.array([val['weight'] for _set, val in S.S.items()])
     
     # Add constraints
-    m.addConstr(A @ x <= b, name="c")
+    m.addConstr(S.M @ x <= b, name="c")
     
     # set optimisation objective: maximize weight of the set packing  
     m.setObjective(obj @ x, GRB.MAXIMIZE)
+    
+    # set warmstart
+    if len(warmstart) > 0:
+        sets = list(S.S.keys())
+        for pos in range(len(sets)):
+            if sets[pos] in warmstart:
+                x[pos].Start = 1
+            else:
+                x[pos].Start = 0
+
+    m.update()
     
     return m
 
