@@ -6,7 +6,7 @@ import networkx as nx
 def createModel(G):
     r""" Create an ILP for the min uncut problem
         
-    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                    
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`                    
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -43,11 +43,11 @@ def createModel(G):
     # Create constraints
     ## for every edge, the nodes must be separated in the complement graph
     for (u, v) in GC.edges():
-            m.addConstr( edges[(u, v)]  <= nodes[v] +nodes[u] )
-            m.addConstr( edges[(u, v)] <= 2 - nodes[v] - nodes[u] ) 
+            m.addConstr(edges[(u, v)] <= nodes[v] +nodes[u])
+            m.addConstr(edges[(u, v)] <= 2 - nodes[v] - nodes[u]) 
 
     # set optimisation objective: maximize the cardinality of the number of edges in the cut of the complement graph  
-    m.setObjective( gurobipy.quicksum(  edges), GRB.MAXIMIZE)  
+    m.setObjective(gurobipy.quicksum(edges), GRB.MAXIMIZE)  
     
     return m
 
