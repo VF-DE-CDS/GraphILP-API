@@ -107,6 +107,9 @@ The methods in this section provide approximate solutions to the vertex cover pr
 Knapsack
 ========
 
+In the `multi-dimensional knapsack problem <https://en.wikipedia.org/wiki/Knapsack_problem#Multi-dimensional_knapsack_problem>`__
+the goal is to pack items with the highest total value into a knapsack where each item has a multi-dimensional weight vector and the knapsack has an individual capacity that cannot be exceeded in each dimension of the weight vector.
+
 .. automodule:: graphilp.covering.knapsack
    :noindex:
 
