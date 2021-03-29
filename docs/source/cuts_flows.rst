@@ -44,6 +44,19 @@ Cuts
    
    createModel
    extractSolution
+   
+Heuristics
+----------
+
+The methods in this section provide approximate solutions to the max cut problem constituting admissible solutions from which to start the exact optimisation.
+
+.. automodule:: graphilp.cuts_flows.heuristics.maxcut_greedy
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   getHeuristic
 
 Flows
 =====
@@ -56,8 +69,6 @@ Flows
    createModel
    extractSolution
 
-
-
 Details
 =======
 
@@ -65,6 +76,9 @@ Details
    :members:
   
 .. automodule:: graphilp.cuts_flows.max_cut
+   :members:
+   
+.. automodule:: graphilp.cuts_flows.heuristics.maxcut_greedy   
    :members:
    
 .. automodule:: graphilp.cuts_flows.min_uncut
