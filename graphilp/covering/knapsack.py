@@ -3,17 +3,25 @@ from gurobipy import *
 import numpy as np
 
 def createModel(S, W):
-    r""" Greate an ILP for the knapsack problem
+    r""" Create an ILP for the multi-dimensional knapsack problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`.
-    :param A: Sparse weight matrix compressed by rows. 
-    :param W: Size of each Knapsack
-    
-    TODO 
+    :param W: capacity of each knapsack
     
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
+        Let :math:`M` be the incidence matrix of the set system, :math:`w` the vector of weights giving
+        the value of the items to be packed and :math:`x` a vector indicating which item is selected.
+    
+        .. math::
+            :nowrap:
+            
+            \begin{align*}
+            \max w^{\top}x \\
+            \text{s.t.} &&\\
+            Mx \leq W && \text{(do not exceed capacity in any dimension)}\\
+            \end{align*}
     """
     
     # Create model
