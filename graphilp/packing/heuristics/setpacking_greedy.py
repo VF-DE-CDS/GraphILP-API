@@ -1,12 +1,10 @@
 # +
-import sys, os
-sys.path.append(os.path.abspath('../..'))
-import numpy as np
-import scipy.sparse as sp
-from imports import ilpsetsystem as ilpss
-from imports import readFile
-import time
-from covering.heuristics import coverHelpers as covHelp
+#import numpy as np
+#import scipy.sparse as sp
+#from imports import ilpsetsystem as ilpss
+#from imports import readFile
+#import time
+#from covering.heuristics import coverHelpers as covHelp
 
 def calculateSetEfficiencies(chosenSets, setSizes, sets):
     costEfficiencies = dict()
@@ -25,13 +23,13 @@ def removeSets(sets, chosenNodes, containedNodes):
         sets.pop(curSet)
     return sets
 
-def getHeurSol(coverMatrix, sets, universe):
+def getHeuristic(coverMatrix, sets, universe):
     """
         Returns the Heuristic Solution calculated by a greedy approximation algorithm for the set Packing Problem.
         
         :param coverMatrix: Cover Matrix defining which Node is contained in which set
         :param sets: Sets that cover Nodes
-        :params universe: List of Nodes that are to be covered
+        :param universe: List of Nodes that are to be covered
         :type coverMatrix: List of List
         :type k: int, optional
         :type sets: Dict of int:dict pairs. The value needs to specifiy a weight.
@@ -59,4 +57,5 @@ def getHeurSol(coverMatrix, sets, universe):
         
         chosenSets.append(minSet)
         sets = removeSets(sets, chosenNodes, containedNodes)
+        
     return chosenSets, chosenNodes

@@ -3,14 +3,24 @@ from gurobipy import *
 import numpy as np
 
 def createModel(S):
-    r""" Greate an ILP for the weighted set packing problem
+    r""" Create an ILP for the weighted set packing problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
+        Let :math:`M` be the incidence matrix of the set system, :math:`w` the vector of weights associated to
+        the sets of the system, :math:`x` a vector indicating which set is selected, and :math:`1` a vector of ones.
     
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \max w^{\top}x\\
+            \text{s.t.} &&\\
+            Mx \leq 1 && \text{(each element of the universe is in only one set)}\\
+            \end{align*}
     """
     
     # Create model
@@ -21,7 +31,7 @@ def createModel(S):
     len_b = len(S.U)
     A = S.M
     x = m.addMVar(shape=len_x, vtype=GRB.BINARY, name="x")
-    S.setSystemVars( x)
+    S.setSystemVars(x)
     m.update()
     
     # Add vector b for the right-hand side
@@ -47,6 +57,6 @@ def extractSolution(S, model):
     :return: a list of sets comprising a set packing
     """
     iterate = list(range(len(S.S)))
-    set_cover = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5 ]
+    set_cover = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5]
     
     return set_cover
