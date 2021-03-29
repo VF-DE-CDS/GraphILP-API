@@ -2,11 +2,10 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(S, A):
+def createModel(S):
     r""" Greate an ILP for the weighted set packing problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param A: TODO
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -20,6 +19,7 @@ def createModel(S, A):
     # Add variables
     len_x = len(S.S)
     len_b = len(S.U)
+    A = S.M
     x = m.addMVar(shape=len_x, vtype=GRB.BINARY, name="x")
     S.setSystemVars( x)
     m.update()

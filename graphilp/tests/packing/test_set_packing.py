@@ -14,7 +14,7 @@ SetCover = ilpss.ILPSetSystem()
 SetCover.setSystem(sets)
 SetCover.setIncMatrix(A)
 SetCover.setUniverse(universe )
-m = setp.createModel(SetCover, A)
+m = setp.createModel(SetCover)
 m.optimize()
 
 

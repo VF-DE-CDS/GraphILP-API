@@ -19,7 +19,7 @@ SetCover = ilpss.ILPSetSystem()
 SetCover.setSystem(sets)
 SetCover.setIncMatrix(A)
 SetCover.setUniverse(universe )
-m = createModel(SetCover, A)
+m = createModel(SetCover)
 m.optimize()
 
 assert(m.objVal == 7)

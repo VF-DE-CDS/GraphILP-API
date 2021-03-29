@@ -18,7 +18,10 @@ SetCover = ilpss.ILPSetSystem()
 SetCover.setSystem(sets)
 SetCover.setIncMatrix(A)
 SetCover.setUniverse(universe )
-m = kc.createModel(SetCover, A, 1)
+m = kc.createModel(SetCover, 1)
 m.optimize()
 
 assert(m.objVal == 8)
+# -
+
+

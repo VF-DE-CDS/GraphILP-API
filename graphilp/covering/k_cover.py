@@ -2,8 +2,9 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(S, A, k):
-    r""" Greate an ILP for the k-coverage problem
+<<<<<<< HEAD
+def createModel(S, k):
+    """ Greate an ILP for the k-coverage problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param A: Sparse covering matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
@@ -31,6 +32,7 @@ def createModel(S, A, k):
     # Add variables
     len_S = len(S.S)
     len_U = len(S.U)
+    A = S.M
     x = m.addMVar(shape=len_S, vtype=GRB.BINARY, name="x")
     S.setSystemVars(x)
     m.update()

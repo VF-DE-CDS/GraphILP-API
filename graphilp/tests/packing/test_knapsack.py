@@ -12,7 +12,7 @@ SetCover = ilpss.ILPSetSystem()
 SetCover.setSystem(sets)
 SetCover.setIncMatrix(A)
 SetCover.setUniverse(universe )
-m = kp.createModel(SetCover, A, 5)
+m = kp.createModel(SetCover, 5)
 m.optimize()
 
 assert(m.objVal == 5.0)
