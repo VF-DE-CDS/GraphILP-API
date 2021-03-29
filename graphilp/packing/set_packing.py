@@ -19,7 +19,7 @@ def createModel(S, warmstart=[]):
             \begin{align*}
             \max w^{\top}x\\
             \text{s.t.} &&\\
-            Mx \leq 1 && \text{(each element of the universe is in only one set)}\\
+            Mx \leq 1 && \text{(each element of the universe is in at most one set)}\\
             \end{align*}
     """
     

@@ -1,61 +1,43 @@
 # +
-#import numpy as np
-#import scipy.sparse as sp
-#from imports import ilpsetsystem as ilpss
-#from imports import readFile
-#import time
-#from covering.heuristics import coverHelpers as covHelp
+from numpy import ones
 
-def calculateSetEfficiencies(chosenSets, setSizes, sets):
-    costEfficiencies = dict()
-    for i, (key, value) in enumerate(sets.items()):
-        costEfficiencies[key] = setSizes[key] / sets[key]['weight']
-    return costEfficiencies
-
-def removeSets(sets, chosenNodes, containedNodes):
-    setsToPop = set()
-    for curSet in sets:
-        for node in chosenNodes:
-            if node in containedNodes[curSet]:
-                setsToPop.add(curSet)
-                break
-    for curSet in setsToPop:
-        sets.pop(curSet)
-    return sets
-
-def getHeuristic(coverMatrix, sets, universe):
+def getHeuristic(S):
     """
-        Returns the Heuristic Solution calculated by a greedy approximation algorithm for the set Packing Problem.
+        Greedy heuristic for the set packing problem
         
-        :param coverMatrix: Cover Matrix defining which Node is contained in which set
-        :param sets: Sets that cover Nodes
-        :param universe: List of Nodes that are to be covered
-        :type coverMatrix: List of List
-        :type k: int, optional
-        :type sets: Dict of int:dict pairs. The value needs to specifiy a weight.
-        :type universe: list of int
-        :return: A list of the Sets covering the chosen Nodes
-        :rtype: list of int, list of int
+        Iteratively add the set with maximal size to weight ratio which does not contain an element
+        that is already covered to the solution.
+        
+        :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+
+        :return: a list of the sets comprising the cover
     """
-    # Instantiation of the Datastructures
-    chosenSets = []
-    chosenNodes = set()
-    numSets = len(sets)
-    setSizes = np.zeros(numSets)
-    numNodes = len(universe)
+    # abbreviations
+    set_names = list(S.S.keys())
+    set_index = range(len(S.S))
+    set_sizes = sum(S.M)
 
-    # Extract the essential information we need from the Cover Matrix
-    containingSets, containedNodes, setSizes = covHelp.extract(coverMatrix, numSets)
+    # which elements of the universe are not yet covered by the solution?
+    not_covered = ones((len(S.U),), dtype=int)
 
-    while sets != {}:
-        # costEfficiencies define how good picking each set is for us
-        costEff = calculateSetEfficiencies(chosenSets, setSizes, sets)
-        # The minimum efficiency is the best set we can pick (greedy)
-        minSet = min(costEff.keys(), key=(lambda k: costEff[k]))
-        # Unify the added Nodes with the ones already existing in the solution
-        chosenNodes = containedNodes[minSet].union(chosenNodes)
+    # all sets can still be used
+    sets = set(set_index)
+    
+    # start with an empty result
+    result = []
+    
+    # while there are still 
+    while len(sets) > 0:
         
-        chosenSets.append(minSet)
-        sets = removeSets(sets, chosenNodes, containedNodes)
+        # pick most efficient set
+        chosen_set = min([(set_sizes[_set] / S.S[set_names[_set]]['weight'], _set) for _set in sets])[1]
+        result.append(chosen_set)
+    
+        # update which elements are not yet covered
+        not_covered = not_covered * (1 - S.M[:,chosen_set])
         
-    return chosenSets, chosenNodes
+        # remove all sets covering an element already covered by a set in the solution
+        remove_sets = {_set for _set in set_index if sum((1 - not_covered) * S.M[:, _set]) > 0}
+        sets = sets.difference(remove_sets)
+        
+    return [set_names[s] for s in result]
