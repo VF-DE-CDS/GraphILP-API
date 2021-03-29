@@ -2,12 +2,10 @@
 from gurobipy import *
 import numpy as np
 
-<<<<<<< HEAD
 def createModel(S, k):
-    """ Greate an ILP for the k-coverage problem
+    r""" Greate an ILP for the k-coverage problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param A: Sparse covering matrix compressed by rows. Rows are Nodes and Columns are the Sets covering the Nodes 
     :param k: Maximum amount of Sets in solution
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
