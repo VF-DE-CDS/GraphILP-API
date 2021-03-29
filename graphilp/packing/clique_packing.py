@@ -40,6 +40,16 @@ def createModel(G, clique_size):
             \forall c \in C: \forall v \in V: y_c - a_{cv} \geq 0
             && \text{(cluster with } \geq 1 \text { vertex needs to be chosen as clique)}\\
             \end{align*}  
+
+    Example:
+            .. list-table:: 
+               :widths: 50 50
+               :header-rows: 0
+
+               * - .. image:: images/example_clique_packing.png
+                 - `Packing tetrahedra <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/CliquePackingExample.ipynb>`_
+
+                   How many vertex disjoint tetrahedra can you pack in a grid graph?
     """        
     # create model    
     m = Model("graphilp_clique_packing")        
