@@ -3,7 +3,7 @@ import numpy as np
 import scipy.sparse as sp
 from gurobipy import *
 
-def createModel(S, A):
+def createModel(S):
     r""" Greate an ILP for the k-coverage problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
@@ -30,6 +30,7 @@ def createModel(S, A):
     # Add variables
     len_x = len(S.S)
     len_b = len(S.U)
+    A = S.M
     x = m.addMVar(shape=len_x, vtype=GRB.BINARY, name="x")
     S.setSystemVars(x)
     m.update()

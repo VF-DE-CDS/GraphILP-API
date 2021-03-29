@@ -47,9 +47,12 @@ def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBa
 
     # create model
     m = Model("Steiner Tree")    
-    Terminals = 0
-    for node in G.G.nodes():
-        Terminals += G.G.nodes[node]['Weight']
+    totLoad = 0
+    for node in G.G.nodes(data=True):
+        if (node[0] == root):
+            continue
+        totLoad += G.G.nodes[node[0]]['Weight']
+    print(totLoad)
     n = G.G.number_of_nodes()
 
     # create reverse edge for every edge in the graph
@@ -126,7 +129,7 @@ def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBa
 
         
     # Flow is started from Root node. Outgoing Flow has to be enough to fill all nodes
-    m.addConstr(gurobipy.quicksum(flow[edge] for edge in fromRoot) == Terminals - 1)   
+    m.addConstr(gurobipy.quicksum(flow[edge] for edge in fromRoot) == totLoad)   
     
     
     # Flow amount must not exceed edge's capacity. If the edge is not chosen, the flow has to always be 0.
