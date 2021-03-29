@@ -74,3 +74,8 @@ The best way to get startet with GraphILP is through one of our examples:
      - `Maximum weight cuts <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Binarisation.ipynb>`_
      
        Use maximum weight cuts for image binarisation.
+
+   * - .. image:: images/example_clique_packing.png
+     - `Packing tetrahedra <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/CliquePackingExample.ipynb>`_
+     
+       How many vertex disjoint tetrahedra can you pack in a grid graph?
