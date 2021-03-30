@@ -94,7 +94,7 @@ The methods in this section provide approximate solutions to the vertex cover pr
 .. autosummary::
    :nosignatures:
 
-   getHeuristic
+   get_heuristic
 
 .. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
    :noindex:
@@ -102,7 +102,7 @@ The methods in this section provide approximate solutions to the vertex cover pr
 .. autosummary::
    :nosignatures:
 
-   getHeuristic
+   get_heuristic
 
 Knapsack
 ========
@@ -159,7 +159,7 @@ The methods in this section provide approximate solutions to the set cover probl
 .. autosummary::
    :nosignatures:
 
-   getHeuristic   
+   get_heuristic   
 
 Details
 =======
