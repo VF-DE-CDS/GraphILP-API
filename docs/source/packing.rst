@@ -8,7 +8,7 @@ Packing problems on graphs deal with the question of how to identify as many dis
 
 .. tikz:: Example of clique packing for 3-cliques (aka triangles).
    :align: center
-   
+
    \tikzset{main node/.style={circle,draw,font=\sffamily\bfseries}}
    \tikzset{scale=0.5}
 
@@ -58,10 +58,10 @@ An independet set in the vertex set of a graph is a subset of the vertices in wh
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   
+
+   create_model
+   extract_solution
+
 Clique packing
 ==============
 
@@ -72,9 +72,9 @@ A `clique <https://en.wikipedia.org/wiki/Clique_(graph_theory)>`__ is a fully co
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 Set packing
 ===========
@@ -86,10 +86,10 @@ The `set packing problem <https://en.wikipedia.org/wiki/Set_packing>`__ is askin
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   
+
+   create_model
+   extract_solution
+
 Heuristics
 ----------
 
@@ -101,7 +101,7 @@ The methods in this section provide approximate solutions to the set packing pro
 .. autosummary::
    :nosignatures:
 
-   getHeuristic   
+   get_heuristic   
 
 Details
 =======
@@ -111,9 +111,9 @@ Details
 
 .. automodule:: graphilp.packing.clique_packing
     :members:
-    
+
 .. automodule:: graphilp.packing.set_packing
-    :members:    
-    
+    :members:
+
 .. automodule:: graphilp.packing.heuristics.setpacking_greedy
-    :members:    
+    :members:

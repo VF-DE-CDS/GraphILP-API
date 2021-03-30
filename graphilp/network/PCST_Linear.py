@@ -1,22 +1,20 @@
-# +
-from gurobipy import *
+from gurobipy import Model, GRB, quicksum
 import networkx as nx
 
-def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
-                cycleBasis:bool = False, nodeColoring: bool = False):    
-    r""" Create an ILP for the Prize Collecting Steiner Tree Problem. 
-    
-    The model can be seen in Paper Chapter 3.0. This model
-    doesn't implement tightened labels.
-    
+
+def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
+    r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
+
+    TODO
+
     :param G: an ILPGraph
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param prize: name of the argument in the node dictionary of the graph used to store node prize values
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
-    
-    ILP: 
+
+    ILP:
         .. math::
             :nowrap:
 
@@ -31,28 +29,27 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
             n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
             n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
             \end{align*}
-    """     
-    
+    """
     # ensure that input is a directed graph
     if type(G.G) != nx.classes.digraph.DiGraph:
         G.G = nx.DiGraph(G.G)
-        
+
     # create model
-    m = Model("Steiner Tree")        
-    
+    m = Model("graphilp_pcst")
+
     n = G.G.number_of_nodes()
 
     # create reverse edge for every edge in the graph
     for edge in G.G.edges():
         G.G.add_edge(*edge[::-1])
 
-    G.setNodeVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.BINARY))
-    G.setEdgeVars(m.addVars(G.G.edges(), vtype = gurobipy.GRB.BINARY))
+    G.set_node_vars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
+    G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
 
-    # node label variables used to avoid cycles 
-    G.setLabelVars(m.addVars(G.G.nodes(), vtype = gurobipy.GRB.INTEGER, lb = 1, ub = n))
+    # node label variables used to avoid cycles
+    G.setLabelVars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1, ub=n))
 
-    m.update()  
+    m.update()
 
     # abbreviations
     edges = G.edge_variables
@@ -61,10 +58,10 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
     edge2var = dict(zip(edges.keys(), edges.values()))
 
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([G.G.nodes[node].get(prize, 0) * node_var for node, node_var in nodes.items()])
-                   - gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), 
+    m.setObjective(quicksum([G.G.nodes[node].get(prize, 0) * node_var for node, node_var in nodes.items()])
+                   - quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]),
                    GRB.MAXIMIZE)
-    
+
     # equality constraints for forced terminals (each terminal needs to be chosen, i.e., set its value to 1)
     for node, node_var in nodes.items():
         # the outer loop makes sure that terminals that are not in the graph are ignored
@@ -72,7 +69,7 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
             m.addConstr(node_var == 1)
 
     # restrict number of edges, at max one edge between each pair of nodes
-    m.addConstr(gurobipy.quicksum(nodes.values()) - gurobipy.quicksum(edges.values()) == 1)
+    m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
 
     # at most one direction per edge can be chosen
     # runtime can probably be greatly improved if iterating is done in a smarter way
@@ -96,52 +93,33 @@ def createModel(G, forced_terminals = [], weight = 'weight', prize = 'prize',
             # in the previous formulation
             if (node == edge[0] or node == edge[1]):
                 edge_vars.append(edge_var)
-        m.addConstr(node_var - gurobipy.quicksum(edge_vars) <= 0)
+        m.addConstr(node_var - quicksum(edge_vars) <= 0)
 
-    
-    # labeling constraints: enforce increasing labels in edge direction of selected edges 
+
+    # labeling constraints: enforce increasing labels in edge direction of selected edges
     for edge, edge_var in edges.items():
         reverseEdge = edge[::-1]
         edge_var_rev = edge2var.get(reverseEdge)
         if edge_var_rev != None:
-            m.addConstr( n * edge_var_rev + labels[edge[1]] - labels[edge[0]] >= 1 - n*(1 - edge_var))
-            m.addConstr( n * edge_var + labels[edge[0]] - labels[edge[1]] >= 1 - n*(1 - edge_var_rev))
+            m.addConstr(n * edge_var_rev + labels[edge[1]] - labels[edge[0]] >= 1 - n*(1 - edge_var))
+            m.addConstr(n * edge_var + labels[edge[0]] - labels[edge[1]] >= 1 - n*(1 - edge_var_rev))
 
     # allow only one arrow into each node
     for node in nodes:
-        constraint_edges =  [(u, v) for (u, v) in edges.keys() if v == node]
-        m.addConstr(gurobipy.quicksum([edges[e] for e in constraint_edges]) <= 1)
-    
+        constraint_edges = [(u, v) for (u, v) in edges.keys() if v == node]
+        m.addConstr(quicksum([edges[e] for e in constraint_edges]) <= 1)
+
     return m
 
-def callback_cycle(model, where):
-    if where == GRB.Callback.MIPSOL:
-        variables = model.getVars()
-        cur_sol = model.cbGetSolution(variables)
-        
-        solution = [edge_dict[int(variables[i].VarName.split('_')[1])] for i in range(len(variables)) if (cur_sol[i] > 0.5) and (variables[i].VarName.split('_')[0] == 'edge')]
-        G2 = nx.Graph()
-        G2.add_edges_from(solution)
-        try:
-            cycle = nx.find_cycle(G2)
-            cycle_idx = [edge if edge in edge_list else (edge[1], edge[0]) for edge in cycle]
-            model.cbLazy(gurobipy.quicksum([model.getVarByName("edge_" + str(rev_edge_dict[edge])) for edge in cycle_idx]) <= len(cycle_idx)-1)
-        except:
-            return 
-        
-def extractSolution(G, model):
-    r""" Get the optimal prize collecting Steiner tree in G 
-    
+
+def extract_solution(G, model):
+    r""" Get the optimal prize collecting Steiner tree in G
+
         :param G: an ILPGraph
-        :param model: a solved Gurobi model for Prize Collecting Steiner tree 
-            
-        :return: the edges of an optimal prize collecting Steiner tree 
+        :param model: a solved Gurobi model for Prize Collecting Steiner tree
+
+        :return: the edges of an optimal prize collecting Steiner tree
     """
     solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
 
     return solution
-
-
-# -
-
-

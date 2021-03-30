@@ -24,8 +24,8 @@ General matching
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Perfect matching
 ================
@@ -38,8 +38,8 @@ A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in graph
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Bipartite matching
 ==================
@@ -52,8 +52,8 @@ For `bipartite <https://en.wikipedia.org/wiki/Bipartite_graph>`__ graphs, matchi
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Details
 =======

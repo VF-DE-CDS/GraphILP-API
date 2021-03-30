@@ -21,10 +21,10 @@ The ILPGraph class takes care of both the graph instance used in an optimisation
    :nosignatures:
    
    ILPGraph
-   ILPGraph.setNXGraph
-   ILPGraph.setEdgeVars
-   ILPGraph.setNodeVars
-   ILPGraph.setLabelVars
+   ILPGraph.set_nx_graph
+   ILPGraph.set_edge_vars
+   ILPGraph.set_node_vars
+   ILPGraph.set_label_vars
    
 NetworkX
 ========
@@ -70,11 +70,11 @@ A set system (or undirected `hypergraph <https://en.wikipedia.org/wiki/Hypergrap
    :nosignatures:
    
    ILPSetSystem
-   ILPSetSystem.setUniverse
-   ILPSetSystem.setSystem
-   ILPSetSystem.setIncMatrix
-   ILPSetSystem.setSystemVars
-   ILPSetSystem.setUniverseVars
+   ILPSetSystem.set_universe
+   ILPSetSystem.set_system
+   ILPSetSystem.set_inc_matrix
+   ILPSetSystem.set_system_vars
+   ILPSetSystem.set_universe_vars
    
 Details
 =======
