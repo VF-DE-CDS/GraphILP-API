@@ -137,6 +137,8 @@ The objective is then to maximise the total weight of the elements that are cove
 Set cover
 =========
 
+The `set cover problem <https://en.wikipedia.org/wiki/Set_cover_problem>`__ is to find the smallest weight sub-collection of the sets in a set system such that all elements of the underlying universe are covered.
+
 .. automodule:: graphilp.covering.set_cover
    :noindex:
 

@@ -11,17 +11,20 @@ def createModel(S, k):
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
     ILP:
-        Let :math:`S` be the collection of sets in the set system and :math:`U` the underlying universe.
+        Let :math:`S` be the collection of sets in the set system, :math:`U` the underlying universe, and
+        :math:`w_u` the weight of each element :math:`u \in U`.
+        For each :math:`s \in S`, the decision variable :math:`x_s` indicates whether :math:`s` is part 
+        of the solution. For each :math:`u \in U`, the decision variable :math:`y_u` indicates whether 
+        :math:`u` is covered in the solution.
     
         .. math::
             :nowrap:
             
             \begin{align*}
-            \min \sum_{s \in S} x_{s} \\
+            \max \sum_{u \in U} w_u y_u \\
             \text{s.t.} &&\\
-            \forall u \in U: \sum_{s:u \in s}x_{s} \geq 1 && \text{(cover every element of the universe)}\\
+            \forall u \in U: \sum_{s:u \in s}x_{s} \geq y_u && \text{(chosen sets cover elements of the universe)}\\
             \sum_{s \in S} x_{s} \leq k && \text{(use at most k sets)}\\
-            \forall s \in S: x_{s} \in \{0,1\} && \text{(every set is either in the set cover or not)}\\
             \end{align*}
     """
     
