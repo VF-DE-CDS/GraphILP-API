@@ -9,10 +9,10 @@ A = sp.csr_matrix(weight_matrix)
 sets = {0:{'weight': 4, 'value':5}, 1:{'weight': 2, 'value':4}, 2:{'weight': 1, 'value':3}}
 universe = {0:{'weight': 4}, 1:{'weight': 2}, 2:{'weight': 1}}
 SetCover = ilpss.ILPSetSystem()
-SetCover.setSystem(sets)
-SetCover.setIncMatrix(A)
-SetCover.setUniverse(universe )
-m = kp.createModel(SetCover, 5)
+SetCover.set_system(sets)
+SetCover.set_inc_matrix(A)
+SetCover.set_universe(universe )
+m = kp.create_model(SetCover, 5)
 m.optimize()
 
 assert(m.objVal == 5.0)

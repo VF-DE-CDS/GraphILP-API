@@ -24,9 +24,9 @@ The :ref:`covering version <covering_version>` below has a tighter integrality g
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 .. _covering_version:
 
@@ -37,18 +37,18 @@ The covering version of the integer linear program for max clique is using the c
 
 .. tikz:: A maximal clique (bold edges, blue vertices) and a vertex cover of the complement (red edges, green vertices).
    :align: left
-   
+
    \tikzset{main node/.style={circle,draw,font=\sffamily\bfseries}}
 
    \node[main node,fill=blue!50] (1) at (3, 3.4) {};
    \node[main node,fill=blue!50] (2) at (3, 2) {};
    \node[main node,fill=blue!50] (3) at (4.2124, 1.3) {};
    \node[main node,fill=blue!50] (4) at (1.7876, 1.3) {};
- 
+
    \node[main node,fill=green!50] (5) at (1, 3.4) {};
    \node[main node,fill=green!50] (6) at (5, 3.4) {};
    \node[main node,fill=green!50] (7) at (3, 0) {};
- 
+
    \path[every node/.style={font=\sffamily\small}]
    (1) edge[line width=1] (2)
        edge[line width=1] (3)
@@ -77,10 +77,10 @@ The covering version of the integer linear program for max clique is using the c
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   
+
+   create_model
+   extract_solution
+
 Details
 =======
 
@@ -89,4 +89,3 @@ Details
 
 .. automodule:: graphilp.sub_super.max_clique_cover
     :members:
-   

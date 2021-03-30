@@ -13,7 +13,7 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
 
 .. tikz:: Examples of minimal vertex colourings
    :align: left
-   
+
    \tikzset{main node/.style={circle,draw,font=\sffamily\bfseries}}
 
    \node[main node,fill=red!50] (1) at (3, 4) {};
@@ -24,7 +24,7 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
    \node[main node,fill=red!50] (6) at (5, 2) {};
    \node[main node,fill=green!50] (7) at (4, 1) {};
    \node[main node,fill=green!50] (8) at (6, 1) {};
-  
+
    \path[every node/.style={font=\sffamily\small}]
     (1) edge node {} (2)
         edge node {} (3)
@@ -52,9 +52,9 @@ A vertex `colouring <https://en.wikipedia.org/wiki/Graph_coloring>`__ of a graph
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 Heuristics
 ----------
@@ -68,13 +68,13 @@ Constant factor approximations also imply a lower bound on the solution.
 .. autosummary::
    :nosignatures:
 
-    getHeuristic
+    get_heuristic
 
 Details
 =======
 
 .. automodule:: graphilp.partitioning.min_vertex_coloring
    :members:
-   
+
 .. automodule:: graphilp.partitioning.heuristics.vertex_coloring_greedy
    :members:

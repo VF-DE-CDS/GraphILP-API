@@ -11,10 +11,10 @@ G = complete_graph(graph_size)
 Graph = imp_nx.read(G)
 
 # Calculate Nearest Neighbours
-tour, length = NN.getHeuristic(Graph)
+tour, length = NN.get_heuristic(Graph)
 assert(len(tour) == graph_size)
 
 # Improve with 2 OPT Heuristic
-tour, length = twoOpt.getHeuristic(Graph, tour, length)
+tour, length = twoOpt.get_heuristic(Graph, tour, length)
 
 assert(len(tour) == graph_size)

@@ -46,8 +46,8 @@ A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :m
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Edge dominating set
 ===================
@@ -63,8 +63,8 @@ An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Vertex cover
 ============
@@ -80,8 +80,8 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Heuristics
 ----------
@@ -94,7 +94,7 @@ The methods in this section provide approximate solutions to the vertex cover pr
 .. autosummary::
    :nosignatures:
 
-   getHeuristic
+   get_heuristic
 
 .. automodule:: graphilp.covering.heuristics.vertexcover_lp_rounding
    :noindex:
@@ -102,7 +102,7 @@ The methods in this section provide approximate solutions to the vertex cover pr
 .. autosummary::
    :nosignatures:
 
-   getHeuristic
+   get_heuristic
 
 Knapsack
 ========
@@ -116,8 +116,8 @@ the goal is to pack items with the highest total value into a knapsack where eac
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 k-Cover
 =======
@@ -131,8 +131,8 @@ The objective is then to maximise the total weight of the elements that are cove
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Set cover
 =========
@@ -145,8 +145,8 @@ The `set cover problem <https://en.wikipedia.org/wiki/Set_cover_problem>`__ is t
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Heuristics
 ----------
@@ -159,7 +159,7 @@ The methods in this section provide approximate solutions to the set cover probl
 .. autosummary::
    :nosignatures:
 
-   getHeuristic   
+   get_heuristic   
 
 Details
 =======
