@@ -119,8 +119,11 @@ the goal is to pack items with the highest total value into a knapsack where eac
    createModel
    extractSolution
    
-k-Covering
-==========
+k-Cover
+=======
+
+In the k-cover problem, the elements of the universe of a set system are to be covered by at most k sets of the system.
+The objective is then to maximise the total weight of the elements that are covered.
 
 .. automodule:: graphilp.covering.k_cover
    :noindex:
