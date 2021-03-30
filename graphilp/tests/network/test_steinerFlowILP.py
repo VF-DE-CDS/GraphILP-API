@@ -1,35 +1,27 @@
 # +
-from graphilp.imports import ilpgraph, readFile
-from graphilp.imports import networkx as imp_nx
-from graphilp.network import Steiner_Linear_with_Flow as sflow
-import graphilp
-import networkx as nx
-from gurobipy import *
-import xlsxwriter
-import random
-import matplotlib.pyplot as plt
+from networkx import complete_bipartite_graph
+from graphilp.imports import networkx as nximp
+from graphilp.network import Steiner_Linear_with_Flow as slf
 
-path = graphilp.__path__[0] + "/examples/Steiner_testInstances/e10.stp"
-G, terminals = readFile.stp_to_networkx(path)
+G = complete_bipartite_graph(16, 8)
+terminals = [0,1,14,15]
+root = 2
 
-for edge in G.edges():
-    G[edge[0]][edge[1]]['weight'] = 1
-    G[edge[0]][edge[1]]['Capacity'] = 1000
+for n in G.nodes():
+    G.nodes[n]['Weight'] = 1
+
+G.nodes[root]['Weight'] = 10 
+
+for t in terminals:
+    G.nodes[t]['Weight'] = 10
     
-root = 2411
-
-assert(nx.is_connected(G))
-assert(root in terminals)
-
-Graph = imp_nx.read(G)
-
-for node in G.nodes(data=True):
-    if node[0] in terminals:
-        node[1]['Weight'] = 1
-    else:
-        node[1]['Weight'] = 0
+for e in G.edges():
+    G.edges[e]['Capacity'] = 32
     
-model = sflow.createModel(Graph, terminals, root, 'weight')
-model.optimize()
+optG = nximp.read(G)
 
-assert(model.objVal == 1382)
+m = slf.createModel(optG, terminals, root)
+m.optimize()
+
+result = slf.extractSolution(optG, m)
+assert(len(result) == 4)

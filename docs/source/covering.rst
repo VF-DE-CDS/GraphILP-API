@@ -107,6 +107,9 @@ The methods in this section provide approximate solutions to the vertex cover pr
 Knapsack
 ========
 
+In the `multi-dimensional knapsack problem <https://en.wikipedia.org/wiki/Knapsack_problem#Multi-dimensional_knapsack_problem>`__
+the goal is to pack items with the highest total value into a knapsack where each item has a multi-dimensional weight vector and the knapsack has an individual capacity that cannot be exceeded in each dimension of the weight vector.
+
 .. automodule:: graphilp.covering.knapsack
    :noindex:
 
@@ -116,8 +119,11 @@ Knapsack
    createModel
    extractSolution
    
-k-Covering
-==========
+k-Cover
+=======
+
+In the k-cover problem, the elements of the universe of a set system are to be covered by at most k sets of the system.
+The objective is then to maximise the total weight of the elements that are covered.
 
 .. automodule:: graphilp.covering.k_cover
    :noindex:
@@ -131,6 +137,8 @@ k-Covering
 Set cover
 =========
 
+The `set cover problem <https://en.wikipedia.org/wiki/Set_cover_problem>`__ is to find the smallest weight sub-collection of the sets in a set system such that all elements of the underlying universe are covered.
+
 .. automodule:: graphilp.covering.set_cover
    :noindex:
 
@@ -139,6 +147,19 @@ Set cover
    
    createModel
    extractSolution
+   
+Heuristics
+----------
+
+The methods in this section provide approximate solutions to the set cover problem constituting admissible solutions from which to start the exact optimisation.
+
+.. automodule:: graphilp.covering.heuristics.setcover_greedy
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   getHeuristic   
 
 Details
 =======
@@ -166,3 +187,6 @@ Details
 
 .. automodule:: graphilp.covering.set_cover
   :members: 
+  
+.. automodule:: graphilp.covering.heuristics.setcover_greedy
+  :members:  

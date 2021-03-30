@@ -1,58 +1,51 @@
 # +
-import networkx as nx
+from networkx import edge_boundary
+from gurobipy import GRB
 
 def getHeuristic(G, weight='weight'):
-    """
-        Max Cut Greedy Heuristic.
-        The Heuristic greedily finds Nodes to add to either to Set A or Set B. 
-        Returns the weight of the edges lying between Set A and Set B.
+    """ Max cut greedy heuristic
+    
+        The heuristic greedily assigns vertices to either Set A or Set B depending on which choice leads
+        to the more expensive cut. 
         
-        :params G: A weighted networkx Graph
-        :type G: Networkx Graph
-        :return: Total weight of edges in Max - Cut solution, i.e. the weight of the edges lying between Set A and Set B
-        :rtype: int
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+        :param weight: name of the weight parameter in the edge dictionary of the graph
+        
+        :return: a pair cut_set, cut_cost of a subset of the vertices inducing a maximum weight cut
+            and the cost of the cut
     """
-    # Set initialization
+    # set initialization
     A = set()
     B = set()
-    maxCut = 0
     
-    edgelist = list(G.edges(data=True))
-    if 'weight' in edgelist[0][2]:
-        pass
-    else:
-        for edge in G.edges(data=True):
-            edge[2]['weight'] = 1
-            
-    for node in G.nodes():
-        # Finding neighbourhood of the Node
-        neighbors = G[node]
-        neighInA = 0
-        neighInB = 0
-        # For every node now decide to either add it to Set A or Set B.
-        # This depends on the amount of neighbours of the node that are in either Set A or B.
-        # So, first of all count the amount of neighbours in either Set.
-        for k, v in neighbors.items():
-            if k in A:
-                neighInA += v['weight']
-            elif k in B:
-                neighInB += v['weight']
-        # Depending on the amount of neighbours in either Set, decide whether to add the node to Set A or B.
-        if neighInA > neighInB:
+    for node in G.G.nodes():
+        # find neighbourhood of the vertex
+        neighbors = G.G[node]
+        weight_to_A = 0
+        weight_to_B = 0
+        
+        # for every node decide to either add it to Set A or Set B.
+        # this depends on the total weight of edges from this node to either Set A or B.
+        for neighbor in neighbors.keys():
+            if neighbor in A:
+                weight_to_A += G.G.edges[(node, neighbor)].get(weight, 1)
+            elif neighbor in B:
+                weight_to_B += G.G.edges[(node, neighbor)].get(weight, 1)
+                
+        # depending on the total weight of the edges to either set, decide whether to add the vertex to Set A or B.
+        if weight_to_A > weight_to_B:
             B.add(node)
         else:
             A.add(node)
 
-    # Calculate the edge boundary, i.e. the edges lying between A and B
-    edgesBetween = nx.edge_boundary(G, A, B)
+    # calculate the edge boundary, i.e. the edges lying between A and B
+    edgesBetween = edge_boundary(G.G, A, B)
     
-    # Sum over all edges in the boundary and get their total weight 
+    # sum over all edges in the boundary and get their total weight 
+    cut_cost = 0
+    
     for edge in edgesBetween:
-        maxCut += G.edges[edge]['weight']
+        cut_cost += G.G.edges[edge].get(weight, 1)
         
-    # Return the total weight of the edge boundary
-    return maxCut
-    
-# -
-
-
+    # return one of the sets and the total weight of the edge boundary
+    return A, cut_cost

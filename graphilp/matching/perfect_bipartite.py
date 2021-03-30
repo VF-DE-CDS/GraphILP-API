@@ -35,7 +35,7 @@ def createModel(G, A, weight='weight', direction=GRB.MAXIMIZE):
            :header-rows: 0
 
            * - .. image:: images/example_bipartite.png
-             - `Two-coloured partitions <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2-coloured%20partitions.ipynb>`_
+             - `Two-coloured partitions <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2ColouredPartitions.ipynb>`_
 
                Learn how to use perfect matching in bipartite graphs to find a way 
 

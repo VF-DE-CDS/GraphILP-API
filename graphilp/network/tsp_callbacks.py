@@ -4,9 +4,15 @@ import networkx as nx
 edge2var = None
 
 def callbackCycle(model, where):
+    """ Callback inserts constraints to forbid more than one cycle in solution candidates
+    
+    :param model: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    :param where: a Gurobi callback parameter indicating from which step of the optimisation the callback
+        originated
+    """
     global edge2var
+    
     if where == gurobipy.GRB.Callback.MIPSOL:
-        print("In Callback")
         activeEdges = model.cbGetSolution(model._x)
         edges = []
         cycles = []
@@ -27,6 +33,7 @@ def callbackCycle(model, where):
             smallestCycle = cycles[minLenIndex]
         except:
             pass
+        
         # Remove cycles if there are more than 1 
         if len(cycles) > 1:
             # Get all the edges from the first cycle to all others by joining the both nodepairs.
@@ -39,22 +46,34 @@ def callbackCycle(model, where):
                             neededEdges.append((nodeOne, nodeTwo))
                             neededEdgesRev.append((nodeTwo, nodeOne))
             
-            model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdges) >= 1)
-            model.cbLazy(gurobipy.quicksum(edge2var[edge] for edge in neededEdgesRev) >= 1)
+            model.cbLazy(quicksum(edge2var[edge] for edge in neededEdges) >= 1)
+            model.cbLazy(quicksum(edge2var[edge] for edge in neededEdgesRev) >= 1)
+            
     return
 
-def createGenModel(G, type_obj, metric, start=None, end=None):
-    global edge2var
+def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=None, end=None,
+                warmstart=[]):
     r""" Create an ILP for the min/max Path asymmetric TSP 
-        
-    :param G: a weighted ILPGraph
-    :param type_obj: choose whether to minimise or maximise the weight of the path
+    
+    This formulation enforces that the solution has at least one cycle.
+    A callback will detect if there is more than one cycle and adds constraints to explicity forbid this.
+    Together, this ensures that the solution is a valid tour.
+    
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` 
+    :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour
     :param metric: 'metric' for symmetric problem otherwise asymmetric problem
+    :param weight: name of the weight parameter in the edge dictionary of the graph
     :param start: require the TSP path to start at this node
     :param end: require the TSP path to end at this node
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
-        
+
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+    
+        model.optimize(callback = :obj:`callbackCycle`)
+
     ILP: 
         Let :math:`s` be the start node (if it is specified) and :math:`e` the end node.
     
@@ -68,20 +87,18 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
             \forall v \in V \setminus \{s, e\}: \sum_{(v, u) \in R}x_{vu} = 1 && \text{(Exactly one incoming edge.)}\\
             \sum_{(s, v) \in R}x_{sv} = 1 && \text{(Exactly one outgoing edge from start node.)}\\
             \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Exactly one incoming edge to end node.)}\\
-            \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Increasing labels along path.)}\\
-            \sum_{(v, e) \in R}x_{ve} = 1 && \text{(Increasing labels along path.)}\\
             \end{align*}   
     """
+    global edge2var
     
-    # Create model
+    # create model
     m = Model("graphilp_path_atsp")
     
     if metric == 'metric':
-        G_d = G.G.to_directed()
-        G_r = G_d.reverse(copy=True)
-        G.G = nx.compose(G_d, G_r)
+        G.G = G.G.to_directed()
+        G.G.add_edges_from([(v,u) for (u,v) in G.G.edges()])
         
-    # Add variables for edges   
+    # add variables for edges   
     G.setEdgeVars(m.addVars(G.G.edges(), vtype=gurobipy.GRB.BINARY))
     m.update()
 
@@ -90,41 +107,45 @@ def createGenModel(G, type_obj, metric, start=None, end=None):
     var2edge = dict(zip(edges.values(), edges.keys()))
     nbr_nodes = G.G.number_of_nodes()
 
-    # Create constraints
+    # create constraints
     # degree condition
     if ((start is None) and (end is None)):
         for node in G.G.nodes():
-            # Only one outgoing connection from every node
-            m.addConstr(gurobipy.quicksum( edges[e] for e in G.G.edges(node)) == 1)
-            # Only one incoming connection to every node
-            m.addConstr(gurobipy.quicksum( edges[e] for e in G.G.in_edges(node)) == 1)    
-            m.addConstr(edges[(node, node)] == 0)        
+            # Exactly one outgoing connection from every node
+            m.addConstr(quicksum( [edges[e] for e in G.G.edges(node)]) == 1)
+            # Exactly one incoming connection to every node
+            m.addConstr(quicksum( [edges[e] for e in G.G.in_edges(node)]) == 1)                        
     else:
         for node in G.G.nodes():     
             if node != start:
-                m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[1] == node]) == 1)
             if node != end:
-                m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 1)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[0] == node]) == 1)
             if node == start:
-                m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 0)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[1] == node]) == 0)
             if node == end:
-                m.addConstr(gurobipy.quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 0)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[0] == node]) == 0)
 
-    # set optimisation objective: find the min / max round tour in G
-    if type_obj == 'min': 
-        m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MINIMIZE)
-    if type_obj == 'max': 
-        m.setObjective(gurobipy.quicksum( [edges[(u,v)]* w['weight'] for (u,v,w) in G.G.edges(data=True)] ), GRB.MAXIMIZE)
+    # set optimisation objective: find the min / max weight round tour in G
+    m.setObjective(quicksum([edges[(u,v)] * w[weight] for (u,v,w) in G.G.edges(data=True)]), direction)
 
+    # set warmstart
+    if len(warmstart) > 0:
+        
+        # initialise warmstart by excluding all edges from solution
+        for edge_var in edges.values():
+            edge_var.Start = 0
+            
+        # set edges along warmstart tour
+        for edge in warmstart:
+            edges[edge].Start = 1
+
+        m.update()
+        
+    # prepare for callbacks
     m._x = G.edge_variables
-
     m.Params.lazyConstraints = 1
-    m.optimize(callbackCycle)
 
-    sol = m.getVars()
-    for s in sol:
-        if s.x == 1:
-            print(var2edge[s])
     return m
 
 def extractSolution(G, model):
@@ -140,6 +161,3 @@ def extractSolution(G, model):
     tour = [edge  for edge, edge_var in edge_vars.items() if edge_var.X > 0.5]
     
     return tour
-
-
-
