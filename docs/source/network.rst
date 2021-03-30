@@ -23,11 +23,11 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
    callback_cycle
-   
+
 Linear-size constraint system
 -----------------------------
 
@@ -38,21 +38,21 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution   
-   
+
+   create_model
+   extract_solution
+
 There is also a version of this constraint system with somewhat stronger conditions on the labels:
-   
+
 .. automodule:: graphilp.network.Steiner_Linear_tightened
    :noindex:
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution   
-   
+
+   create_model
+   extract_solution
+
 Flow-based constraint system
 -----------------------------
 .. automodule:: graphilp.network.Steiner_Linear_with_Flow
@@ -60,11 +60,11 @@ Flow-based constraint system
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution   
-   
-Heuristics 
+
+   create_model
+   extract_solution
+
+Heuristics
 ----------
 
 Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
@@ -76,7 +76,7 @@ Constant factor approximations also imply a lower bound on the solution.
 .. autosummary::
    :nosignatures:
 
-    getHeuristic
+    get_heuristic
 
 
 Prize Collecting Steiner Tree (PCST)
@@ -94,10 +94,10 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   callback_cycle   
+
+   create_model
+   extract_solution
+   callback_cycle
 
 Linear-size constraint system
 -----------------------------
@@ -109,10 +109,10 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   
+
+   create_model
+   extract_solution
+
 Travelling Salesman Problem (TSP)
 =================================
 
@@ -135,10 +135,10 @@ Introducing increasing node labels along the tour allows to give a formulation o
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
-   
+
+   create_model
+   extract_solution
+
 This formulation ensures that solutions are a disjoint union of cycles. More than one cycle appearing in incumbent solutions is then avoided by explicitly adding constraints forbidding this through a callback (sub-tour elimination).
 
 .. automodule:: graphilp.network.tsp_callbacks
@@ -146,44 +146,44 @@ This formulation ensures that solutions are a disjoint union of cycles. More tha
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
 
-.. automodule:: graphilp.network.atsp_DT_formulation 
+   create_model
+   extract_solution
+
+.. automodule:: graphilp.network.atsp_DT_formulation
    :noindex:
 
 .. autosummary::
    :nosignatures:
 
    createGenModel
-   extractSolution
+   extract_solution
 
 ATSP
 ^^^^
 
 .. automodule:: graphilp.network.atsp
    :noindex:
-   
+
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 
-   
+
 Path ATSP
 ^^^^^^^^^
-   
+
 .. automodule:: graphilp.network.patsp
    :noindex:
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 Metric TSP
 ----------
@@ -193,9 +193,9 @@ Metric TSP
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
+
+   create_model
+   extract_solution
 
 Path TSP
 ^^^^^^^^
@@ -205,11 +205,11 @@ Path TSP
 
 .. autosummary::
    :nosignatures:
-   
-   createModel
-   extractSolution
 
-Heuristics 
+   create_model
+   extract_solution
+
+Heuristics
 ----------
 
 Approximate solutions can be used as a warmstart in the optimisation, usually leading to shorter running times.
@@ -221,7 +221,7 @@ Constant factor approximations also imply a lower bound on the solution.
 .. autosummary::
    :nosignatures:
 
-    getHeuristic
+    get_heuristic
 
 .. automodule:: graphilp.network.heuristics.tsp_nearest_neighbour
    :noindex:
@@ -229,7 +229,7 @@ Constant factor approximations also imply a lower bound on the solution.
 .. autosummary::
    :nosignatures:
 
-    getHeuristic
+    get_heuristic
 
 .. automodule:: graphilp.network.heuristics.tsp_two_opt
    :noindex:
@@ -237,7 +237,7 @@ Constant factor approximations also imply a lower bound on the solution.
 .. autosummary::
    :nosignatures:
 
-    getHeuristic
+    get_heuristic
 
 Details
 =======
@@ -246,26 +246,26 @@ Details
    :members:
 
 .. automodule:: graphilp.network.Steiner_Linear
-   :members:   
+   :members:
 
 .. automodule:: graphilp.network.Steiner_Linear_tightened
-   :members:   
+   :members:
 
 .. automodule:: graphilp.network.Steiner_Linear_with_Flow
-   :members:   
-   
-.. automodule:: graphilp.network.heuristics.steiner_metric_closure   
-   :members:   
-   
+   :members:
+
+.. automodule:: graphilp.network.heuristics.steiner_metric_closure
+   :members:
+
 .. automodule:: graphilp.network.PCST
-   :members:   
-   
+   :members:
+
 .. automodule:: graphilp.network.PCST_Linear
-   :members:   
+   :members:
 
 .. automodule:: graphilp.network.atsp
-   :members:   
-   
+   :members:
+
 .. automodule:: graphilp.network.atsp_DT_formulation
    :members:
 
@@ -284,11 +284,11 @@ Details
 .. automodule:: graphilp.network.tsp_callbacks
    :members:
 
-.. automodule:: graphilp.network.heuristics.tsp_christofides 
-   :members:      
-   
+.. automodule:: graphilp.network.heuristics.tsp_christofides
+   :members:
+
 .. automodule:: graphilp.network.heuristics.tsp_nearest_neighbour
-   :members:       
-   
+   :members:
+
 .. automodule:: graphilp.network.heuristics.tsp_two_opt
-   :members:   
+   :members:
