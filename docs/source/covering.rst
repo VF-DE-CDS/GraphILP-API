@@ -147,6 +147,19 @@ The `set cover problem <https://en.wikipedia.org/wiki/Set_cover_problem>`__ is t
    
    createModel
    extractSolution
+   
+Heuristics
+----------
+
+The methods in this section provide approximate solutions to the set cover problem constituting admissible solutions from which to start the exact optimisation.
+
+.. automodule:: graphilp.covering.heuristics.setcover_greedy
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   getHeuristic   
 
 Details
 =======
@@ -174,3 +187,6 @@ Details
 
 .. automodule:: graphilp.covering.set_cover
   :members: 
+  
+.. automodule:: graphilp.covering.heuristics.setcover_greedy
+  :members:  

@@ -35,7 +35,7 @@ def createModel(S, warmstart=[]):
     b = np.ones((len(S.U),), dtype=int)
     
     # set weight vector 
-    obj = np.array([val['weight'] for _set, val in S.S.items()])
+    obj = np.array([val.get('weight', 1) for _set, val in S.S.items()])
     
     # Add constraints
     m.addConstr(S.M @ x <= b, name="c")

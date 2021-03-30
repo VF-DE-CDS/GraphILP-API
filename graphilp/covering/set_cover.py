@@ -3,10 +3,11 @@ import numpy as np
 import scipy.sparse as sp
 from gurobipy import *
 
-def createModel(S):
+def createModel(S, warmstart=[]):
     r""" Greate an ILP for the set cover problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -45,6 +46,16 @@ def createModel(S):
     
     # set optimisation objective: minimize weight of the set cover  
     m.setObjective(obj @ x, GRB.MINIMIZE)
+    
+    # set warmstart
+    if len(warmstart) > 0:
+        sets = list(S.S.keys())
+        for pos in range(len(sets)):
+            if sets[pos] in warmstart:
+                x[pos].Start = 1
+            else:
+                x[pos].Start = 0
+    
     
     return m
 
