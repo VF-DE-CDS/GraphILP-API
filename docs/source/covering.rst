@@ -46,8 +46,8 @@ A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :m
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Edge dominating set
 ===================
@@ -63,8 +63,8 @@ An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Vertex cover
 ============
@@ -80,8 +80,8 @@ A `vertex cover <https://en.wikipedia.org/wiki/Vertex_cover>`_ in a graph :math:
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Heuristics
 ----------
