@@ -1,16 +1,15 @@
-# +
 from numpy import ones
 
-def getHeuristic(S):
-    """
-        Greedy heuristic for the set packing problem
-        
-        Iteratively add the set with maximal size to weight ratio which does not contain an element
-        that is already covered to the solution.
-        
-        :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
 
-        :return: a list of the sets comprising the cover
+def get_heuristic(S):
+    """ Greedy heuristic for the set packing problem
+
+    Iteratively add the set with maximal size to weight ratio which does not contain an element
+    that is already covered to the solution.
+
+    :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
+
+    :return: a list of the sets comprising the cover
     """
     # abbreviations
     set_names = list(S.S.keys())
@@ -22,22 +21,22 @@ def getHeuristic(S):
 
     # all sets can still be used
     sets = set(set_index)
-    
+
     # start with an empty result
     result = []
-    
-    # while there are still 
+
+    # while there are still
     while len(sets) > 0:
-        
+
         # pick most efficient set
         chosen_set = min([(set_sizes[_set] / S.S[set_names[_set]]['weight'], _set) for _set in sets])[1]
         result.append(chosen_set)
-    
+
         # update which elements are not yet covered
-        not_covered = not_covered * (1 - S.M[:,chosen_set])
-        
+        not_covered = not_covered * (1 - S.M[:, chosen_set])
+
         # remove all sets covering an element already covered by a set in the solution
         remove_sets = {_set for _set in set_index if sum((1 - not_covered) * S.M[:, _set]) > 0}
         sets = sets.difference(remove_sets)
-        
+
     return [set_names[s] for s in result]
