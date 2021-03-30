@@ -1,5 +1,4 @@
 # +
-import sys, os
 import numpy as np
 import scipy.sparse as sp
 from graphilp.imports import ilpsetsystem as ilpss
