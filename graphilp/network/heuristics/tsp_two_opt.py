@@ -106,5 +106,7 @@ def getHeuristic(G, tour, length):
     newSolFound = True
     while newSolFound:
         newTour, bestLength, newSolFound = iterateOuter(G.G, newTour, bestLength, cities)
+        
+    newTour = list(zip(newTour, newTour[1:]))
     
     return newTour, bestLength

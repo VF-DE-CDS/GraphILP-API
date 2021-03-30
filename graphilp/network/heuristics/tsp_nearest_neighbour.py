@@ -28,6 +28,6 @@ def getHeuristic(G, weight='weight'):
         
     # close the tour
     tour.append((tour[-1][1], first))
-    length += G.G.edges[tour[-1]][weight]
+    length += G.G.edges[tour[-1]].get(weight, 1)
     
     return tour, length
