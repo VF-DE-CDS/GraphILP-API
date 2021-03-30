@@ -116,8 +116,8 @@ the goal is to pack items with the highest total value into a knapsack where eac
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 k-Cover
 =======
@@ -145,8 +145,8 @@ The `set cover problem <https://en.wikipedia.org/wiki/Set_cover_problem>`__ is t
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Heuristics
 ----------
