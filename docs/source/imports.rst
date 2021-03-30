@@ -55,8 +55,6 @@ In this section, we provide import filters to create NetworkX Graph objects from
    edges_to_networkx
    stp_to_networkx
    mis_to_networkx
-   col_file_to_networkx
-   read_set_cover
 
 ILPSetSystem
 ============
