@@ -2,11 +2,12 @@
 from gurobipy import *
 import numpy as np
 
-def createModel(S, k):
+def createModel(S, k, warmstart=[]):
     r""" Greate an ILP for the k-cover problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param k: maximal number of sets in solution
+    :param warmstart: a sets forming a cover
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -55,6 +56,26 @@ def createModel(S, k):
     
     # set optimisation objective: maximize weight of the set cover 
     m.setObjective(obj @ y, GRB.MAXIMIZE)
+    
+    # set warmstart
+    if len(warmstart) > 0:
+        
+        for pos in range(len(S.U)):
+            y[pos].Start = 0
+        
+        sets = list(S.S.keys())
+        for pos in range(len(sets)):
+            if sets[pos] in warmstart:
+                x[pos].Start = 1
+                
+                covered = S.M[:, pos]
+                for element in range(len(covered)):
+                    if covered[element] > 0:
+                        y[element].Start = 1
+            else:
+                x[pos].Start = 0
+                
+        m.update()
     
     return m
 
