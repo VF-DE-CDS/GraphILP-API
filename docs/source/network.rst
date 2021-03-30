@@ -128,7 +128,20 @@ In the asymmetric case, the underlying graph is directed and the distance from A
 Generic
 ^^^^^^^
 
+Introducing increasing node labels along the tour allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+
 .. automodule:: graphilp.network.gen_path_atsp
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   createModel
+   extractSolution
+   
+This formulation ensures that solutions are a disjoint union of cycles. More than one cycle appearing in incumbent solutions is then avoided by explicitly adding constraints forbidding this through a callback (sub-tour elimination).
+
+.. automodule:: graphilp.network.tsp_callbacks
    :noindex:
 
 .. autosummary::
@@ -266,6 +279,9 @@ Details
    :members:
 
 .. automodule:: graphilp.network.tsp
+   :members:
+
+.. automodule:: graphilp.network.tsp_callbacks
    :members:
 
 .. automodule:: graphilp.network.heuristics.tsp_christofides 
