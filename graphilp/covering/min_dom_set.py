@@ -1,7 +1,7 @@
 from gurobipy import Model, quicksum, GRB
 
 
-def createModel(G):
+def create_model(G):
     r""" Create an ILP for the minimum dominating set problem
 
     :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
@@ -47,7 +47,7 @@ def createModel(G):
     return m
 
 
-def extractSolution(G, model):
+def extract_solution(G, model):
     """ Get a list of edges comprising a dominating set
 
     :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
