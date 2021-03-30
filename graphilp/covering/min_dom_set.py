@@ -24,7 +24,7 @@ def createModel(G):
            :header-rows: 0
 
            * - .. image:: images/example_mindomset.png
-             - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Dominating%20queens.ipynb>`_
+             - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/DominatingQueens.ipynb>`_
 
                Find how many queens are needed to cover all squares on an :math:`n\times n` chessboard.
     """        

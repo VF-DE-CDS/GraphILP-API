@@ -28,7 +28,7 @@ def createModel(G):
            :header-rows: 0
            
            * - .. image:: images/example_mapcolouring.png
-             - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_
+             - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/MapColouring.ipynb>`_
 
                Colour a map with as few colours as possible such that 
 

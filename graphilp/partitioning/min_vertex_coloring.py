@@ -35,13 +35,13 @@ def createModel(G, bound_num_colors=-1, warmstart={}):
            :header-rows: 0
 
            * - .. image:: images/example_mapcolouring.png
-             - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_
+             - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/MapColouring.ipynb>`_
 
                Colour a map with as few colours as possible such that 
 
                no two adjacent areas get the same colour.
            * - .. image:: images/example_vertexcolour.png
-             - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/min_vertex_coloring_example.ipynb>`_
+             - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/MinVertexColouring.ipynb>`_
 
                A simple example finding the minimal number of colours needed
 
