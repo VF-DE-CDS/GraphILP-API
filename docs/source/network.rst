@@ -218,6 +218,14 @@ Constant factor approximations also imply a lower bound on the solution.
 
     getHeuristic
 
+.. automodule:: graphilp.network.heuristics.tsp_two_opt
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+    getHeuristic
+
 Details
 =======
 
@@ -265,3 +273,6 @@ Details
    
 .. automodule:: graphilp.network.heuristics.tsp_nearest_neighbour
    :members:       
+   
+.. automodule:: graphilp.network.heuristics.tsp_two_opt
+   :members:   
