@@ -7,7 +7,7 @@ def createModel(S, warmstart=[]):
     r""" Greate an ILP for the set cover problem
     
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param warmstart: a sets forming a cover
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     
@@ -55,8 +55,9 @@ def createModel(S, warmstart=[]):
                 x[pos].Start = 1
             else:
                 x[pos].Start = 0
-    
-    
+                
+        m.update()
+        
     return m
 
 def extractSolution(S, model):
