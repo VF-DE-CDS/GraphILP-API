@@ -1,4 +1,3 @@
-# +
 import numpy as np
 import scipy.sparse as sp
 from graphilp.imports import ilpsetsystem as ilpss
@@ -14,13 +13,11 @@ A = sp.csr_matrix(cover_matrix)
 sets = {0:{'weight': 4},1:{'weight': 2},2:{'weight': 1}, 3:{'weight':3}}
 universe = {0:{'weight': 4},1:{'weight': 2},2:{'weight': 1}, 3:{'weight':3}, 4:{'weight': 1}}
 SetCover = ilpss.ILPSetSystem()
-SetCover.setSystem(sets)
-SetCover.setIncMatrix(A)
-SetCover.setUniverse(universe )
-m = kc.createModel(SetCover, 1)
+SetCover.set_system(sets)
+SetCover.set_inc_matrix(A)
+SetCover.set_universe(universe )
+m = kc.create_model(SetCover, 1)
 m.optimize()
 
 assert(m.objVal == 8)
 # -
-
-

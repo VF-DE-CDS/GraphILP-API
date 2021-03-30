@@ -11,10 +11,10 @@ A = sp.csr_matrix(cover_matrix)
 sets = {0:{'weight': 4},1:{'weight': 2},2:{'weight': 1}}
 universe = [0, 1, 2]
 SetCover = ilpss.ILPSetSystem()
-SetCover.setSystem(sets)
-SetCover.setIncMatrix(A)
-SetCover.setUniverse(universe )
-m = setp.createModel(SetCover)
+SetCover.set_system(sets)
+SetCover.set_inc_matrix(A)
+SetCover.set_universe(universe )
+m = setp.create_model(SetCover)
 m.optimize()
 
 
