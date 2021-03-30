@@ -27,6 +27,9 @@ Graph bisection deals with the question of how to cut edges in a connected graph
 Cuts
 ====
 
+A cut in a graph is a partition of the vertex set into two disjoint subsets.
+A `maximum cut <https://en.wikipedia.org/wiki/Maximum_cut>`__ is a cut for which the total weight of the edges between the two sets is maximal.
+
 .. automodule:: graphilp.cuts_flows.max_cut
    :noindex:
 
@@ -35,6 +38,8 @@ Cuts
    
    createModel
    extractSolution
+   
+The minimum uncut problem is complementary to the maximum cut problem. It asks for a cut that minimises the total number of edges which are not cut.   
 
 .. automodule:: graphilp.cuts_flows.min_uncut
    :noindex:
@@ -44,6 +49,19 @@ Cuts
    
    createModel
    extractSolution
+   
+Heuristics
+----------
+
+The methods in this section provide approximate solutions to the max cut problem constituting admissible solutions from which to start the exact optimisation.
+
+.. automodule:: graphilp.cuts_flows.heuristics.maxcut_greedy
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+   
+   getHeuristic
 
 Flows
 =====
@@ -56,8 +74,6 @@ Flows
    createModel
    extractSolution
 
-
-
 Details
 =======
 
@@ -65,6 +81,9 @@ Details
    :members:
   
 .. automodule:: graphilp.cuts_flows.max_cut
+   :members:
+   
+.. automodule:: graphilp.cuts_flows.heuristics.maxcut_greedy   
    :members:
    
 .. automodule:: graphilp.cuts_flows.min_uncut

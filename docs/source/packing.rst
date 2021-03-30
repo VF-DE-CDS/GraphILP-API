@@ -65,6 +65,8 @@ An independet set in the vertex set of a graph is a subset of the vertices in wh
 Clique packing
 ==============
 
+A `clique <https://en.wikipedia.org/wiki/Clique_(graph_theory)>`__ is a fully connected subgraph. The clique packing problem asks for the maximal number of vertex disjoint cliques that can be found in a graph.
+
 .. automodule:: graphilp.packing.clique_packing
    :noindex:
 
@@ -77,6 +79,8 @@ Clique packing
 Set packing
 ===========
 
+The `set packing problem <https://en.wikipedia.org/wiki/Set_packing>`__ is asking for a maximum weight, disjoint sub-collection of the sets in a set system.
+
 .. automodule:: graphilp.packing.set_packing
    :noindex:
 
@@ -85,6 +89,19 @@ Set packing
    
    createModel
    extractSolution
+   
+Heuristics
+----------
+
+The methods in this section provide approximate solutions to the set packing problem constituting admissible solutions from which to start the exact optimisation.
+
+.. automodule:: graphilp.packing.heuristics.setpacking_greedy
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   getHeuristic   
 
 Details
 =======
@@ -96,4 +113,7 @@ Details
     :members:
     
 .. automodule:: graphilp.packing.set_packing
+    :members:    
+    
+.. automodule:: graphilp.packing.heuristics.setpacking_greedy
     :members:    

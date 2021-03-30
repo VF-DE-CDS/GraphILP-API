@@ -39,13 +39,13 @@ The best way to get startet with GraphILP is through one of our examples:
    :header-rows: 0
 
    * - .. image:: images/example_bipartite.png
-     - `Two-coloured partitions <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2-coloured%20partitions.ipynb>`_
+     - `Two-coloured partitions <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/2ColouredPartitions.ipynb>`_
      
        Learn how to use perfect matching in bipartite graphs to find a way 
        
        to connect n random blue points in the plane to n random orange points without crossings.
    * - .. image:: images/example_mapcolouring.png
-     - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Map%20colouring.ipynb>`_
+     - `Map colouring <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/MapColouring.ipynb>`_
      
        Colour a map with as few colours as possible such that 
        
@@ -55,18 +55,18 @@ The best way to get startet with GraphILP is through one of our examples:
      
        Find the shortest tree connecting a given set of nodes in a graph.
    * - .. image:: images/example_tsp_art.png
-     - `TSP art <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/TSP%20Art.ipynb>`_
+     - `TSP art <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/TSPArt.ipynb>`_
      
        Transform an image into line art that can be drawn without lifting the pencil.
    * - .. image:: images/example_vertexcolour.png
-     - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/min_vertex_coloring_example.ipynb>`_
+     - `Minimum vertex cover <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/MinVertexColouring.ipynb>`_
      
        A simple example finding the minimal number of colours needed
        
        to colour circle graphs such that neighbouring nodes get different colours.
 
    * - .. image:: images/example_mindomset.png
-     - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/Dominating%20queens.ipynb>`_
+     - `Minimum dominating set <https://github.com/VF-DE-CDS/GraphILP-API/blob/develop/graphilp/examples/DominatingQueens.ipynb>`_
      
        Find how many queens are needed to cover all squares on an :math:`n\times n` chessboard.
 
