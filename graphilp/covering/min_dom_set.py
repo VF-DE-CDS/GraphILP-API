@@ -32,7 +32,7 @@ def create_model(G):
     m = Model("graphilp_min_dominating_set")
 
     # Add variables for edges
-    G.setNodeVars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
+    G.set_node_vars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
     m.update()
 
     nodes = G.node_variables

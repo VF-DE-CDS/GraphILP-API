@@ -23,7 +23,7 @@ def create_model(G):
     m = Model("graphilp_min_edge_dominating_set")
 
     # Add variables for edges
-    G.setEdgeVars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
+    G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
     m.update()
 
     edges = G.edge_variables
