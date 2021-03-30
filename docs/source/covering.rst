@@ -131,8 +131,8 @@ The objective is then to maximise the total weight of the elements that are cove
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Set cover
 =========
