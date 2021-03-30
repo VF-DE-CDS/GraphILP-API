@@ -70,19 +70,19 @@ def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=Non
     if ((start is None) and (end is None)):
         for node in G.G.nodes():
             # Exactly one outgoing connection from every node
-            m.addConstr(quicksum( [edges[e] for e in G.G.edges(node)]) == 1)
+            m.addConstr(quicksum([edges[e] for e in G.G.edges(node)]) == 1)
             # Exactly one incoming connection to every node
-            m.addConstr(quicksum( [edges[e] for e in G.G.in_edges(node)]) == 1)            
+            m.addConstr(quicksum([edges[e] for e in G.G.in_edges(node)]) == 1)            
     else:
         for node in G.G.nodes():     
             if node != start:
-                m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 1)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[1] == node]) == 1)
             if node != end:
-                m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 1)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[0] == node]) == 1)
             if node == start:
-                m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[1] == node]) == 0)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[1] == node]) == 0)
             if node == end:
-                m.addConstr(quicksum( [edges[e] for e in G.G.edges() if e[0] == node]) == 0)
+                m.addConstr(quicksum([edges[e] for e in G.G.edges() if e[0] == node]) == 0)
 
     # Create permutations via labels         
     if (start is None) and (end is None):        
@@ -120,7 +120,7 @@ def createModel(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=Non
             label_vars[edge[0]].Start = pos
             pos += 1
 
-    m.update()
+        m.update()
     
     return m
 
