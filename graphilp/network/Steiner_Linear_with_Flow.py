@@ -2,7 +2,7 @@
 from gurobipy import *
 import networkx as nx
 
-def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBasis: bool = False, nodeColoring: bool = False):    
+def createModel(G, terminals, root, weight = 'weight', minCapacity = 20):    
     r""" Create an ILP for the linear Steiner Problem. 
     
     The model can be seen in Paper Chapter 3.0. This model
@@ -52,7 +52,7 @@ def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBa
         if (node[0] == root):
             continue
         totLoad += G.G.nodes[node[0]]['Weight']
-    print(totLoad)
+
     n = G.G.number_of_nodes()
 
     # create reverse edge for every edge in the graph
@@ -85,7 +85,7 @@ def createModel(G, terminals, root, weight = 'weight', minCapacity = 20, cycleBa
     edge2var = dict(zip(edges.keys(), edges.values()))
 
     # set objective: minimise the sum of the weights of edges selected for the solution
-    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), GRB.MINIMIZE)
+    m.setObjective(gurobipy.quicksum([edge_var * G.G.edges[edge].get(weight, 1) for edge, edge_var in edges.items()]), GRB.MINIMIZE)
     
     # equality constraints for terminals (each terminal needs to be chosen, i.e., set its value to 1)
     for node, node_var in nodes.items():
