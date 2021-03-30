@@ -21,8 +21,8 @@ Graph bisection deals with the question of how to cut edges in a connected graph
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Cuts
 ====
@@ -36,8 +36,8 @@ A `maximum cut <https://en.wikipedia.org/wiki/Maximum_cut>`__ is a cut for which
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 The minimum uncut problem is complementary to the maximum cut problem. It asks for a cut that minimises the total number of edges which are not cut.   
 
@@ -47,8 +47,8 @@ The minimum uncut problem is complementary to the maximum cut problem. It asks f
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
    
 Heuristics
 ----------
@@ -61,7 +61,7 @@ The methods in this section provide approximate solutions to the max cut problem
 .. autosummary::
    :nosignatures:
    
-   getHeuristic
+   get_heuristic
 
 Flows
 =====
@@ -71,8 +71,8 @@ Flows
 .. autosummary::
    :nosignatures:
    
-   createModel
-   extractSolution
+   create_model
+   extract_solution
 
 Details
 =======

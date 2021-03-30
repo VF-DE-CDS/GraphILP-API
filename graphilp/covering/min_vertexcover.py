@@ -25,7 +25,7 @@ def create_model(G, weight='weight', warmstart=[]):
     m = Model("graphilp_min_vertex_cover")
 
     # Add variables for edges and nodes
-    G.setNodeVars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
+    G.set_node_vars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
     m.update()
 
     nodes = G.node_variables
