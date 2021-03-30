@@ -18,56 +18,22 @@ def create_model(G, terminals, root, weight='weight', minCapacity=20):
         .. math::
             :nowrap:
 
-            \section{Sets}
-                Edges \indent E = $\{(i,j) \in E : i \in V, j \in V, i \ne j\}$ \newline
-                Nodes \indent V = $\{i\}$ \newline
-                Terminals T = $\{i \in V :$ i is a terminal Node\} \newline
-                Neighborhood O(i) = $\{(i, j) \in E : $ j is connected to i \}
-            \section{Decision Variables}
-                \begin{tabular}{l l}
-                    $y_{i,j}$ & Binary variable whether edge (i, j) is chosen\\
-                    $w_{i,j}$ & Binary variable whether edge (i, J) is expanded by a fibre connection\\
-                    $f_{i,j}$ & Flow amount from i to j  \\
-                    $x_{i}$ & Binary variable whether node i is chosen \\
-                    $l_{i}$ & Label variables for the nodes to indicate "when" they where chosen \\
-                \end{tabular}
-            \newline
-            \section{Objective Function}
-                \begin{tabular}{l l}
-                    Min z = $\sum_{i,j \in E} c_{i,j} \cdot y_{i,j}$ & Minimize costs of adding new edges \\
-                \end{tabular}
-            \section{Parameters}
-                \begin{tabular}{l l}
-                    $|T|$   &  Amount of Terminal Nodes in the Model \\
-                    $Cap_{(i, j)}$ & Maximum Capacity of edge by supplying it with Fibre (i,j) \\
-                    $b_i$ & Demand of node i\\
-                    $CurCap_{(i,j)}$ & Current capacity on edge (i,j) \\
-                \end{tabular}\newline
-            \section{Constraints}
-                \begin{tabular}{l l }
-                    Only one direction of Edges between two Nodes can be chosen at once\\
-                        \indent $x_{i,j} + x_{j, i} \leq 1$ & $\forall (i,j) \in E$\\
-                    Prohibit isolated nodes \\
-                        \indent $x_{i}-\sum_{u=i \vee v=i}x_{uv} \leq 0$ & $\forall i \in V$ \\
-                    Enforce increasing labels \\
-                        \indent $ n \ast x_{(i,j)} + \ell_j - \ell_i \geq 1 - n \ast (1-x_{(j,i)})$ & $\forall (i,j) \in E$ \\    
-                        \indent $ n \ast x_{(j,i)} + \ell_i - \ell_j \geq 1 - n \ast (1-x_{(i,j)})$ & $\forall (i,j) \in E$ \\
-                    All Flow has to come from the Root and has to end in each of the Terminals\\
-                        \indent$ \sum_{j \in O(r)} f_{i, j} = \sum_{i} b_i$ & \\
-                    Flow conservation constraint \\
-                        \indent $\sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = 0$ & $\forall j \in V \backslash T$ \\
-                        \indent $\sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = b_i$ & $\forall j \in T \subseteq V$ \\
-                    There can only be flow when the edge is activated (but maximum Capacity) \\
-                        \indent $f_{i, j} \leq y_{i, j} * Cap_{(i, j)} + CurCap_{(i,j)}$ & $\forall (i,j) \in E$ \\
-                    Chose nodes when edge is chosen \\
-                        \indent $2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 $ & $\forall (i,j) \in E$\\
-                    All Terminals must be chosen \\
-                        \indent $x_{t} = 1$ & $\forall t \in T \subseteq V$ \\
-                    Variable Domains \\
-                            
-                        \indent $y_{i, j} \in \{0, 1\}$ & $\forall (i, j) \in E$ \\
-                        \indent $f_{i, j} \geq 0$ & $\forall (i, j) \in E$ \\
-            \end{tabular}
+            \begin{align*}
+            \forall (u,v) \in E: x_{uv} + x_{vu} \leq 1 \in E && \text{(at most one direction per edges)}\\
+            \forall i \in V: x_{i}-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(prohibit isolated nodes)}\\
+            \forall (u,v) \in E: n x_{(u,v)} + \ell_v - \ell_u \geq 1 - n (1-x_{vu}) && \text{(enforce increasing labels)}\\
+            \forall (u,v) \in E: n x_{(v,u)} + \ell_u - \ell_v \geq 1 - n (1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \sum_{j \in O(r)} f_{i, j} = \sum_{i} b_i && \text{(flow starts at root and ends at terminals)} \\
+            \forall j \in V \backslash T: \sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = 0 
+            && \text{(flow conservation)}\\
+            \forall j \in T: \sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = b_i
+            && \text{(flow conservation)}\\
+            \forall (i,j) \in E: f_{ij} \leq y_{ij} Cap_{ij} + CurCap_{ij} &&
+            \text{(there can only be flow when the edge is activated (but maximum Capacity))} \\
+            \forall (i,j) \in E: 2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 &&
+            \text{(choose nodes when edge is chosen)} \\   
+            \forall t \in T: x_{t} = 1 && \text{(all terminals must be chosen)}\\
+            \end{align*}
     """        
     # ensure that input is a directed graph
     if type(G.G) != nx.classes.digraph.DiGraph:
