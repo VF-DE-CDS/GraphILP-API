@@ -13,10 +13,10 @@ cover_matrix = array(
 sets = {0:{'weight': 4},1:{'weight': 2},2:{'weight': 1}}
 universe = [0, 1, 2, 3]
 SetCover = ilpss.ILPSetSystem()
-SetCover.setSystem(sets)
-SetCover.setIncMatrix(cover_matrix)
-SetCover.setUniverse(universe)
-m = sc.createModel(SetCover)
+SetCover.set_system(sets)
+SetCover.set_inc_matrix(cover_matrix)
+SetCover.set_universe(universe)
+m = sc.create_model(SetCover)
 m.optimize()
 
 assert(m.objVal == 7)

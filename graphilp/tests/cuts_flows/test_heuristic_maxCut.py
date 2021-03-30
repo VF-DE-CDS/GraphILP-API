@@ -8,6 +8,6 @@ G.add_weighted_edges_from([(1,3,2),(3,5,1),(5,6,1),(4,6,3),(6,7,1),(4,7,1),(2,4,
 
 optG = impnx.read(G)
 
-cut, cutsize = maxcut_greedy.getHeuristic(optG)
+cut, cutsize = maxcut_greedy.get_heuristic(optG)
 
 assert(cutsize >= 13)
