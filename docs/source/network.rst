@@ -174,7 +174,7 @@ ATSP
 Path ATSP
 ^^^^^^^^^
 
-.. automodule:: graphilp.network.patsp
+.. automodule:: graphilp.network.path_atsp
    :noindex:
 
 .. autosummary::
@@ -198,7 +198,7 @@ Metric TSP
 Path TSP
 ^^^^^^^^
 
-.. automodule:: graphilp.network.ptsp
+.. automodule:: graphilp.network.path_tsp
    :noindex:
 
 .. autosummary::
@@ -270,10 +270,10 @@ Details
 .. automodule:: graphilp.network.gen_path_atsp
    :members:
 
-.. automodule:: graphilp.network.patsp
+.. automodule:: graphilp.network.path_atsp
    :members:
 
-.. automodule:: graphilp.network.ptsp
+.. automodule:: graphilp.network.path_tsp
    :members:
 
 .. automodule:: graphilp.network.tsp
