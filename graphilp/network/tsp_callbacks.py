@@ -1,5 +1,5 @@
 from gurobipy import Model, GRB, quicksum
-import networkx as nx
+from networkx import Graph, connected_components
 
 edge2var = None
 
@@ -20,9 +20,9 @@ def callback_cycle(model, where):
         for k, v in active_edges.items():
             if (0 < v):
                 edges.append(k)
-        G2 = nx.Graph()
+        G2 = Graph()
         G2.add_edges_from(edges)
-        con_comp = nx.connected_components(G2)
+        con_comp = connected_components(G2)
         for comp in con_comp:
             cycles.append(comp)
 
