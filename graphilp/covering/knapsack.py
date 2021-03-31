@@ -1,5 +1,5 @@
 from gurobipy import Model, GRB
-import numpy as np
+from numpy import array
 
 
 def create_model(S, W):
@@ -33,7 +33,7 @@ def create_model(S, W):
     m.update()
 
     # set weight vector
-    obj = np.array([val['value'] for _set, val in S.S.items()])
+    obj = array([val['value'] for _set, val in S.S.items()])
 
     # Add constraints for covering
     m.addConstr(S.M @ x <= W, name="packing")
