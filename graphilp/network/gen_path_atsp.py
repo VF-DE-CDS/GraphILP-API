@@ -11,7 +11,7 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=No
     :param weight: name of the weight parameter in the edge dictionary of the graph
     :param start: require the TSP path to start at this node
     :param end: require the TSP path to end at this node
-    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param warmstart: a list of edges forming a tour
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -34,8 +34,8 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=No
             \sum_{(e, v) \in E}x_{ev} = 0 && \text{(no outgoing edge from end vertex)}\\
             \ell_s = 0 && \text{(start vertex has label 0)}\\
             \ell_e = n-1 && \text{(end vertex has label } n-1 \text{)}\\
-            \forall (u,v) \in E \setminus \{(u, s)\mid u \in V \}: \ell_u - \ell_v + nx_{uv} \leq n-1
-            && \text{(increasing labels along tour)}\\
+            \forall (u,v) \in E \setminus \{(u, s)\mid u \in V \}:\\
+            \ell_u - \ell_v + nx_{uv} \leq n-1 && \text{(increasing labels along tour)}\\
             \end{align*}
     """
 

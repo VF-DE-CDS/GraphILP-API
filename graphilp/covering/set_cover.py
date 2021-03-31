@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import array, ones
 from gurobipy import Model, GRB
 
 
@@ -36,9 +36,9 @@ def create_model(S, warmstart=[]):
     m.update()
 
     # add  vector b for the right-hand side
-    b = np.ones((len_b,), dtype=int)
+    b = ones((len_b,), dtype=int)
     # set weight vector
-    obj = np.array([val.get('weight', 1) for _set, val in S.S.items()])
+    obj = array([val.get('weight', 1) for _set, val in S.S.items()])
 
     # add constraints
     m.addConstr(S.M @ x >= b, name="c")

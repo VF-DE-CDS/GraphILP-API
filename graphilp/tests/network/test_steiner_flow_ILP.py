@@ -1,7 +1,7 @@
 # +
 from networkx import complete_bipartite_graph
 from graphilp.imports import networkx as nximp
-from graphilp.network import Steiner_Linear_with_Flow as slf
+from graphilp.network import steiner_flow_linear as slf
 
 G = complete_bipartite_graph(16, 8)
 terminals = [0,1,14,15]
