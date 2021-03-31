@@ -2,11 +2,12 @@ from gurobipy import Model, GRB, quicksum
 import networkx as nx
 
 def create_model(G, terminals, root, weight='weight', minCapacity=20):
-    r""" Create an ILP for the linear Steiner Problem with additional Flow Constraints. 
+    r""" Create an ILP for the Steiner tree problem with additional flow constraints
 
-    Flow Constraints limit the maximum amount of FLow from a specified root to the Terminals.
-    Each edge has a limit of flow it can transport, i.e. minCapacity. This flow can be extended to a larger amount, i.e. each edges Capacity.  
-      
+    Flow constraints limit the maximum amount of fLow from a specified root to the terminals.
+    Each edge has a limit of flow it can transport.
+    This flow can be extended to a larger amount up to each edges capacity.
+
     :param G: an ILPGraph
     :param terminals: a list of nodes that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
@@ -19,22 +20,27 @@ def create_model(G, terminals, root, weight='weight', minCapacity=20):
             :nowrap:
 
             \begin{align*}
+            \min \sum_{(u,v) \in \overrightarrow{E}} w_{uv} x_{uv}\\
+            \text{s.t.} &&\\
             \forall (u,v) \in E: x_{uv} + x_{vu} \leq 1 \in E && \text{(at most one direction per edges)}\\
-            \forall i \in V: x_{i}-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(prohibit isolated nodes)}\\
+            \forall i \in V: x_{i}-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(prohibit isolated vertices)}\\
             \forall (u,v) \in E: n x_{(u,v)} + \ell_v - \ell_u \geq 1 - n (1-x_{vu}) && \text{(enforce increasing labels)}\\
             \forall (u,v) \in E: n x_{(v,u)} + \ell_u - \ell_v \geq 1 - n (1-x_{uv}) && \text{(enforce increasing labels)}\\
-            \sum_{j \in O(r)} f_{i, j} = \sum_{i} b_i && \text{(flow starts at root and ends at terminals)} \\
-            \forall j \in V \backslash T: \sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = 0 
+            \sum_{j \in O(r)} f_{i, j} = \sum_{i} b_i && \text{(flow starts at root}\\
+            && \text{and ends at terminals)} \\
+            \forall j \in V \backslash T: \sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = 0
             && \text{(flow conservation)}\\
             \forall j \in T: \sum_{i, j \in E} f_{i, j} - \sum_{j, k \in E} f_{j, k} = b_i
             && \text{(flow conservation)}\\
-            \forall (i,j) \in E: f_{ij} \leq y_{ij} Cap_{ij} + CurCap_{ij} &&
-            \text{(there can only be flow when the edge is activated (but maximum Capacity))} \\
+            \forall (i,j) \in E: f_{ij} \leq y_{ij} \kappa_{ij} + \kappa^0_{ij} &&
+            \text{(there can only be flow when edge}\\
+            && \text{is activated (limited by capacity))} \\
             \forall (i,j) \in E: 2(x_{ij}+x_{ji}) - x_i - x_j \leq 0 &&
-            \text{(choose nodes when edge is chosen)} \\   
+            \text{(choose vertices when}\\
+            && \text{edge is chosen)} \\
             \forall t \in T: x_{t} = 1 && \text{(all terminals must be chosen)}\\
             \end{align*}
-    """        
+    """
     # ensure that input is a directed graph
     if type(G.G) != nx.classes.digraph.DiGraph:
         G.G = nx.DiGraph(G.G)
