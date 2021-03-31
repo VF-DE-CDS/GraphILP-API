@@ -12,6 +12,10 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
                 warmstart=[], lower_bound=None):
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
 
+    This formulation enforces a cycle in the solution if it is not connected.
+    A callback will detect cycles and add constraints to explicity forbid them.
+    Together, this ensures that the solution is a tree.
+
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
@@ -39,8 +43,8 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
             \forall \{u,v\}\in E: x_{uv} + x_{vu} \leq 1 && \text{(restrict edges to one direction)}\\
             \forall t \in T_f: x_t = 1 && \text{(require forced terminals to be chosen)}\\
             \sum_{v\in V} x_v - \sum_{\{u,v\}\in E} x_{uv} = 1 && \text{(enforce circle when graph is not connected)}\\
-            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
+            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require vertices to be chosen when edge is chosen)}\\
+            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated vertices)}\\
             \end{align*}
 
         The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)`

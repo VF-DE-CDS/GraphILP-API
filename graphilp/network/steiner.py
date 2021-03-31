@@ -39,8 +39,8 @@ def create_model(G, terminals, weight='weight', warmstart=[], lower_bound=None):
             \text{s.t.} &&\\
             \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
             \sum_{v\in V} x_v - \sum_{\{u,v\}\in E} x_{uv} = 1 && \text{(enforce cycle when graph is not connected)}\\
-            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require nodes to be chosen when edge is chosen)}\\
-            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated nodes)}\\
+            \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require vertices to be chosen when edge is chosen)}\\
+            \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated vertices)}\\
             \end{align*}
 
         The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)`
