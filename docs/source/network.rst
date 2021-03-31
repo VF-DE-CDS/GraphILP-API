@@ -53,8 +53,8 @@ There is also a version of this constraint system with somewhat stronger conditi
    create_model
    extract_solution
 
-Flow-based constraint system
------------------------------
+Steiner with flow conditions
+----------------------------
 .. automodule:: graphilp.network.steiner_flow_linear
    :noindex:
 
@@ -162,7 +162,10 @@ ATSP
    create_model
    extract_solution
 
-.. automodule:: graphilp.network.atsp_DT_formulation
+Path ATSP
+^^^^^^^^^
+
+.. automodule:: graphilp.network.path_atsp
    :noindex:
 
 .. autosummary::
@@ -171,10 +174,7 @@ ATSP
    create_model
    extract_solution
 
-Path ATSP
-^^^^^^^^^
-
-.. automodule:: graphilp.network.path_atsp
+.. automodule:: graphilp.network.atsp_DT_formulation
    :noindex:
 
 .. autosummary::
