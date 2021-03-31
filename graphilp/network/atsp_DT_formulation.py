@@ -6,6 +6,8 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', warmstar
 
     Start and end vertices cannot be chosen in this formulation.
 
+    TODO: Update ILP and check use of node "1"
+
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour
     :param metric: 'metric' for symmetric problem otherwise asymmetric problem
@@ -15,7 +17,23 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', warmstar
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
     ILP:
-        TODO
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min / \max \sum_{(u,v) \in E} w_{uv} x_{uv}\\
+            \text{s.t.} &&\\
+            \forall v \in V \setminus \{s, e\}: \sum_{(u, v) \in E}x_{uv} = 1 && \text{(exactly one incoming edge)}\\
+            \forall v \in V \setminus \{s, e\}: \sum_{(v, u) \in E}x_{vu} = 1 && \text{(exactly one outgoing edge)}\\
+            \sum_{(s, v) \in E}x_{sv} = 1 && \text{(exactly one outgoing edge from start vertex)}\\
+            \sum_{(v, e) \in E}x_{ve} = 1 && \text{(exactly one incoming edge to end vertex)}\\
+            \sum_{(v, s) \in E}x_{vs} = 0 && \text{(no incoming edge to start vertex)}\\
+            \sum_{(e, v) \in E}x_{ev} = 0 && \text{(no outgoing edge from end vertex)}\\
+            \ell_s = 0 && \text{(start vertex has label 0)}\\
+            \ell_e = n-1 && \text{(end vertex has label } n-1 \text{)}\\
+            \forall (u,v) \in E \setminus \{(u, s)\mid u \in V \}: \ell_u - \ell_v + nx_{uv} \leq n-1
+            && \text{(increasing labels along tour)}\\
+            \end{align*}
     """
 
     # Create model

@@ -18,7 +18,7 @@ Cycle-based constraint system
 
 This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
 
-.. automodule:: graphilp.network.Steiner
+.. automodule:: graphilp.network.steiner
    :noindex:
 
 .. autosummary::
@@ -33,7 +33,7 @@ Linear-size constraint system
 
 Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
-.. automodule:: graphilp.network.Steiner_Linear
+.. automodule:: graphilp.network.steiner_linear
    :noindex:
 
 .. autosummary::
@@ -44,7 +44,7 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
 
 There is also a version of this constraint system with somewhat stronger conditions on the labels:
 
-.. automodule:: graphilp.network.Steiner_Linear_tightened
+.. automodule:: graphilp.network.steiner_linear_tightened
    :noindex:
 
 .. autosummary::
@@ -55,7 +55,7 @@ There is also a version of this constraint system with somewhat stronger conditi
 
 Flow-based constraint system
 -----------------------------
-.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+.. automodule:: graphilp.network.steiner_flow_linear
    :noindex:
 
 .. autosummary::
@@ -89,7 +89,7 @@ Cycle-based constraint system
 
 This formulation ensures that non-connected solutions must contain a cycle. Any cycles appearing in incumbent solutions are then avoided by explicitly adding constraints forbidding them through a callback.
 
-.. automodule:: graphilp.network.PCST
+.. automodule:: graphilp.network.pcst
    :noindex:
 
 .. autosummary::
@@ -104,7 +104,7 @@ Linear-size constraint system
 
 Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
-.. automodule:: graphilp.network.PCST_Linear
+.. automodule:: graphilp.network.pcst_linear
    :noindex:
 
 .. autosummary::
@@ -162,14 +162,14 @@ ATSP
    create_model
    extract_solution
 
-   .. automodule:: graphilp.network.atsp_DT_formulation
-      :noindex:
+.. automodule:: graphilp.network.atsp_DT_formulation
+   :noindex:
 
-   .. autosummary::
-      :nosignatures:
+.. autosummary::
+   :nosignatures:
 
-      create_model
-      extract_solution
+   create_model
+   extract_solution
 
 Path ATSP
 ^^^^^^^^^
@@ -240,25 +240,25 @@ Constant factor approximations also imply a lower bound on the solution.
 Details
 =======
 
-.. automodule:: graphilp.network.Steiner
+.. automodule:: graphilp.network.steiner
    :members:
 
-.. automodule:: graphilp.network.Steiner_Linear
+.. automodule:: graphilp.network.steiner_linear
    :members:
 
-.. automodule:: graphilp.network.Steiner_Linear_tightened
+.. automodule:: graphilp.network.steiner_linear_tightened
    :members:
 
-.. automodule:: graphilp.network.Steiner_Linear_with_Flow
+.. automodule:: graphilp.network.steiner_flow_linear
    :members:
 
 .. automodule:: graphilp.network.heuristics.steiner_metric_closure
    :members:
 
-.. automodule:: graphilp.network.PCST
+.. automodule:: graphilp.network.pcst
    :members:
 
-.. automodule:: graphilp.network.PCST_Linear
+.. automodule:: graphilp.network.pcst_linear
    :members:
 
 .. automodule:: graphilp.network.atsp
