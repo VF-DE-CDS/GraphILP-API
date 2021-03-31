@@ -1,4 +1,4 @@
-import networkx as nx
+from networkx import Graph
 import re
 
 
@@ -28,7 +28,7 @@ def edges_to_networkx(path):
         edges.append((tuple_data[0], tuple_data[1]))
 
     # Create a new NetworkX Graph object
-    G = nx.Graph()
+    G = Graph()
 
     # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
@@ -77,7 +77,7 @@ def stp_to_networkx(path):
             terminals.append(int(line.rstrip().split(" ")[1]))
 
     # Create a new NetworkX Graph object
-    G = nx.Graph()
+    G = Graph()
 
     # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
@@ -115,7 +115,7 @@ def mis_to_networkx(path):
             edges.append((tuple_data[0], tuple_data[1]))
 
     # Create a new NetworkX Graph object
-    G = nx.Graph()
+    G = Graph()
 
     # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)

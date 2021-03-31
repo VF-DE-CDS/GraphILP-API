@@ -1,5 +1,5 @@
 from gurobipy import Model, GRB, quicksum
-import networkx as nx
+from networkx import Graph, find_cycle
 
 # a dictionary translating edge variables to edge names for the callback
 var2edge = None
@@ -149,12 +149,12 @@ def callback_cycle(model, where):
 
         # create graph from current solution
         solution = [var2edge[variables[i]] for i in range(len(variables)) if (cur_sol[i] > 0.5) and (variables[i]in var2edge)]
-        G2 = nx.Graph()
+        G2 = Graph()
         G2.add_edges_from(solution)
 
         try:
             # find a cycle in the solution
-            cycle = nx.find_cycle(G2)
+            cycle = find_cycle(G2)
             cycle_idx = [edge if edge in var2edge.values() else (edge[1], edge[0]) for edge in cycle]
 
             # add new constraint

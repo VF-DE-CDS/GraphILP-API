@@ -1,6 +1,6 @@
 from gurobipy import Model, GRB, quicksum
 from itertools import product
-import networkx as nx
+from networkx import non_edges
 
 
 def create_model(G, clique_size):
@@ -72,7 +72,7 @@ def create_model(G, clique_size):
         m.addConstr(quicksum([cluster_assignment[(c, v)] for c in range(max_clusters)]) <= 1)
 
     # clique condition: vertices not connected by an egde cannot be in the same clique
-    for u, v in nx.non_edges(G.G):
+    for u, v in non_edges(G.G):
         for c in range(max_clusters):
             m.addConstr(cluster_assignment[(c, u)] + cluster_assignment[(c, v)] <= 1)
 

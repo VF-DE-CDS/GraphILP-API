@@ -1,5 +1,4 @@
 from gurobipy import Model, GRB, quicksum
-import networkx as nx
 
 
 def createGenModel(G, type_obj, metric):
@@ -14,9 +13,8 @@ def createGenModel(G, type_obj, metric):
     m = Model("graphilp_path_atsp")
 
     if metric == 'metric':
-        G_d = G.G.to_directed()
-        G_r = G_d.reverse(copy=True)
-        G.G = nx.compose(G_d, G_r)
+        G.G = G.G.to_directed()
+        G.G.add_edges_from([(v, u) for (u, v) in G.G.edges()])
 
     # Add variables for edges
     G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
