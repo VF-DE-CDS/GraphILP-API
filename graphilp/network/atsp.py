@@ -10,7 +10,7 @@ def create_model(G, direction=GRB.MAXIMIZE, weight='weight', warmstart=[]):
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour
     :param weight: name of the weight parameter in the edge dictionary of the graph
-    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param warmstart: a list of edges forming a tour
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """

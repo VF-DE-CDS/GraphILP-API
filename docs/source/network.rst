@@ -150,15 +150,6 @@ This formulation ensures that solutions are a disjoint union of cycles. More tha
    create_model
    extract_solution
 
-.. automodule:: graphilp.network.atsp_DT_formulation
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-
-   createGenModel
-   extract_solution
-
 ATSP
 ^^^^
 
@@ -171,7 +162,14 @@ ATSP
    create_model
    extract_solution
 
+   .. automodule:: graphilp.network.atsp_DT_formulation
+      :noindex:
 
+   .. autosummary::
+      :nosignatures:
+
+      create_model
+      extract_solution
 
 Path ATSP
 ^^^^^^^^^

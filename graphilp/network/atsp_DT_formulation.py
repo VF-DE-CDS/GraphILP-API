@@ -1,12 +1,21 @@
 from gurobipy import Model, GRB, quicksum
 
 
-def createGenModel(G, type_obj, metric):
-    r""" Create another formulation which is faster as ILP for the min Path asymmetric TSP. Start and End Nodes cannot be fixed in this formulation
+def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', warmstart=[]):
+    r""" Faster formulation for the min/max path asymmetric TSP
 
-    :param G: a weighted ILPGraph
-    :param type_obj: choose whether to minimise or maximise the weight of the path
+    Start and end vertices cannot be chosen in this formulation.
+
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour
     :param metric: 'metric' for symmetric problem otherwise asymmetric problem
+    :param weight: name of the weight parameter in the edge dictionary of the graph
+    :param warmstart: a list of edges forming a tour
+
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+
+    ILP:
+        TODO
     """
 
     # Create model
@@ -50,10 +59,27 @@ def createGenModel(G, type_obj, metric):
             m.addConstr(label_vars[u] - label_vars[v] + (nbr_nodes - 1) * edges[(u, v)] + (nbr_nodes - 3) * edges[(v, u)] <= nbr_nodes - 2)
 
     # set optimisation objective: find the min / max round tour in G
-    if type_obj == 'min':
-        m.setObjective(quicksum([edges[(u, v)] * w['weight'] for (u, v, w) in G.G.edges(data=True)]), GRB.MINIMIZE)
-    if type_obj == 'max':
-        m.setObjective(quicksum([edges[(u, v)] * w['weight'] for (u, v, w) in G.G.edges(data=True)]), GRB.MAXIMIZE)
+    m.setObjective(quicksum([edges[(u, v)] * w.get(weight, 1) for (u, v, w) in G.G.edges(data=True)]), direction)
+
+    # set warmstart
+    if len(warmstart) > 0:
+
+        # initialise warmstart by excluding all edges and vertices from solution
+        for edge_var in edges.values():
+            edge_var.Start = 0
+
+        for label_var in label_vars.values():
+            label_var.Start = 0
+
+        # set edges and labels along warmstart tour
+        pos = 0
+
+        for edge in warmstart:
+            edges[edge].Start = 1
+            label_vars[edge[0]].Start = pos
+            pos += 1
+
+        m.update()
 
     return m
 

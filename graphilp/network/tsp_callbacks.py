@@ -68,7 +68,7 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=No
     :param weight: name of the weight parameter in the edge dictionary of the graph
     :param start: require the TSP path to start at this node
     :param end: require the TSP path to end at this node
-    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param warmstart: a list of edges forming a tour
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
