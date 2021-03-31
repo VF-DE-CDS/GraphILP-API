@@ -56,7 +56,7 @@ def callback_cycle(model, where):
 
 def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=None, end=None,
                 warmstart=[]):
-    r""" Create an ILP for the min/max Path asymmetric TSP
+    r""" Create an ILP for the min/max path asymmetric TSP
 
     This formulation enforces that the solution has at least one cycle.
     A callback will detect if there is more than one cycle and adds constraints to explicity forbid this.
@@ -153,8 +153,8 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=No
 def extract_solution(G, model):
     """ Get the optimal tour in G
 
-        :param G: a weighted ILPGraph
-        :param model: a solved Gurobi model for min/max Path asymmetric TSP
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+        :param model: a solved Gurobi model for min/max path asymmetric TSP
 
         :return: the edges of an optimal tour/path in G
     """
