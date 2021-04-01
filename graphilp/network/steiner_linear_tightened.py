@@ -44,6 +44,9 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
             \forall \{u,v\}\in E: \ell_u + 1 \leq 2nx_{vu} + \ell_v + 2n(1-x_{uv}) && \text{(enforce increasing labels)}\\
             \forall \{u,v\}\in E: \ell_u - 2nx_{uv} \leq \ell_v + 1 + 2n(1-x_{vu}) && \text{(enforce increasing labels)}\\
             \forall \{u,v\}\in E: \ell_v + 1 \leq 2nx_{uv} + \ell_u + 2n(1-x_{vu}) && \text{(enforce increasing labels)}\\
+            \forall v \in V: \ell_v - n x_v \leq 1&& \text{(set label to 1 when}\\
+            && \text{vertex is not chosen)}\\
+            \forall v \in V: \sum_{(u,v) \in \overrightarrow{E}} x_{uv} \leq 1 && \text{(only one arrow into each vertex)}\\
             \end{align*}
 
     Example:
@@ -140,6 +143,10 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
             m.addConstr(labels[u] + 1 <= 2*n*edge_var_rev + labels[v] + 2*n*(1 - edge_var))
             m.addConstr(labels[u] - 2*n*edge_var <= labels[v] + 1 + 2*n*(1 - edge_var_rev))
             m.addConstr(labels[v] + 1 <= 2*n*edge_var + labels[u] + 2*n*(1 - edge_var_rev))
+    
+    # set label to 1 if node is not chosen
+    for v in G.G.nodes():
+        m.addConstr(labels[v] - n * nodes[v] <= 1)            
 
     # allow only one arrow into each node
     for node in nodes:
