@@ -99,14 +99,44 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     for node, node_var in nodes.items():
         edge_vars = [edge_var for edge, edge_var in edges.items() if (node == edge[0]) or (node == edge[1])]
         m.addConstr(node_var - quicksum(edge_vars) <= 0)
-
+        
+    # set lower bound
+    if lower_bound:
+        m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
+        
     m.update()
+    
+    # set warmstart
+    if len(warmstart) > 0:
+
+        # Initialise warmstart by excluding all edges and vertices from solution:
+        for edge_var in edges.values():
+            edge_var.Start = 0
+
+        for node_var in nodes.values():
+            node_var.Start = 0
+
+        # Include all edges and vertices from the warmstart in the solution:
+        for edge in warmstart:
+            if edge in edges:
+                edges[edge].Start = 1
+            else:
+                edges[(edge[1], edge[0])].Start = 1
+
+            nodes[edge[0]].Start = 1
+            nodes[edge[1]].Start = 1
+
+        m.update()    
 
     return m
 
 
 def callback_cycle(model, where):
     """ Callback inserts constraints to forbid cycles in solution candidates
+    
+    :param model: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+    :param where: a Gurobi callback parameter indicating from which step of the optimisation the callback
+        originated    
     """
     if where == GRB.Callback.MIPSOL:
         # check for cycles whenever a new solution candidate is found

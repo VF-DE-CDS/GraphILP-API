@@ -2,17 +2,20 @@ from gurobipy import Model, GRB, quicksum
 import networkx as nx
 
 
-def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
+def create_model(G, forced_terminals=[], weight='weight', prize='prize',
+                warmstart=[], lower_bound=None):
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
 
     This formulation enforces a cycle in the solution if it is not connected.
     Cycles are then forbidden by enforcing an increasing labelling along the edges of the solution.
     To this end, the formulation is working with a directed graph internally.
 
-    :param G: an ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -38,6 +41,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
             \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated vertices)}\\
             \forall \{u,v\}\in E: n x_{uv} + \ell_v - \ell_u \geq 1 - n(1-x_{vu}) && \text{(enforce increasing labels)}\\
             \forall \{u,v\}\in E: n x_{vu} + \ell_u - \ell_v \geq 1 - n(1-x_{uv}) && \text{(enforce increasing labels)}\\
+            \forall v \in V: \sum_{(u,v) \in \overrightarrow{E}} x_{uv} \leq 1 && \text{(only one arrow into each vertex)}\\
             \end{align*}
     """
     # ensure that input is a directed graph
@@ -57,7 +61,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
     G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
 
     # node label variables used to avoid cycles
-    G.setLabelVars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1, ub=n))
+    G.set_label_vars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1, ub=n))
 
     m.update()
 
@@ -119,6 +123,45 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
         constraint_edges = [(u, v) for (u, v) in edges.keys() if v == node]
         m.addConstr(quicksum([edges[e] for e in constraint_edges]) <= 1)
 
+    # set lower bound
+    if lower_bound:
+        m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
+        
+    # set warmstart
+    if len(warmstart) > 0:
+
+        # Initialise warmstart by excluding all edges and vertices from solution:
+        for edge_var in edges.values():
+            edge_var.Start = 0
+
+        for node_var in nodes.values():
+            node_var.Start = 0
+
+        for label_var in labels.values():
+            label_var.Start = 1
+
+        # Include all edges and vertices from the warmstart in the solution
+        # and set vertex labels:
+        start_node = warmstart[0][0]
+
+        warmstart_tree = nx.Graph()
+        warmstart_tree.add_edges_from(warmstart)
+
+        label = {start_node: 1}
+        labels[start_node].Start = 1
+        bfs = nx.bfs_edges(warmstart_tree, start_node)
+
+        for e in bfs:
+            label[e[1]] = label[e[0]] + 1
+            labels[e[1]].Start = label[e[1]]
+
+            edges[e].Start = 1
+
+            nodes[e[0]].Start = 1
+            nodes[e[1]].Start = 1
+
+        m.update()
+        
     return m
 
 
