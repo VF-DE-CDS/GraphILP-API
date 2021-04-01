@@ -31,7 +31,8 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', warmstar
             \sum_{(e, v) \in E}x_{ev} = 0 && \text{(no outgoing edge from end vertex)}\\
             \ell_s = 0 && \text{(start vertex has label 0)}\\
             \ell_e = n-1 && \text{(end vertex has label } n-1 \text{)}\\
-            \forall (u,v) \in E \setminus \{(u, s)\mid u \in V \}: \ell_u - \ell_v + nx_{uv} \leq n-1
+            \forall (u,v) \in E \setminus \{(u, s)\mid u \in V \}:\\
+            \ell_u - \ell_v + nx_{uv} \leq n-1
             && \text{(increasing labels along tour)}\\
             \end{align*}
     """
