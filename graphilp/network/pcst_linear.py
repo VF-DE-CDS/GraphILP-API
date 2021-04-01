@@ -9,7 +9,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize'):
     Cycles are then forbidden by enforcing an increasing labelling along the edges of the solution.
     To this end, the formulation is working with a directed graph internally.
 
-    :param G: an ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param prize: name of the argument in the node dictionary of the graph used to store node prize values
