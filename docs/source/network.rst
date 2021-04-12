@@ -174,7 +174,7 @@ Path ATSP
    create_model
    extract_solution
 
-.. automodule:: graphilp.network.atsp_DT_formulation
+.. automodule:: graphilp.network.atsp_desrochers_laporte
    :noindex:
 
 .. autosummary::
@@ -264,7 +264,7 @@ Details
 .. automodule:: graphilp.network.atsp
    :members:
 
-.. automodule:: graphilp.network.atsp_DT_formulation
+.. automodule:: graphilp.network.atsp_desrochers_laporte
    :members:
 
 .. automodule:: graphilp.network.gen_path_atsp
