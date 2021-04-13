@@ -47,7 +47,6 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     # ensure that input is a directed graph
     if type(G.G) != nx.classes.digraph.DiGraph:
         G.G = nx.DiGraph(G.G)
-
     # create model
     m = Model("graphilp_pcst")
 
