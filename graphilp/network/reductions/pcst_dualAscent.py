@@ -168,10 +168,12 @@ def test4(G):
 
 
 def dual_ascent_tests(G, root):
+
     G = parse_to_APCSTP(G)
     G = terminals_to_leaves(G, root)
     lowerBound, G = dual_ascent(G, root)
     upperBound = pcst_utilities.computeUpperBound(G, root)
+    print(G.edges())
     test2(G, lowerBound, upperBound, root)
     test1(G, lowerBound, upperBound, root)
     fixed_terminals = test3(G, lowerBound, upperBound, root)

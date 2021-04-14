@@ -18,9 +18,7 @@ def ntd2(G, terminals):
             u, v = list(G.neighbors(node[0]))[0], list(G.neighbors(node[0]))[1]
             edgelength = G.get_edge_data(node[0], u).get('weight') + G.get_edge_data(node[0], v).get('weight')
             if not G.has_edge(u,v) or G.has_edge(u, v) and G.get_edge_data(u, v).get('weight') > edgelength:
-                G.add_edge(u, v, length=edgelength)
-        if node[0] == 1557864932:
-            print("Stop")
+                G.add_edge(u, v, weight=edgelength)
         G.remove_node(node[0])
 
 
@@ -33,7 +31,7 @@ def td1(G, terminals, root):
             if t != root:
                 nodes_to_remove.append(t)
     for n in nodes_to_remove:
-        edgelength = G.get_edge_data(n[0], list(G.neighbors(n[0]))[0]).get('weight')
+        edgelength = G.get_edge_data(n, list(G.neighbors(n))[0]).get('weight')
         #Case 2, Case 1 muss nicht behandelt werden, da der Knoten bei beiden Cases gelöscht wird am ende des Durchlaufs
         if n[1].get('prize') > edgelength:
             oldProfit = G.nodes[list(G.neighbors(n[0]))[0]]['prize']
@@ -49,15 +47,15 @@ def td2(G, terminals, root):
     #candidates = [n for n in G.nodes(data=True) if G.degree[n[0]] == 2 and len(G.adj[n[0]]) > 1 and n in terminals]
     nodes_to_remove = []
     for n in candidates:
-        profit_candidate = n[1]["prize"]
-        neighbors = list(G.neighbors(n[0]))
-        length_e1 = G.get_edge_data(n[0], neighbors[0]).get(0)['weight']
-        length_e2 = G.get_edge_data(n[0], neighbors[1]).get(0)['weight']
-        profit_terminals = [t[1]["prize"] for t in terminals if t != n]
+        profit_candidate = G.nodes[n]["prize"]
+        neighbors = list(G.neighbors(n))
+        length_e1 = G.get_edge_data(n, neighbors[0])['weight']
+        length_e2 = G.get_edge_data(n, neighbors[1])['weight']
+        profit_terminals = [G.nodes[t]["prize"] for t in terminals if t != n]
         if profit_candidate <= min(length_e1, length_e2, min(profit_terminals)):
-            nodes_to_remove.append(n[0])
+            nodes_to_remove.append(n)
         length_newEdge = length_e1 + length_e2 - profit_candidate
-        G.add_edge(neighbors[0], neighbors[1], length = length_newEdge)
+        G.add_edge(neighbors[0], neighbors[1], weight = length_newEdge)
     G.remove_nodes_from(nodes_to_remove)
 
 
@@ -79,8 +77,9 @@ def basic_reductions(G, root):
     terminals = pcst_utilities.computeTerminals(G)
     ntd1(G, terminals)
     ntd2(G, terminals)
-    td1(G, terminals, root)
-    td2(G, terminals, root)
+    #td1(G, terminals, root)
+    # TODO: Kante wird negativ ( Siehe Cologne i105M3.stp aus Dimacs.)
+    #td2(G, terminals, root)
     # TODO: For directed type
     #unconnectedComponent(G, terminals)
 

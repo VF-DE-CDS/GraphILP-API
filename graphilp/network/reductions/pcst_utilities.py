@@ -4,6 +4,7 @@ import graphilp.network.reductions.pcst_fast_interface_temp as pcst
 from gurobipy import Model, GRB, quicksum
 import gurobipy
 import time
+import matplotlib.pyplot as plt
 
 def show_graph_size(G, name):
     """ Print out the individual properties of a graph on the console
@@ -200,3 +201,20 @@ def gurobi(G, root, voronoi_active = False, term_deg2 = None, nodes_deg3 = None,
 
     best_val = m.objVal
     return solution, best_val
+
+
+def draw(G, edgelabel='weight',edges=None):
+
+    #pos = nx.circular_layout(G)
+    pos = nx.spring_layout(G, k=2)
+    costs = nx.get_edge_attributes(G,edgelabel)
+    profit = nx.get_node_attributes(G, 'prize')
+    nx.draw_networkx_nodes(G, pos, node_color='w', edgecolors='black')
+    nx.draw_networkx_edges(G, pos, edgelist=G.edges())
+    nx.draw_networkx_edge_labels(G, pos, font_size=7, edge_labels=costs)
+    nx.draw_networkx_labels(G, pos, profit, font_size=5, font_color='r')
+    #nx.draw(G, pos=pos, with_labels=True)
+
+
+
+    plt.show()

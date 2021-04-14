@@ -8,9 +8,9 @@ import gurobipy
 
 
 G, terminals, root = stp_to_networkx(
-    "/home/addimator/Dropbox/WiSe21/Projektarbeit/cooperation-vodafone-data/Dimacs/RPCST-cologne/cologne1/i101M1.stp")
-
-
+    "/home/addimator/Dropbox/WiSe21/Projektarbeit/cooperation-vodafone-data/Dimacs/RPCST-cologne/cologne1/i105M3.stp")
+pu.gurobi(G, root)
+print("###############################################################\n##############################################################")
 G = n.read(G)
 m = pl.create_model(G, forced_terminals=[root])
 m.optimize()
