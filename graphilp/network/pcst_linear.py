@@ -44,21 +44,16 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
             \forall v \in V: \sum_{(u,v) \in \overrightarrow{E}} x_{uv} \leq 1 && \text{(only one arrow into each vertex)}\\
             \end{align*}
     """
-    # ensure that input is a directed graph
-    if type(G.G) != nx.classes.digraph.DiGraph:
-        G.G = nx.DiGraph(G.G)
-
     # create model
     m = Model("graphilp_pcst")
 
     n = G.G.number_of_nodes()
 
-    # create reverse edge for every edge in the graph
-    for edge in G.G.edges():
-        G.G.add_edge(*edge[::-1])
-
+    # add variables for edges and nodes
     G.set_node_vars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
-    G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
+    edge_set = set(G.G.edges())
+    edge_set = edge_set.union({(v, u) for u, v in edge_set})
+    G.set_edge_vars(m.addVars(edge_set, vtype=GRB.BINARY))
 
     # node label variables used to avoid cycles
     G.set_label_vars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1, ub=n))
@@ -81,21 +76,15 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
         # the outer loop makes sure that terminals that are not in the graph are ignored
         if node in forced_terminals:
             m.addConstr(node_var == 1)
-
-    # restrict number of edges, at max one edge between each pair of nodes
+            
+    # enforce cycle when graph is not connected
     m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
 
     # at most one direction per edge can be chosen
-    # runtime can probably be greatly improved if iterating is done in a smarter way
-    for edge, edge_var in edges.items():
-        reverseEdge = edge[::-1]
-        rev_edge_var = edge2var.get(reverseEdge)
-        if rev_edge_var != None:
-            m.addConstr(edge_var + rev_edge_var <= 1)
+    m.addConstrs(edges[(u, v)] + edges[(v, u)] <= 1 for u, v in G.G.edges())
 
     # if edge is chosen, both adjacent nodes need to be chosen
-    for edge, edge_var in edges.items():
-        m.addConstr(2*edge_var - nodes[edge[0]] - nodes[edge[1]] <= 0)
+    m.addConstrs(2*(edges[(u, v)] + edges[(v, u)]) - nodes[u] - nodes[v] <= 0 for u, v in G.G.edges())
 
     # prohibit isolated vertices
     for node, node_var in nodes.items():
@@ -109,14 +98,10 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
                 edge_vars.append(edge_var)
         m.addConstr(node_var - quicksum(edge_vars) <= 0)
 
-
     # labeling constraints: enforce increasing labels in edge direction of selected edges
-    for edge, edge_var in edges.items():
-        reverseEdge = edge[::-1]
-        edge_var_rev = edge2var.get(reverseEdge)
-        if edge_var_rev != None:
-            m.addConstr(n * edge_var_rev + labels[edge[1]] - labels[edge[0]] >= 1 - n*(1 - edge_var))
-            m.addConstr(n * edge_var + labels[edge[0]] - labels[edge[1]] >= 1 - n*(1 - edge_var_rev))
+    for u, v in G.G.edges():
+        m.addConstr(n * edges[(v, u)] + labels[v] - labels[u] >= 1 - n*(1 - edges[(u, v)]))
+        m.addConstr(n * edges[(u, v)] + labels[u] - labels[v] >= 1 - n*(1 - edges[(v, u)]))
 
     # allow only one arrow into each node
     for node in nodes:

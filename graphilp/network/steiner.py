@@ -92,7 +92,7 @@ def create_model(G, terminals, weight='weight', warmstart=[], lower_bound=None):
         if node in terminals:
             m.addConstr(node_var == 1)
 
-    # restrict number of edges, at max one edge between each pair of nodes
+    # enforce cycle when graph is not connected
     m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
 
     # if edge is chosen, both adjacent nodes need to be chosen
