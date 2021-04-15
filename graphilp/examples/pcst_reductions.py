@@ -19,8 +19,6 @@ import time
 import sys
 
 
-from graphilp.imports import networkx as imp_nx
-from graphilp.network import pcst_linear as pl
 from graphilp.network.reductions import pcst_utilities as pu
 from graphilp.network.reductions import pcst_basic_reductions as br
 from graphilp.network.reductions import pcst_voronoi as vor
@@ -196,8 +194,9 @@ def all(file, show_plots):
             term_deg2, nodes_deg3 = vor.reductionTechniques(G, root)
         except KeyError:
             # If PCST fast throws a Key Error the upper bound solution is only the root note and therefore the real solution is only the root node.
+            file.write("Solution without reductions:" + str(solution) + "\n")
             s = "Pcst-fast found only Root note, no Graph for the upperBound could be built. Solution is only the root node: " \
-                + str(root) + ". \nThe optimal solution is: " + str(G.nodes[root]['prize']) + "."
+                + str(root) + ". \nThe optimal solution is: " + str(G.nodes[root]['prize']) + ".\n"
             file.write(s + "\n")
             return
             sys.exit(0)
@@ -220,7 +219,7 @@ def all(file, show_plots):
         except KeyError:
             # If PCST fast throws a Key Error the upper bound solution is only the root note and therefore the real solution is only the root node.
             # If PCST fast throws a Key Error the upper bound solution is only the root note and therefore the real solution is only the root node.
-            s = "Pcst-fast found only Root note, no Graph for the upperBound could be built. Solution is only the root node: " + str(root) + ". \nThe optimal solution is: " +  str(G.nodes[root]['prize']) + "."
+            s = "Pcst-fast found only Root note, no Graph for the upperBound could be built. Solution is only the root node: " + str(root) + ". \nThe optimal solution is: " +  str(G.nodes[root]['prize']) + ".\n"
             file.write(s)
             return
             sys.exit(0)
@@ -260,6 +259,7 @@ def all(file, show_plots):
     print("\nGurobi took " + str(gurobi_with_reductions_time) + " Seconds to compute.")
     print("Edges in solution (for debugging): ", solution, "\n")
 
+
     #%% md
 
     ## Plot the solution
@@ -290,7 +290,7 @@ def all(file, show_plots):
     file.write(s)
     print(s)
 
-show_plots = False
+show_plots = True
 results = open("results.txt", "w")
 for i in range(4):
     try:

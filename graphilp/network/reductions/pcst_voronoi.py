@@ -126,11 +126,6 @@ def proposition17(G, radius, upperBound, diagram):
     terminals = pcst_utilities.computeTerminals(G)
     edges_to_remove = []
     for (v, w) in G.edges:
-        if (v, w) == (5093054218, 1561453964):
-            print("STOP")
-        if (v, w) == (1561453964, 584047465):
-            print("STOP")
-
         dNearestTerminal_v = dNearestTerminals(G, v, terminals, 2)
         dNearestTerminal_w = dNearestTerminals(G, w, terminals, 2)
         if len(dNearestTerminal_w) < 2 or len(dNearestTerminal_v) < 2:
@@ -148,15 +143,6 @@ def proposition17(G, radius, upperBound, diagram):
         if lowerBound > upperBound:
             edges_to_remove.append((v, w))
     G.remove_edges_from(edges_to_remove)
-    for e in [(595793277, 1561453934), (1561453933, 595793277), (596188953, 1561453933),
-              (584047447, 1561453932), (584047465, 584047447), (584047465, 4278832131),
-              (1561453932, 596188953), (1561453964, 584047465), (5093054218, 1561453964),
-              (5093054218, 4028758284), (1561453966, 5093054218), (3314944014, 1561453966),
-              (3314944014, 3314944018), (4028758284, 8096912481), (8096912481, 8096912480)]:
-        if e not in G.edges:
-            print("aesröjgtpasiohjgt", e)
-        else:
-            print("OK")
 
 def proposition18(G, radius, upperBound):
     terminals = pcst_utilities.computeTerminals(G)
