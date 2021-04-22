@@ -38,7 +38,7 @@ GraphILP has two main requirements:
 
 Some additional libraries are required for running the examples.
 
-While GraphILP is not yet on PyPI, it can be installed by checking out repository and addings the path to your PYTHONPATH.
+While GraphILP is not yet on PyPI, it can be installed by checking out the repository and adding the path to your PYTHONPATH.
 For example:
 
 ```bash
