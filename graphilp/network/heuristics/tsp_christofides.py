@@ -5,7 +5,7 @@ from gurobipy import GRB
 
 
 def get_heuristic(G, weight='weight'):
-    """ Approximation to TSP by Christofides's algorithm
+    """ Approximation to TSP by `Christofides's algorithm <https://en.wikipedia.org/wiki/Christofides_algorithm>`__
 
     Creates a TSP tour from a minimum weight spanning tree by applying a minimum weight perfect matching
     to the nodes of odd degree in the spanning tree. This gives a low-weight Eulerian subgraph.
@@ -22,9 +22,9 @@ def get_heuristic(G, weight='weight'):
     Example:
         .. code-block::
 
-            warmstart, lower_bound = tsp_christofides.getHeuristic(G)
+            warmstart, lower_bound = tsp_christofides.get_heuristic(G)
 
-            m = createModel(G, warmstart=warmstart, lower_bound=lower_bound)
+            m = create_model(G, warmstart=warmstart, lower_bound=lower_bound)
 
     """
     # compute minimum spanning tree
