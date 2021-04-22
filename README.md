@@ -26,12 +26,17 @@ m.optimize()
 color_to_node, node_to_color = vtx.extract_solution(G, m)
 ```
 
+The best way to get started with GraphILP is through one of our examples.
+
 Installation
 -------------
 
-Requirements: Networkx and Gurobi
+GraphILP has two main requirements: 
 
-Check out repository and add the path to your PYTHONPATH.
+1. [NetworkX](https://networkx.org) is used internally to represent graphs. It is also the easiest way to create problem instances.
+2. GraphILP creates integer linear programs in the form of [Gurobi](https://www.gurobi.com) models. To create and solve these models, you need the Gurobi solver and its Python API.
+
+While GraphILP is not yet on PyPI, it can be installed by checking out repository and addings the path to your PYTHONPATH.
 For example:
 
 ```bash
