@@ -30,9 +30,80 @@ The general idea is to input a graph, select an optimisation problem, and run an
 
 We are currently supporting `Gurobi <https://www.gurobi.com>`_ as an underlying ILP solver and interfacing through its Python API.
 
+How to use
+==========
+The following figure illustrates the general usage pattern of GraphILP. It consists of creating a problem instance in the form of a graph (or hypergraph), choosing a problem, generating and solving a integer linear programming model for this problem, and finally extracting the solution.
+
+.. tikz:: Usage pattern for GraphILP. Methods in red are from GraphILP, blue indicates a method from the Gurobi API.
+   :libs: shapes
+   :align: center
+   
+   \tikzset{main node/.style={circle,draw,font=\sffamily\bfseries}}
+   \tikzset{heading node/.style={anchor=west,font=\sffamily\bfseries}}
+
+   \node [heading node] (heading1) at (0, 12) {1) Create graph};
+   \node [heading node] (heading2) at (7, 12) {2) Choose problem};
+   \node [heading node] (heading3) at (7, 8) {3) Generate model};
+   \node [heading node, text=gray] (heading3b) at (0, 6) {3') Create warmstart};
+   \node [heading node] (heading4) at (7, 4) {4) Solve model};
+   \node [heading node] (heading5) at (7, 2) {5) Extract solution};
+   
+   \node[main node,fill=blue!50] (6) at (2+2.0, 9.5-0.0) {};
+   \node[main node,fill=blue!50] (7) at (2+0.618, 9.5-1.902) {};
+   \node[main node,fill=blue!50] (8) at (2-1.618, 9.5-1.176) {};
+   \node[main node,fill=blue!50] (9) at (2-1.618, 9.5+1.176) {};
+   \node[main node,fill=blue!50] (10) at (2+0.618, 9.5+1.902) {};
+
+   \path[every node/.style={font=\sffamily\small}]
+   (6) edge (8)
+   (7) edge (9)
+   (8) edge (10)
+   (9) edge (6)
+   (10) edge (7);
+
+   \node (labelG) at (2, 9.5) {G};
+   \node [anchor=west, font=\ttfamily] (graphimp) at (0, 7) {\footnotesize G' = imports.networkx.{\color{red} read}(G)};
+   
+   \node [anchor=north west, font=\sffamily\bfseries, align=left] (problem) at (7, 11)
+   {\footnotesize Covering\\
+   \footnotesize $\vdots$ -- vertex cover\\
+   \footnotesize Partitioning\\
+   \footnotesize $\vdots$ -- vertex colouring
+   };
+   
+   \node [ellipse, draw=red, minimum width=75pt, minimum height=25pt] (choose) at (8.7, 10) {};
+
+   \node [anchor=west, font=\ttfamily] (model) at (7, 7) {\footnotesize m = covering.min\_vertexcover.{\color{red} create\_model}(G', {\color{gray} warmstart=w})};
+
+   \node [heading node, text=gray] (heading3bopt) at (0, 5) {\footnotesize (optional)};
+   \node [anchor=west, font=\ttfamily, text=gray] (warmstart) at (0, 4) {\footnotesize w = $\cdots$.{\color{red} get\_heuristic(G')}};
+
+   \node [anchor=west, font=\ttfamily] (optimize) at (7, 3) {\footnotesize m.{\color{blue} optimize}()};
+
+   \node [anchor=west, font=\ttfamily] (extract) at (7, 1) {\footnotesize H = covering.min\_vertexcover.{\color{red} extract\_solution}(G', m)};
+   
+   \path[->,gray,every node/.style={font=\sffamily\small}]
+   (graphimp) edge (model)
+   (warmstart) edge (model);
+
+   \node[main node,fill=blue!50] (1) at (2+2.0, 1-0.0) {};
+   \node[main node,fill=red!50] (2) at (2+0.618, 1-1.902) {};
+   \node[main node,fill=blue!50] (3) at (2-1.618, 1-1.176) {};
+   \node[main node,fill=red!50] (4) at (2-1.618, 1+1.176) {};
+   \node[main node,fill=blue!50] (5) at (2+0.618, 1+1.902) {};
+
+   \path[every node/.style={font=\sffamily\small}]
+   (1) edge (3)
+   (2) edge (4)
+   (3) edge (5)
+   (4) edge (1)
+   (5) edge (2);
+
+   \node (labelH) at (2, 1) {H};
+
 Examples
 ========
-The best way to get startet with GraphILP is through one of our examples:
+The best way to get started with GraphILP is through one of our examples:
 
 .. list-table:: List of examples
    :widths: 50 50
