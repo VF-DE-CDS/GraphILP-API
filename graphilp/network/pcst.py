@@ -88,7 +88,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
         if node in forced_terminals:
             m.addConstr(node_var == 1)
 
-    # restrict number of edges, at max one edge between each pair of nodes
+    # enforce cycle when graph is not connected
     m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
 
     # if edge is chosen, both adjacent nodes need to be chosen

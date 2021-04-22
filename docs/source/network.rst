@@ -162,8 +162,19 @@ ATSP
    create_model
    extract_solution
 
+.. automodule:: graphilp.network.atsp_desrochers_laporte
+   :noindex:
+
+.. autosummary::
+   :nosignatures:
+
+   create_model
+   extract_solution
+
 Path ATSP
 ^^^^^^^^^
+
+In the path version, the tour may start and end in different vertices.
 
 .. automodule:: graphilp.network.path_atsp
    :noindex:
@@ -174,17 +185,10 @@ Path ATSP
    create_model
    extract_solution
 
-.. automodule:: graphilp.network.atsp_DT_formulation
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-
-   create_model
-   extract_solution
-
 Metric TSP
 ----------
+
+In the metric TSP, the edge weights form a metric on the graph, i.e., they obey the triangle inequality :math:`w_{uv} \leq w_{ux} + w_{xv}` for any three vertices :math:`u, v, x`.
 
 .. automodule:: graphilp.network.tsp
    :noindex:
@@ -197,6 +201,8 @@ Metric TSP
 
 Path TSP
 ^^^^^^^^
+
+In the path version, the tour may start and end in different vertices.
 
 .. automodule:: graphilp.network.path_tsp
    :noindex:
@@ -264,7 +270,7 @@ Details
 .. automodule:: graphilp.network.atsp
    :members:
 
-.. automodule:: graphilp.network.atsp_DT_formulation
+.. automodule:: graphilp.network.atsp_desrochers_laporte
    :members:
 
 .. automodule:: graphilp.network.gen_path_atsp
