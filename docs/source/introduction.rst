@@ -88,7 +88,7 @@ The following figure illustrates the general usage pattern of GraphILP. It consi
 
    \node[main node,fill=blue!50] (1) at (2+2.0, 1-0.0) {};
    \node[main node,fill=red!50] (2) at (2+0.618, 1-1.902) {};
-   \node[main node,fill=blue!50] (3) at (2-1.618, 1-1.176) {};
+   \node[main node,fill=red!50] (3) at (2-1.618, 1-1.176) {};
    \node[main node,fill=red!50] (4) at (2-1.618, 1+1.176) {};
    \node[main node,fill=blue!50] (5) at (2+0.618, 1+1.902) {};
 
