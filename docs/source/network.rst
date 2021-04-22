@@ -162,10 +162,7 @@ ATSP
    create_model
    extract_solution
 
-Path ATSP
-^^^^^^^^^
-
-.. automodule:: graphilp.network.path_atsp
+.. automodule:: graphilp.network.atsp_desrochers_laporte
    :noindex:
 
 .. autosummary::
@@ -174,7 +171,10 @@ Path ATSP
    create_model
    extract_solution
 
-.. automodule:: graphilp.network.atsp_desrochers_laporte
+Path ATSP
+^^^^^^^^^
+
+.. automodule:: graphilp.network.path_atsp
    :noindex:
 
 .. autosummary::
