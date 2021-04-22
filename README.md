@@ -3,8 +3,8 @@ GraphILP
 
 GraphILP is a Python API to automatically cast graph-related optimisation problems into integer linear programming (ILP) instances.
 
-* Source: https://github.com/VF-DE-CDS/GraphILP-API
-* Documentation: TODO
+* **Source:** https://github.com/VF-DE-CDS/GraphILP-API
+* **Documentation:** TODO
 
 Simple example
 -------------------
@@ -35,6 +35,8 @@ GraphILP has two main requirements:
 
 1. [NetworkX](https://networkx.org) is used internally to represent graphs. It is also the easiest way to create problem instances.
 2. GraphILP creates integer linear programs in the form of [Gurobi](https://www.gurobi.com) models. To create and solve these models, you need the Gurobi solver and its Python API.
+
+Some additional libraries are required for running the examples.
 
 While GraphILP is not yet on PyPI, it can be installed by checking out repository and addings the path to your PYTHONPATH.
 For example:
