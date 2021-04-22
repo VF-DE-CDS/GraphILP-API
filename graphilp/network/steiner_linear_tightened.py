@@ -74,7 +74,7 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
     G.set_edge_vars(m.addVars(edge_set, vtype=GRB.BINARY))
 
     # node label variables used to avoid cycles
-    G.set_label_vars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1, ub=n))
+    G.set_label_vars(m.addVars(G.G.nodes(), vtype=GRB.INTEGER, lb=1))
 
     m.update()
 
