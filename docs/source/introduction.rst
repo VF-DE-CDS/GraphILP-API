@@ -32,7 +32,7 @@ We are currently supporting `Gurobi <https://www.gurobi.com>`_ as an underlying 
 
 How to use
 ==========
-The following figure illustrates the general usage pattern of GraphILP. It consists of creating a problem instance in the form of a graph (or hypergraph), choosing a problem, generating and solving a integer linear programming model for this problem, and finally extracting the solution.
+The following figure illustrates the general usage pattern of GraphILP. It consists of creating a problem instance in the form of a graph (or hypergraph), choosing a problem, generating and solving an integer linear programming model for this problem, and finally extracting the solution.
 
 .. tikz:: Usage pattern for GraphILP. Methods in red are from GraphILP, blue indicates a method from the Gurobi API.
    :libs: shapes
