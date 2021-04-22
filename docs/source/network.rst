@@ -53,17 +53,6 @@ There is also a version of this constraint system with somewhat stronger conditi
    create_model
    extract_solution
 
-Steiner with flow conditions
-----------------------------
-.. automodule:: graphilp.network.steiner_flow_linear
-   :noindex:
-
-.. autosummary::
-   :nosignatures:
-
-   create_model
-   extract_solution
-
 Heuristics
 ----------
 
@@ -253,9 +242,6 @@ Details
    :members:
 
 .. automodule:: graphilp.network.steiner_linear_tightened
-   :members:
-
-.. automodule:: graphilp.network.steiner_flow_linear
    :members:
 
 .. automodule:: graphilp.network.heuristics.steiner_metric_closure
