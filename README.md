@@ -7,7 +7,7 @@ GraphILP is a Python API to automatically cast graph-related optimisation proble
 * **Documentation:** TODO
 
 Simple example
--------------------
+--------------
 
 Find the smallest number colours needed to colour the vertices of a cycle such that adjacent vertices have different colours.
 
@@ -29,7 +29,7 @@ color_to_node, node_to_color = vtx.extract_solution(G, m)
 The best way to get started with GraphILP is through one of our examples.
 
 Installation
--------------
+------------
 
 GraphILP has two main requirements: 
 
@@ -46,6 +46,20 @@ export PYTHONPATH=$PYTHONPATH:< your path >
 ```
 
 Licence
----------
+-------
 
 The GraphILP API is released under the MIT License. See LICENSE.txt for the details.
+
+Authors
+-------
+
+### Core development team
+
+* Rolf Bardeli <rolf.bardeli1@vodafone.com>
+* Richard Schmied <richard.schmied@vodafone.com>
+* Morris Stallmann <morris.stallmann1@vodafone.com>
+
+### Contributors
+
+* Adrian Prinz
+* Thomas Sauter
