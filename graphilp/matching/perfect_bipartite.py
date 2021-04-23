@@ -66,7 +66,7 @@ def create_model(G, A, weight='weight', direction=GRB.MAXIMIZE):
             m.addConstr(quicksum([edge_var for edge, edge_var in edges.items() if v in edge]) == 1)
 
     # set optimisation objective: maximum/minimum weight matching (sum of weights of chosen edges)
-    m.setObjective(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]), direction)
+    m.setObjective(quicksum([edge_var * G.G.edges[edge].get(weight, 1) for edge, edge_var in edges.items()]), direction)
 
     return m
 
