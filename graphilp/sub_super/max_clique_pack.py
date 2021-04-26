@@ -43,7 +43,7 @@ def create_model(G):
 def extract_solution(G, model):
     """ Get a list of vertices comprising a maximal clique
 
-    :param G: a weighted ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param model: a solved Gurobi model for maximum clique
 
     :return: a list of vertices comprising a maximal clique
