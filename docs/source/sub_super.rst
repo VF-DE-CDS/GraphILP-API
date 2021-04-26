@@ -4,7 +4,7 @@
 Sub- and supergraphs
 ********************
 
-Many questions in graph theory are asking revolving around the relationship between a graph and its sub-structures. Optimisation problems typically ask for the largest subgraph of a given type like a clique or a planar graph. They may also ask for the minimal modification necessary to ensure the existence of such a subgraph.
+Many questions in graph theory are revolving around the relationship between a graph and its sub-structures. Optimisation problems typically ask for the largest subgraph of a given type like a clique or a planar graph. They may also ask for the minimal modification necessary to ensure the existence of such a subgraph.
 
 Clique
 ======

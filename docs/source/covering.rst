@@ -4,7 +4,7 @@
 Covering
 *********
 
-Covering problems in graphs ask for substructures in the graph such that all other elements of the graph are adjacent to this substructure. For example, in a minimal vertex cover we look for a subset of the vertex set such that all other vertices are connected to the selected ones by an edge.
+Covering problems in graphs are about finding substructures in a graph to which all other elements of the graph are adjacent. For example, in a vertex cover we look for a subset of the vertex set containing at least one end-point of each edge and hence covering all edges.
 
 Dominating set
 ==============

@@ -5,7 +5,7 @@ from graphilp.network import gen_path_atsp
 def create_model(G, direction=GRB.MAXIMIZE, weight='weight', warmstart=[]):
     """ Create an ILP for the min/max metric TSP
 
-    Uses :py:func:`graphilp.network.gen_path_atsp.createModel` to set up the problem.
+    Uses :py:func:`graphilp.network.gen_path_atsp.create_model` to set up the problem.
 
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param direction: GRB.MAXIMIZE for maximum weight tour, GRB.MINIMIZE for minimum weight tour

@@ -65,7 +65,7 @@ def create_model(G, slack=0, weight='weight', direction=GRB.MAXIMIZE):
 def extract_solution(G, model):
     """ Get a list of vertices comprising a minimum/maximum balanced cut of G
 
-    :param G: an ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param model: a solved Gurobi model for the minimum/maximum bisection problem
 
     :return: a list of vertices comprising a minimum/maximum balanced cut of G

@@ -9,11 +9,11 @@ def create_model(G, bound_num_colors=-1, warmstart={}):
     :param bound_num_colors: an upper bound on the number of colours needed in a minimum vertex colouring
     :param warmstart: a dictionary mapping vertices to colours such that connected vertices have different colours
 
-    :return: Gurobi model
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`__
 
     ILP:
         We allow for up to :math:`H` colours to be used in the solution (if no better bound is given
-        by bound_num_colors, assume :math:`H=|V|`) and introduce variable :math:`w_i` indicating whether
+        by bound_num_colors, assume :math:`H=|V|`) and introduce variables :math:`w_i` indicating whether
         colour :math:`i` is used in the solution. Variables :math:`x_{vi}` indicate whether colour :math:`i`
         is assigned to vertex :math:`v`.
 
@@ -21,12 +21,15 @@ def create_model(G, bound_num_colors=-1, warmstart={}):
             :nowrap:
 
             \begin{align*}
-            \min \sum_{1\le i \le H}w_{i} && \text{ (minimize the total number of colors used) }\\
+            \min \sum_{1\le i \le H}w_{i} && \text{ (minimize the total number of colours used) }\\
             \text{s.t.} \\
-            \sum_{i=1}^{H} x_{vi} = 1\;\forall v\in V && \text{ (every vertex gets exactly one colour) } \\
-            x_{ui}+x_{vi}\le w_{i}\;\forall(u,v)\in E, i=1,\ldots,H && \text{ (neighbours do not get the same colour) } \\
-            x_{vi},w_{i}\in\{0,1\}\;\forall v\in V, i=1,\ldots, H && \text{ (assigning a colour is a binary decision) }\\
-            \forall i\in\{1, \ldots, H-1\}: w_{i} \leq w_{i-1} && \text{(only assign colour i if colour i-1 is assigned)}
+            \forall v\in V: \sum_{i=1}^{H} x_{vi} = 1\ && \text{ (every vertex gets exactly one colour) } \\
+            \forall(u,v)\in E, i \in \{1,\ldots,H\}:\\
+            x_{ui}+x_{vi}\le w_{i}\ && \text{ (neighbours do not get the same colour) } \\
+            \forall v\in V, i \in \{1,\ldots, H\}:\\
+            x_{vi},w_{i}\in\{0,1\}\ && \text{ (assigning a colour is a binary decision) }\\
+            \forall i\in\{1, \ldots, H-1\}: w_{i} \leq w_{i-1} &&
+            \text{(only assign colour } i \text{ if colour } i-1 \text{ is assigned)}
             \end{align*}
 
     Examples:
@@ -105,13 +108,12 @@ def create_model(G, bound_num_colors=-1, warmstart={}):
 
 def extract_solution(G, model):
     """
-    Get a dictionary with colors as keys and a list of nodes with that color assigned as values.
+    Get a dictionary mapping colours to lists of vertices
 
-    :param G: graph to find minimum vertex coloring for
-    :type G: ILPGraph
-    :param model: ILP solved for minimum vertex coloring
-    :type model: Gurobi model
-    :rtype: dictionary
+    :param G: an :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    :param model: a solved Gurobi model for the minimum Steiner tree problem
+
+    :return: a dictionary mapping colours to lists of vertices
     """
 
     col_to_node = {}

@@ -7,7 +7,7 @@ def create_model(S, k, warmstart=[]):
 
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param k: maximal number of sets in solution
-    :param warmstart: a sets forming a cover
+    :param warmstart: a list of sets forming a cover
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 

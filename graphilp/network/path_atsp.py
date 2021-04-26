@@ -5,7 +5,7 @@ from graphilp.network import gen_path_atsp
 def create_model(G, start, end, direction=GRB.MAXIMIZE, weight='weight', warmstart=[]):
     """ Create an ILP for the min/max asymmetric path TSP
 
-    Uses :py:func:`graphilp.network.gen_path_atsp.createModel` to set up the problem.
+    Uses :py:func:`graphilp.network.gen_path_atsp.create_model` to set up the problem.
 
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param start: a vertex of the graph G in which the ATSP path should start
