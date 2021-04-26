@@ -17,7 +17,7 @@ def create_model(G, start, end, direction=GRB.MAXIMIZE, weight='weight', warmsta
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     """
     # Create model
-    m = gen_path_atsp.createModel(G, direction, '', weight=weight, start=start, end=end, warmstart=warmstart)
+    m = gen_path_atsp.create_model(G, direction, '', weight=weight, start=start, end=end, warmstart=warmstart)
 
     return m
 
@@ -30,6 +30,6 @@ def extract_solution(G, model):
 
     :return: the edges of an optimal tour in G
     """
-    tour = gen_path_atsp.extractSolution(G, model)
+    tour = gen_path_atsp.extract_solution(G, model)
 
     return tour

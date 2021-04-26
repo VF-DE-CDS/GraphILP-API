@@ -54,7 +54,7 @@ def create_model(G, direction=GRB.MAXIMIZE, metric='', weight='weight', start=No
 
     # Add variables for labels
     label_vars = m.addVars(G.G.nodes(), lb=0, ub=nbr_nodes - 1, vtype=GRB.INTEGER)
-    G.setLabelVars(label_vars)
+    G.set_label_vars(label_vars)
 
     m.update()
 

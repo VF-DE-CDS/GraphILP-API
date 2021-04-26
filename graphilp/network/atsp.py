@@ -16,7 +16,7 @@ def create_model(G, direction=GRB.MAXIMIZE, weight='weight', warmstart=[]):
     """
 
     # Create model
-    m = gen_path_atsp.createModel(G, direction, '', weight=weight, warmstart=warmstart)
+    m = gen_path_atsp.create_model(G, direction, '', weight=weight, warmstart=warmstart)
 
     return m
 
