@@ -3,14 +3,14 @@ import networkx as nx
 
 
 def create_model(G, terminals, weight='weight', warmstart=[], lower_bound=None):
-    r""" Create an ILP for the linear Steiner Problem.
+    r""" Create an ILP for the minimum Steiner tree problem in graphs.
 
     This formulation enforces a cycle in the solution if it is not connected.
     Cycles are then forbidden by enforcing an increasing labelling along the edges of the solution.
     To this end, the formulation is working with a directed graph internally.
 
-    :param G: an ILPGraph
-    :param terminals: a list of nodes that need to be connected by the Steiner tree
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
+    :param terminals: a list of vertices that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
@@ -158,7 +158,7 @@ def create_model(G, terminals, weight='weight', warmstart=[], lower_bound=None):
 def extract_solution(G, model):
     r""" Get the optimal Steiner tree in G
 
-        :param G: a weighted ILPGraph
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
         :param model: a solved Gurobi model for the minimum Steiner tree problem
 
         :return: the edges of an optimal Steiner tree connecting all terminals in G

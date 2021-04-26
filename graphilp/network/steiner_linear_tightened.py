@@ -3,7 +3,7 @@ import networkx as nx
 
 
 def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_bound=None):
-    r""" Create an ILP for the linear Steiner Problem.
+    r""" Create an ILP for the minimum Steiner tree problem in graphs.
 
     This formulation enforces a cycle in the solution if it is not connected.
     Cycles are then forbidden by enforcing an increasing labelling along the edges of the solution.
@@ -11,9 +11,9 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
     As a slight modification of :obj:`graphilp.network.steiner_linear`, the constraints enforce
     that the labels increase by one along each edge in the solution.
 
-    :param G: an ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param terminals: a list of nodes that need to be connected by the Steiner tree
-    :param root: a termin chosen as the root of the Steiner tree
+    :param root: a terminal chosen as the root of the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
     :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
@@ -33,7 +33,7 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
             \min \sum_{(u,v) \in \overrightarrow{E}} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
             \forall \{u,v\} \in E: x_{uv} + x_{vu} \leq 1 && \text{(restrict edges to one direction)}\\
-            x_r = 1 && \text{(require root to be chosen)}\\
+            \ell_r = 1 && \text{(root label is set to 1)}\\
             \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
             \sum_{v \in V} x_v - \sum_{(u, v) \in \overrightarrow{E}} x_{ij} = 1 && \text{(enforce circle when graph}\\
             && \text{is not connected)}\\
@@ -181,7 +181,7 @@ def create_model(G, terminals, root=None, weight='weight', warmstart=[], lower_b
 def extract_solution(G, model):
     r""" Get the optimal Steiner tree in G
 
-    :param G: a weighted ILPGraph
+    :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param model: a solved Gurobi model for the minimum Steiner tree problem
 
     :return: the edges of an optimal Steiner tree connecting all terminals in G

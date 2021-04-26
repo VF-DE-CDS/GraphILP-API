@@ -11,7 +11,7 @@ Graphs are very well-suited as models for networks. Typical questions in this ar
 Steiner Tree Problem
 ====================
 
-The `Steiner Tree Problem in graphs <https://en.wikipedia.org/wiki/Steiner_tree_problem#Steiner_tree_in_graphs_and_variants>`__ asks for the shortest connection of a subset of the node set. This subset is usually called the set of terminals. While this problem is easy when all nodes are terminals (minimum spanning tree) or when there are only two terminals (shortest path), it is NP-hard otherwise. This means that unless P=NP, we expect any algorithm to become very slow for large instances. For this reason, we provide different formulations of the problem which may be more or less suitable for solving different types of instances.
+The `Steiner Tree Problem in graphs <https://en.wikipedia.org/wiki/Steiner_tree_problem#Steiner_tree_in_graphs_and_variants>`__ asks for the shortest connection of a subset of the vertex set. This subset is usually called the set of terminals. While this problem is easy when all vertices are terminals (minimum spanning tree) or when there are only two terminals (shortest path), it is NP-hard otherwise. This means that unless P=NP, we expect any algorithm to become very slow for large instances. For this reason, we provide different formulations of the problem which may be more or less suitable for solving different types of instances.
 
 Cycle-based constraint system
 -----------------------------
@@ -31,7 +31,7 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
 Linear-size constraint system
 -----------------------------
 
-Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+Introducing vertex labels that increase along edges of the solution in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
 .. automodule:: graphilp.network.steiner_linear
    :noindex:
@@ -91,7 +91,7 @@ This formulation ensures that non-connected solutions must contain a cycle. Any 
 Linear-size constraint system
 -----------------------------
 
-Introducing increasing node labels in the Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+Introducing vertex labels that increase along edges of the solution in the prize collecting Steiner tree allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
 .. automodule:: graphilp.network.pcst_linear
    :noindex:
@@ -105,7 +105,7 @@ Introducing increasing node labels in the Steiner tree allows to give a formulat
 Travelling Salesman Problem (TSP)
 =================================
 
-The `travelling salesman problem <https://en.wikipedia.org/wiki/Travelling_salesman_problem>`__ is one of the most well-known problems of combinatorial optimisation. Given a list of cities (nodes in a graph) and distances between all pairs of cities (weighted edges in a graph), a solution to this problem is a shortest to going through all cities but visiting no city twice.
+The `Travelling Salesman Problem <https://en.wikipedia.org/wiki/Travelling_salesman_problem>`__ is one of the most well-known problems of combinatorial optimisation. Given a list of cities (nodes in a graph) and distances between all pairs of cities (weighted edges in a graph), a solution to this problem is a shortest tour going through all cities but visiting no city twice.
 
 Depending on whether the tour needs to start where it began and on the properties of the distances (for example they can be required to give a metric) there are many variants of the problem.
 
@@ -117,7 +117,7 @@ In the asymmetric case, the underlying graph is directed and the distance from A
 Generic
 ^^^^^^^
 
-Introducing increasing node labels along the tour allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
+Introducing vertex labels that increase along the edges of the tour allows to give a formulation of linear size in the number of edges of the graph. Thus, the use of callback functions can be avoided.
 
 .. automodule:: graphilp.network.gen_path_atsp
    :noindex:

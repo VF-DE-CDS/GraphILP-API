@@ -19,7 +19,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
-    :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+    :param prize: name of the argument in the vertex dictionary of the graph used to store vertex prize values
     :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
 
