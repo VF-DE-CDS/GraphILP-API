@@ -6,7 +6,7 @@ def create_model(S, warmstart=[]):
     r""" Greate an ILP for the set cover problem
 
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param warmstart: a sets forming a cover
+    :param warmstart: a list of sets forming a cover
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
