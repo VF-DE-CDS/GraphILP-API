@@ -50,8 +50,7 @@ def extract_solution(S, model):
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
     :param model: a solved Gurobi model for the knapsack problem
 
-    :return: Items contained in the knapsack solution
-    :rtype: list of indeces
+    :return: list of items contained in the knapsack solution
     """
     iterate = list(range(len(S.S)))
     knapsack = [list(S.S.keys())[i] for i in iterate if S.system_variables.X[i] > 0.5]
