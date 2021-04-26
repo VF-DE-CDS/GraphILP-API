@@ -5,21 +5,21 @@ class ILPSetSystem:
     """
 
     def set_universe(self, U):
-        """ set the universe of the set system
+        """ Set the universe of the set system
 
         :param U: the universe of the set system
         """
         self.U = U
 
     def set_system(self, S):
-        """ set the names of the sets in the system
+        """ Set the names of the sets in the system
 
         :param S: the system of the set system
         """
         self.S = S
 
     def set_inc_matrix(self, M):
-        """ set the incidence matrix of the system
+        """ Set the incidence matrix of the system
 
         The incidence matrix indicates which element of the universe is contained in which set of the system.
 
@@ -28,14 +28,14 @@ class ILPSetSystem:
         self.M = M
 
     def set_system_vars(self, variables):
-        """ set the dictionary of indicator variables for the elements of the system
+        """ Set the dictionary of indicator variables for the elements of the system
 
         :param variables: a dictionary with variable names as keys and gurobipy variables as values
         """
         self.system_variables = variables
 
     def set_universe_vars(self, variables):
-        """ set the dictionary of indicator variables for elements of the universe
+        """ Set the dictionary of indicator variables for elements of the universe
 
         :param variables: a dictionary with variable names as keys and gurobipy variables as values
         """
