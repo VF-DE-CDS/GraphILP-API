@@ -6,7 +6,7 @@ def create_model(S, warmstart=[]):
     r""" Create an ILP for the weighted set packing problem
 
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
-    :param warmstart: a list of edges forming a tree in G connecting all terminals
+    :param warmstart: a list of disjoint sets in the set system
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
