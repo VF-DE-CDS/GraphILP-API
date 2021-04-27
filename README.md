@@ -9,7 +9,7 @@ GraphILP is a Python API to automatically cast graph-related optimisation proble
 Simple example
 --------------
 
-Find the smallest number colours needed to colour the vertices of a cycle such that adjacent vertices have different colours.
+Find the smallest number of colours needed to colour the vertices of a cycle such that adjacent vertices have different colours.
 
 ```python
 import networkx as nx
