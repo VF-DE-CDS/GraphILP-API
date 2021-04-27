@@ -52,7 +52,7 @@ A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :m
 Edge dominating set
 ===================
 
-An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
+An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subseteq E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
 
 .. image:: images/illustration_edge_dom.png
     :height: 200

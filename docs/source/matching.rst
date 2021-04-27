@@ -4,7 +4,7 @@
 Matching
 *********
 
-A `matching <https://en.wikipedia.org/wiki/Matching_(graph_theory)>`__ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of edges in which no pair of edges shares a vertex.
+A `matching <https://en.wikipedia.org/wiki/Matching_(graph_theory)>`__ in a graph :math:`G = (V, E)` is a subset :math:`S \subseteq E` of edges in which no pair of edges shares a vertex.
 
 .. image:: images/illustration_matching.png
     :height: 200
