@@ -17,6 +17,7 @@ def get_heuristic(G):
             \begin{align*}
             \min \sum_{v\in V} x_v\\
             \text{s.t.}&&\\
+            \forall \{u, v\} \in E: x_u + x_v \geq 1 && \text{(at least one vertex in each edge is covered)}\\
             \forall v \in V: & x_v \geq 0\\
             \forall v \in V: & x_v \leq 1\\
             \end{align*}
