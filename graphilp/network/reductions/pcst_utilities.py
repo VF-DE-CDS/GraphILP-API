@@ -6,7 +6,7 @@ import gurobipy
 import time
 import matplotlib.pyplot as plt
 
-def show_graph_size(G, name):
+def show_graph_size(G, name, file):
     """ Print out the individual properties of a graph on the console
 
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
@@ -17,7 +17,8 @@ def show_graph_size(G, name):
         "\nNumber of nodes: " + str(G.number_of_nodes()) + \
         "\nNumber of edges: " + str(G.number_of_edges()) + \
         "\nNumber of terminals: " + str(terminals) + \
-        "\n#########################"
+        "\n#########################\n"
+    file.write(s)
     print(s)
 
 def computeTerminals(G):
@@ -31,6 +32,25 @@ def computeTerminals(G):
         if node[1]['prize'] > 0:
             terminals.append(node[0])
     return terminals
+
+def dNearestTerminals(G, source, terminals, edgeweight = 'weight',  numberOfNearestTerminals = 1, duin=True):
+    """
+    Returns the nearest terminals for a given node
+
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param source: integer representing the eource node
+    :param terminals: list of all terminals of the underlying graph
+    :param numberOfNearestTerminals: the desired number of nearest terminals
+    :param duin: if true and source is a terminal itself, source is added to the list of the nearest terminals
+    :return:
+    """
+
+    shortestPaths = nx.shortest_path_length(G, source, weight=edgeweight)
+    if duin:
+        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals}
+    else:
+        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals and k != source}
+    return sorted(list(shortestPathsTerminals.values()))[0:numberOfNearestTerminals]
 
 def computeUpperBound(G, root):
     """ Uses the PCST-Fast heuristic to compute an upper bound
