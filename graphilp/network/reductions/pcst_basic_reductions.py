@@ -1,8 +1,13 @@
 import networkx as nx
 import graphilp.network.reductions.pcst_utilities as pcst_utilities
 
-#Lösche alle Knoten mit Grad 1, die keine Terminals sind (Aus dem Proktikumsbericht von Morris)
+
 def ntd1(G, terminals):
+    """
+    Delete all non-Terminals with degree one and their corresponding edges.
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param terminals: A list of all terminals
+    """
     nodes_to_remove = [n[0] for n in G.nodes(data=True) if G.degree[n[0]] == 1 and n[0] not in terminals]
     G.remove_nodes_from(nodes_to_remove)
 
@@ -24,26 +29,25 @@ def ntd2(G, terminals):
 
 #Lösche alle Knoten mit Grad 1, die Terminals sind (Aus dem Praktikumsbericht von Morris)
 def td1(G, terminals, root):
-    #nodes_to_remove = [t for t in terminals if G.degree[t] == 1 and t != root]
+    candidates = [t for t in terminals if G.degree[t] == 1 and t != root]
     nodes_to_remove = []
-    for t in terminals:
-        if G.degree[t] == 1:
-            if t != root:
-                nodes_to_remove.append(t)
-    for n in nodes_to_remove:
-        edgelength = G.get_edge_data(n, list(G.neighbors(n))[0]).get('weight')
+    for t in candidates:
+        neighbour = list(G.neighbors(t))[0]
+        edgelength = G.get_edge_data(t, neighbour)['weight']
+        profit = G.nodes[t]['prize']
+        #Case a:
+        if profit <= edgelength:
+            nodes_to_remove.append(t)
         #Case 2, Case 1 muss nicht behandelt werden, da der Knoten bei beiden Cases gelöscht wird am ende des Durchlaufs
-        if n[1].get('prize') > edgelength:
-            oldProfit = G.nodes[list(G.neighbors(n[0]))[0]]['prize']
-            profitTerminal = n[1].get('prize')
-            newProfit =  oldProfit + profitTerminal + edgelength
-            G.nodes[list(G.neighbors(n[0]))[0]]['prize'] = newProfit
-    nodes_to_remove = [n[0] for n in nodes_to_remove]
-    G.remove_nodes_from(nodes_to_remove)
+        else:
+            G.nodes[neighbour]['prize'] += profit - edgelength
+            nodes_to_remove.append(t)
+        G.remove_nodes_from(nodes_to_remove)
 
 #Lösche ausgewählte Knoten mit Grad 2, die Terminals sind (Aus dem Proktikumsbericht von Morris)
-def td2(G, terminals, root):
-    candidates = [t for t in terminals if G.degree[t] == 2 and len(G.adj[t]) > 1 and t != root]
+def td2(G, root):
+    terminals = pcst_utilities.computeTerminals(G)
+    candidates = [t for t in terminals if G.degree[t] == 2 and t != root]
     #candidates = [n for n in G.nodes(data=True) if G.degree[n[0]] == 2 and len(G.adj[n[0]]) > 1 and n in terminals]
     nodes_to_remove = []
     for n in candidates:
@@ -52,16 +56,17 @@ def td2(G, terminals, root):
         length_e1 = G.get_edge_data(n, neighbors[0])['weight']
         length_e2 = G.get_edge_data(n, neighbors[1])['weight']
         profit_terminals = [G.nodes[t]["prize"] for t in terminals if t != n]
-        if profit_candidate <= min(length_e1, length_e2, min(profit_terminals)):
+        if profit_candidate <= min(length_e1, length_e2, max(profit_terminals)):
             nodes_to_remove.append(n)
-        length_newEdge = length_e1 + length_e2 - profit_candidate
-        G.add_edge(neighbors[0], neighbors[1], weight = length_newEdge)
+            length_newEdge = length_e1 + length_e2 - profit_candidate
+            G.add_edge(neighbors[0], neighbors[1], weight = length_newEdge)
     G.remove_nodes_from(nodes_to_remove)
 
 
 
-def unconnectedComponent(G : nx.Graph, terminals):
-    terminal_nodes = [n[0] for n in terminals]
+def unconnectedComponent(G):
+    terminals = pcst_utilities.computeTerminals(G)
+    terminal_nodes = [t for t in terminals]
     if nx.number_connected_components(G) > 1:
         for comp in list(nx.connected_components(G)):
             delete_component = True
@@ -77,11 +82,9 @@ def basic_reductions(G, root):
     terminals = pcst_utilities.computeTerminals(G)
     ntd1(G, terminals)
     ntd2(G, terminals)
-    #td1(G, terminals, root)
-    # TODO: Kante wird negativ ( Siehe Cologne i105M3.stp aus Dimacs.)
-    #td2(G, terminals, root)
-    # TODO: For directed type
-    #unconnectedComponent(G, terminals)
+    td1(G, terminals, root)
+    td2(G, root)
+    unconnectedComponent(G)
 
 if __name__ == '__main__':
     if __name__ == '__main__':

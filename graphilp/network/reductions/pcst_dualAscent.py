@@ -12,14 +12,21 @@ import graphilp.network.reductions.pcst_utilities as pcst_utilities
 
 def parse_to_APCSTP(G):
     """
-    An undirected Graph has to be parsed to an Asymmetric prize-collecting Steiner tree
-    :param G:
-    :return:
+    Creates an instance of the APCSTP by converting an undirected graph into a directed one.
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :return: G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     """
-    G1 = G.to_directed()
-    return G1
+    G_directed = G.to_directed()
+    return G_directed
 
 def terminals_to_leaves(G: nx.DiGraph, root):
+    """
+    Transforms every terminal except the root into a leaf by inserting a new node between the terminal and all adjacent nodes.
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param root: Integer representing the root node
+    :return: G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+
+    """
     terminals = pcst_utilities.computeTerminals(G)
     terminals = [t for t in terminals if t != root]
     i = G.number_of_nodes() + 1
@@ -27,13 +34,19 @@ def terminals_to_leaves(G: nx.DiGraph, root):
         G.add_nodes_from([(i, {'prize': G.nodes[terminal]['prize']})])
         G.add_edge(terminal, i, weight=0)
         G.nodes[terminal]['prize'] = 0
-        # Change the ids of the new node and the terminal in order to keep track of the right terminal for printing
+        # Change the ids of the new node and the terminal in order to keep track of the right terminals
         mapping = {i: terminal, terminal: i}
         G = nx.relabel_nodes(G, mapping)
         i += 1
     return G
 
 def leaves_to_terminals(G: nx.DiGraph, root):
+    """
+    Translates back the terminals previously transformed into a leave
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param root: Integer representing the root node
+    :return: G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    """
     terminals = pcst_utilities.computeTerminals(G)
     terminals = [t for t in terminals if t != root]
     for terminal in terminals:
@@ -44,16 +57,25 @@ def leaves_to_terminals(G: nx.DiGraph, root):
         G.remove_node(i)
     return G
 
-def nearestTerminal(G, source, terminals):
-    # TODO: Ich erstelle hier zu allen Knoten nicht nur zu den Terminals einen shortest Path und Filter erst hinterher -> ineffizient
-    shortestPaths = nx.shortest_path_length(G, source, weight='reduced_costs')
-    shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals}
-    return sorted(list(shortestPathsTerminals.values()))[0]
 
 #Nach Pajor2018 3.2 Processing a root component
 def bfs(G : nx.DiGraph, k, activeTerminals, root):
+    """
+    Looks for a given node to see if it belongs to the root component. Is divided into three different passes
+    :param G:
+    :param k:
+    :param activeTerminals:
+    :param root:
+    :return:
+    """
     def pass1(G, k, activeTerminals, root):
-        queue = [k]  # Initialize a queue
+        """
+        Breadth-first search, which only considers saturated incoming arcs.
+        :return:
+            s: Set containing all vertices in the cut
+            l: List of arcs
+        """
+        queue = [k]
         s = set()
         l = set()
         while queue:
@@ -63,39 +85,40 @@ def bfs(G : nx.DiGraph, k, activeTerminals, root):
                 l.add((neighbour, node))
                 if G.get_edge_data(neighbour, node).get('reduced_costs') == 0 and neighbour not in s:
                     queue.append(neighbour)
+                    # k does not define a root component
                     if neighbour in activeTerminals or neighbour == root:
                         return None, None
         return s, l
 
     def pass2(l, s):
-        #aim (1)
+        """
+        Traverses the list of arcs in the root component and deletes all edges that are completely contained in the root component.
+        Picks the minimum residual capacity among all edges.
+        :return:
+            l: list only containing valid arcs
+            delta: minimum residual capacity
+        """
         l = [(u, v) for (u, v) in l if u not in s]
-        #aim(2)
-        delta = float('inf')
-        for (u,v) in l:
-            if G.get_edge_data(u, v).get('reduced_costs') < delta:
-                delta = G.get_edge_data(u, v).get('reduced_costs')
-                e = (u,v)
+        delta = min([G.get_edge_data(u, v).get('reduced_costs') for (u, v) in l])
         return l, delta
 
     def pass3(G, delta, l):
+        """
+        Reduces the residual capacity of each arc in l by delta.
+        :return:
+        """
         x = set()
         for (u, v) in l:
-            #(G.edges[(u, v)]['reduced_costs'])
             G.edges[(u, v)]['reduced_costs'] -= delta
-            #print(G.edges[(u, v)]['reduced_costs'])
-            if G.get_edge_data(u, v).get('reduced_costs') < 0:
-                print("STOP")
             if G.get_edge_data(u, v).get('reduced_costs') == 0:
                 x.add(u)
-        return(x, G)
-
+        return x
 
     s, l = pass1(G, k, activeTerminals, root)
     if s == None:
         return None, G, None
     l, delta = pass2(l, s)
-    x, G = pass3(G, delta, l)
+    x = pass3(G, delta, l)
     return x, G, delta
 
 
@@ -133,7 +156,7 @@ def test1(G, lowerBound, upperBound, root):
     for (i, j) in G.edges:
         distance_reduced = nx.shortest_path_length(G, root, i, weight='reduced_costs')
         reduced_costs = G.get_edge_data(i, j)['reduced_costs']
-        distTerminal = nearestTerminal(G, j, terminals)
+        distTerminal = pcst_utilities.dNearestTerminals(G, j, terminals, edgeweight='reduced_costs')[0]
         if lowerBound + distance_reduced + distTerminal + reduced_costs - 0.001 > upperBound:
             to_be_deleted.append((i, j))
     G.remove_edges_from(to_be_deleted)
@@ -145,7 +168,7 @@ def test2(G, lowerBound, upperBound, root):
     for i in nodes:
         try:
             distance_reduced = nx.shortest_path_length(G, root, i, weight='reduced_costs')
-            distTerminal = nearestTerminal(G, i, terminals)
+            distTerminal = pcst_utilities.dNearestTerminals(G, i, terminals, edgeweight='reduced_costs')[0]
         except:
             G.remove_node(i)
             continue
@@ -168,45 +191,13 @@ def test4(G):
 
 
 def dual_ascent_tests(G, root):
-
     G = parse_to_APCSTP(G)
     G = terminals_to_leaves(G, root)
     lowerBound, G = dual_ascent(G, root)
     upperBound = pcst_utilities.computeUpperBound(G, root)
-    print(G.edges())
     test2(G, lowerBound, upperBound, root)
     test1(G, lowerBound, upperBound, root)
     fixed_terminals = test3(G, lowerBound, upperBound, root)
     G = leaves_to_terminals(G, root)
+
     return G, fixed_terminals
-
-
-
-if __name__ == '__main__':
-    G = nx.Graph()
-
-    G.add_nodes_from([
-        (1, {'prize': 6}),
-        (2, {'prize': 0}),
-        (3, {'prize': 0}),
-        (4, {'prize': 6}),
-        (5, {'prize': 0}),
-        (6, {'prize': 0}),
-        (7, {'prize': 20}),
-        (8, {'prize': 0})
-    ])
-
-    G.add_edges_from([(1, 2, {'weight': 3}), (1, 5, {'weight': 4}), (2, 3, {'weight': 1}),
-                      (2, 4, {'weight': 4}), (3, 4, {'weight': 1}), (5, 6, {'weight': 2}),
-                      (5, 7, {'weight': 1}), (6, 4, {'weight': 7}), (7, 8, {'weight': 2}),
-                      (8, 4, {'weight': 0})
-                      ])
-    
-
-    #helpfunctions.draw(G)
-    root = 1
-    #TODO: Root transformation
-
-    pcst_utilities.draw(G)
-    dual_ascent_tests(G, root)
-    pcst_utilities.draw(G)
