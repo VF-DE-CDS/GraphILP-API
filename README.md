@@ -34,7 +34,7 @@ Installation
 GraphILP has two main requirements: 
 
 1. [NetworkX](https://networkx.org) is used internally to represent graphs. It is also the easiest way to create problem instances.
-2. GraphILP creates integer linear programs in the form of [Gurobi](https://www.gurobi.com) models. To create and solve these models, you need the Gurobi solver and its Python API.
+2. GraphILP creates integer linear programs in the form of [Gurobi](https://www.gurobi.com) models. To create and solve these models, you need the Gurobi solver and its [Python API](https://www.gurobi.com/documentation/9.1/quickstart_mac/cs_using_pip_to_install_gr.html).
 
 Some additional libraries are required for running the examples.
 
