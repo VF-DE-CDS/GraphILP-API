@@ -12,6 +12,12 @@ It also lists a number of examples that are ideal for a quick start with GraphIL
    :maxdepth: 2
    
    introduction
+   Source Code <https://github.com/VF-DE-CDS/GraphILP-API>
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: Modules
+
    covering
    cuts_flows
    imports
