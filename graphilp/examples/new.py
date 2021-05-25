@@ -12,6 +12,7 @@
 
 import random
 import networkx as nx
+from gurobipy import Model, GRB, quicksum
 import numpy as np
 
 import osmnx as ox
@@ -20,6 +21,7 @@ import time
 import sys
 
 from graphilp.imports import networkx as imp_nx
+from graphilp.imports import readFile as gf
 from graphilp.network import pcst_linear as stp
 from graphilp.network import pcst as p
 from graphilp.network.reductions import pcst_utilities as pu
@@ -27,148 +29,68 @@ from graphilp.network.reductions import pcst_basic_reductions as br
 from graphilp.network.reductions import pcst_voronoi as vor
 from graphilp.network.reductions import pcst_dualAscent as da
 
+from graphilp.network import pcst_linear_tightened as plt
 
-#%% md
 
-## Choose reduction techniques
-
-#%%
 # Choose which reduction techniques to use
 basic_reductions_active = True
 voronoi_active = True
-dualAscent_active = True
+dual_ascent_active = True
 
-# Variables for time evaluation
-basic_reductions_time = 0
-voronoi_time = 0
-dualAscent_time = 0
-gurobi_with_reductions_time = 0
-gurobi_without_reductions_time = 0
 
 # Variables for adding more constraints based on reductions
 term_deg2 = None
 nodes_deg3 = None
 fixed_terminals = None
 
+cologne = True
+pucnu = True
+vodafone = False
+
+to_rooted = False
+ilp_method = "pcst_linear"
+timeout = 310
+gap = 0.0
 
 
-#%% md
+forced_terminals = []
+if cologne == True:
+    stp_file = "/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance/data/Dimacs/RPCST-cologne/cologne1/i101M2.stp"
+    result_file = open("/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance/data/res.txt", "w")
+    result_file.write("Instance: " + stp_file[35:41] + "\n")
+    G, terminals, root = gf.stp_rooted_to_networkx(stp_file)
+    # TODO: Ändere Ergebnis um 1
+    forced_terminals = []
 
-## Set up the graph
+if pucnu == True:
+    stp_file = "/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance_rooted/data/Dimacs/PCSPG-PUCNU/bip42nu.stp"
+    G, terminals = gf.stp_to_networkx(stp_file)
+    root = -1
 
-#%%
+if vodafone == True:
+    stp_file = "/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance/data/vodafone/dap_graph_37488.stp"
+    G, terminals = gf.stp_to_networkx(stp_file)
+    root = -1
 
-crs = pyproj.crs.CRS('epsg:31467')
+sum_of_prizes = 0
+for n in G.nodes():
+    sum_of_prizes += G.nodes[n]['prize']
 
-#%%
+if to_rooted == True:
+    G, forced_terminals, sum_of_profits, root = pu.pcst_to_rpcst(G)
+    for t in forced_terminals:
+        G.nodes[t]['prize'] = float("inf")
 
-place = 'Carlstadt, Düsseldorf, Deutschland'
-
-# road network of suburb (converted to Gauss-Krüger 3)
-G_ox = ox.project_graph(ox.graph_from_place(place, network_type='walk'), to_crs=crs)
-
-node_list = list(G_ox.nodes())
-
-# choose random terminals
-# 92 seconds: [316776963, 4185973923, 4028758242, 1561453930, 584047465]
-# 100 seconds: [51839401, 596188953, 3762705297, 51236114, 7274705869]
-num_terminals = 5
-terminals = [node_list[random.randint(0, len(node_list) -1)] for n in range(num_terminals)]
-terminals =  [1561453944, 584046535, 4278667367, 1598737566, 281534788]
-#terminals = [595793277, 1561453934, 4278832131, 3314944018, 8096912480]
-path = "results/" + str(terminals) + "/"
-
-#%%
-
-#draw the road map
-ox.plot_graph(G_ox, figsize=(14, 10),
-              bgcolor='#FFF',
-              node_color='b', save=True, filepath=path + "graph.png");
-
-#%%
-
-
-
-#%%
-
-
-result_file = open(path + "result_file.txt", "w")
-result_file.write("Terminals: " + str(terminals) + "\n")
-print(terminals)
-
-#Set up a root
-root = terminals[0]
-print("Root: ", root)
-result_file.write("Root: " + str(root))
-
-#%%
-
-#%%
-
-
-#%%
-
-# draw road map and terminals
-ox.plot_graph(G_ox, figsize=(14, 10),
-    bgcolor='#FFF',
-    node_color=['g' if n == root else'#ED0000' if n in terminals else '#00F' for n in node_list],
-    node_size=[70 if n == root else 50 if n in terminals else 15 for n in node_list], save=True, filepath=path + "terminals.png");
-
-#%%
-
-
-
-#%%
-
-# Transformation of the MultiDiGraph to a DiGraph because Networkx doesn't fully support Multigraphs.
-G = nx.Graph(G_ox)
-for e in G.edges():
-    G.edges[e]['weight'] = G.get_edge_data(e[0], e[1])['length']
-
-
-distance = pu.dNearestTerminals(G, root, terminals, num_terminals -1, duin = False)
-distance = sum(distance) / (num_terminals -1)
-
-prizes = []
-# Set up the profit of the nodes (What is the profit of terminals?)
-for node in G.nodes():
-    if node in terminals:
-        profit = np.random.normal(loc=distance, scale=distance/2)
-        G.nodes[node]['prize'] = 300
-        prizes.append(profit)
-    else:
-        G.nodes[node]['prize'] = 0
-print(profit)
-# Print size of graph
-pu.show_graph_size(G, "Original graph: ", result_file)
-
-#%% md
+pu.show_graph_size(G, "Original graph: ", None)
 time_start = time.time()
-## Solve the instance without any reductions for comparison
 
 
-#%% md
-
-## Use Reductions
-
-#%% md
-
-### Basic Reductions
-
-#%%
 
 if basic_reductions_active:
     br.basic_reductions(G, root)
     # Print size of graph
-    pu.show_graph_size(G, "Basic reductions: ", result_file)
+    pu.show_graph_size(G, "Basic reductions: ", None)
 
-#%% md
-
-
-
-### Voronoi
-
-#%%
 
 if voronoi_active:
     try:
@@ -182,16 +104,13 @@ if voronoi_active:
         result_file.write(s + "\n")
         print(s)
         sys.exit(0)
-    pu.show_graph_size(G, "Voronoi: ", result_file)
-
-#%% md
-
-### Dual Ascent
-
-#%%
+    except ValueError:
+        print("Instance already reduced to the root")
+    pu.show_graph_size(G, "Voronoi: ", None)
 
 
-if dualAscent_active:
+
+if dual_ascent_active:
     try:
         G, fixed_terminals = da.dual_ascent_tests(G, root)
     except KeyError:
@@ -200,90 +119,53 @@ if dualAscent_active:
         s = "Pcst-fast found only Root note, no Graph for the upperBound could be built. \nSolution is only the root node: " \
             + str(root) + "\nTime to compute: " + str(time_end - time_start) + ". \nObj. value reduction: " + str(
             G.nodes[root]['prize']) + ".\n"
-        result_file.write(s + "\n")
+        print(s)
         sys.exit(0)
-    pu.show_graph_size(G, "Dual Ascent: ", result_file)
+    except ValueError:
+        print("Instance already reduced to the root")
+    pu.show_graph_size(G, "Dual Ascent: ", None)
 
-#%% md
-
-## Plot graph after reduction
-
-#%%
-
-terminals = [t for t in G.nodes() if G.nodes[t]['prize'] > 0]
-node_list_after_reduction = list(G.nodes())
-
-edge_colors = ["black" if (u, v) == (584047447, 1561453932) else '#ED0000' if (u, v) in G.edges() or (v, u) in G.edges() else '#AAA' for u, v in G_ox.edges()]
-edge_widths = [3 if (u, v) in G.edges() else 1 for u, v in G_ox.edges()]
-
-ox.plot_graph(G_ox, figsize=(14, 10),
-              bgcolor='#FFF',
-              node_color=['red' if n == root else '#ED0000' if n in terminals else "blue" if n in node_list_after_reduction else'white' for n in
-                          node_list],
-              node_size=[80 if n == root else 60 if n in terminals else 15 for n in node_list],
-              edge_color=edge_colors, edge_linewidth=edge_widths, save=True, filepath=path + "after_reduction.png");
-
-#%% md
-
-# Use gurobi to run the optimisation problem
-
-#%%
-
-#solution, best_val = pu.gurobi(G, root, False, term_deg2, nodes_deg3, False, fixed_terminals)
-#time_end = time.time()
+if to_rooted:
+    for t in forced_terminals:
+        G.nodes[t]['prize'] = 0
 
 
 G = nx.to_undirected(G)
 optG = imp_nx.read(G)
-m = stp.create_model(optG, forced_terminals=[root], weight='weight')
-m.optimize()
-
-#m = p.create_model(optG, forced_terminals=[root], weight='weight')
-#m.optimize(p.callback_cycle)
-
-timeout = 10 * 60
-m.setParam('TimeLimit', timeout)
-m.optimize()
+if ilp_method == "pcst":
+    m = p.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize(p.callback_cycle)
+elif ilp_method == "pcst_linear":
+    m = stp.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+elif ilp_method == "pcst_linear_tightened":
+    m = plt.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
 best_val = m.objVal
-solution = stp.extract_solution(optG, m)
+solution = p.extract_solution(optG, m)
 time_end = time.time()
-if m.Runtime + 1 > timeout:
-    result_file.write("\nTimeout!\n")
-
-#edge_colors = ['#ED0000' if (u,v) in solution or (v, u) in solution else '#AAA' for u, v in G.edges()]
-#edge_widths = [3 if (u,v) in solution else 1 for u, v in G.edges()]
 
 
-#%% md
 
-## Plot the solution
-
-#%%
-
-node_list1 = [u for (u, v) in solution]
-node_list2 = [v for (u, v) in solution]
-res_node_list = list(set(node_list1 + node_list2))
-res_terminals = [t for t in res_node_list if t in terminals]
-
-
-edge_colors = ['#ED0000' if (u, v) in solution or (v, u) in solution else '#AAA' for u, v in G_ox.edges()]
-edge_widths = [3 if (u, v) in solution else 1 for u, v in G_ox.edges()]
-
-ox.plot_graph(G_ox, figsize=(14, 10),
-              bgcolor='#FFF',
-              node_color=['red' if n == root else '#ED0000' if n in res_terminals else "blue" if n in res_node_list else 'white' for n in node_list],
-              node_size=[80 if n == root else 60 if n in res_terminals else 15 for n in node_list],
-              edge_color=edge_colors, edge_linewidth=edge_widths, save=True, filepath=path + "solution_with_reductions.png");
+result = sum_of_prizes
+res_nodes = set()
+for (u, v) in solution:
+    result += G.get_edge_data(u, v)['weight']
+    res_nodes.add(u)
+    res_nodes.add(v)
+for u in G.nodes():
+    if u in res_nodes:
+        result -= G.nodes[u]['prize']
+if to_rooted:
+    result -= len(forced_terminals) * sum_of_profits
 
 
-#%% md
-
-## Compare times used
-
-#%%
-
-s = "\nTime to compute: " + str(time_end - time_start) + ". \n"
-s += "Obj. value reduction: " + str(best_val) + ". \n\n"
-result_file.write(s)
-print(s)
-result_file.close()
+print(result)
+print("Gurobi gap is:", m.MIPGap, "%")
+print(solution)

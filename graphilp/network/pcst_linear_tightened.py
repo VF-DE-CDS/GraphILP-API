@@ -3,7 +3,7 @@ import networkx as nx
 
 
 def create_model(G, forced_terminals=[], weight='weight', prize='prize',
-                warmstart=[], lower_bound=None):
+                 warmstart=[], lower_bound=None):
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
 
     This formulation enforces a cycle in the solution if it is not connected.
@@ -64,6 +64,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     edges = G.edge_variables
     nodes = G.node_variables
     labels = G.label_variables
+    edge2var = dict(zip(edges.keys(), edges.values()))
 
     # set objective: minimise the sum of the weights of edges selected for the solution
     m.setObjective(quicksum([G.G.nodes[node].get(prize, 0) * node_var for node, node_var in nodes.items()])
@@ -82,7 +83,6 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
         if node in forced_terminals:
             m.addConstr(node_var == 1)
 
-            
     # enforce cycle when graph is not connected
     m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
 
@@ -90,8 +90,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     m.addConstrs(edges[(u, v)] + edges[(v, u)] <= 1 for u, v in G.G.edges())
 
     # if edge is chosen, both adjacent nodes need to be chosen
-    m.addConstrs(2*(edges[(u, v)] + edges[(v, u)]) - nodes[u] - nodes[v] <= 0 for u, v in G.G.edges())
-
+    m.addConstrs(2 * (edges[(u, v)] + edges[(v, u)]) - nodes[u] - nodes[v] <= 0 for u, v in G.G.edges())
 
     # prohibit isolated vertices
     for node, node_var in nodes.items():
@@ -105,10 +104,21 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
                 edge_vars.append(edge_var)
         m.addConstr(node_var - quicksum(edge_vars) <= 0)
 
-    # labeling constraints: enforce increasing labels in edge direction of selected edges
-    for u, v in G.G.edges():
-        m.addConstr(n * edges[(v, u)] + labels[v] - labels[u] >= 1 - n*(1 - edges[(u, v)]))
-        m.addConstr(n * edges[(u, v)] + labels[u] - labels[v] >= 1 - n*(1 - edges[(v, u)]))
+    for edge, edge_var in edges.items():
+        reverseEdge = edge[::-1]
+        edge_var_rev = edge2var.get(reverseEdge)
+        u = edge[0]
+        v = edge[1]
+        if edge_var_rev != None:
+            m.addConstr(labels[v] - 2 * n * edge_var_rev <= labels[u] + 1 + 2 * n * (1 - edge_var))
+            m.addConstr(labels[u] + 1 <= 2 * n * edge_var_rev + labels[v] + 2 * n * (1 - edge_var))
+            m.addConstr(labels[u] - 2 * n * edge_var <= labels[v] + 1 + 2 * n * (1 - edge_var_rev))
+            m.addConstr(labels[v] + 1 <= 2 * n * edge_var + labels[u] + 2 * n * (1 - edge_var_rev))
+
+    # set label to 1 if node is not chosen
+    for v in G.G.nodes():
+        m.addConstr(labels[v] - n * nodes[v] <= 1)
+
 
     # allow only one arrow into each node
     for node in nodes:
@@ -118,7 +128,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     # set lower bound
     if lower_bound:
         m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
-        
+
     # set warmstart
     if len(warmstart) > 0:
 
@@ -153,7 +163,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
             nodes[e[1]].Start = 1
 
         m.update()
-        
+
     return m
 
 

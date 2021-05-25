@@ -5,8 +5,17 @@ from gurobipy import Model, GRB, quicksum
 import gurobipy
 import time
 import matplotlib.pyplot as plt
+from graphilp.imports import networkx as imp_nx
+from graphilp.imports import readFile as gf
+from graphilp.network import pcst_linear as stp
+from graphilp.network.reductions import pcst_basic_reductions as br
+from graphilp.network.reductions import pcst_voronoi as vor
+from graphilp.network.reductions import pcst_dualAscent as da
+import gurobipy as gp
+from gurobipy import GRB
 
-def show_graph_size(G, name, file):
+
+def show_graph_size(G, name, file = None):
     """ Print out the individual properties of a graph on the console
 
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
@@ -18,7 +27,8 @@ def show_graph_size(G, name, file):
         "\nNumber of edges: " + str(G.number_of_edges()) + \
         "\nNumber of terminals: " + str(terminals) + \
         "\n#########################\n"
-    file.write(s)
+    if file != None:
+        file.write(s)
     print(s)
 
 def computeTerminals(G):
@@ -28,9 +38,9 @@ def computeTerminals(G):
      :return: list of integers representing the terminals
     """
     terminals = []
-    for node in G.nodes(data=True):
-        if node[1]['prize'] > 0:
-            terminals.append(node[0])
+    for n in G.nodes:
+        if G.nodes[n]['prize'] > 0:
+            terminals.append(n)
     return terminals
 
 def dNearestTerminals(G, source, terminals, edgeweight = 'weight',  numberOfNearestTerminals = 1, duin=True):
@@ -51,6 +61,54 @@ def dNearestTerminals(G, source, terminals, edgeweight = 'weight',  numberOfNear
     else:
         shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals and k != source}
     return sorted(list(shortestPathsTerminals.values()))[0:numberOfNearestTerminals]
+
+def dNearestTerminalsRoot(G, source, terminals, edgeweight = 'weight',  numberOfNearestTerminals = 1, duin=True, root_contained = False):
+    """
+    Returns the nearest terminals for a given node
+
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param source: integer representing the eource node
+    :param terminals: list of all terminals of the underlying graph
+    :param numberOfNearestTerminals: the desired number of nearest terminals
+    :param duin: if true and source is a terminal itself, source is added to the list of the nearest terminals
+    :return:
+    """
+    shortestPaths = nx.shortest_path_length(G, source, weight=edgeweight)
+    if duin:
+        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals}
+
+    else:
+        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals and k != source}
+    return {k: shortestPathsTerminals[k] for k in list(shortestPathsTerminals)[:2]}
+
+def pcst_to_rpcst(G):
+    terminals = computeTerminals(G)
+    terminals_proper = [t for t in terminals if G.nodes[t]['prize'] >  min([e.get('weight') for e in list(G.adj[t].values())])]
+    terminals_unproper = [t for t in terminals if G.nodes[t]['prize'] <=  min([e.get('weight') for e in list(G.adj[t].values())])]
+    terminals_fixed = []
+    m = sum([G.nodes[t]['prize'] for t in terminals_proper])
+    G_r = G.copy()
+    for v in G_r.nodes:
+        if v not in terminals_unproper:
+            G_r.nodes[v]['prize'] = 0
+    j = min(terminals_proper, key = lambda x: G.nodes[x]['prize'])
+    n = G_r.number_of_nodes() + 1
+    G_r.add_nodes_from([(n, {'prize': 0})])
+    terminals_fixed.append(n)
+    for t in terminals_proper:
+        id = t + n
+        G_r.add_nodes_from([(id, {'prize': 0})])
+        G_r.add_edges_from([(n, t, {'weight': m}), (t, id, {'weight': m})])
+        terminals_fixed.append(id)
+    for t in terminals_proper:
+        if t == j:
+            continue
+        id = t + n
+        G_r.add_edges_from([(t, j + n, {'weight': m + G.nodes[j]['prize']}), (id, j + n, {'weight': m + G.nodes[t]['prize']})])
+
+
+    return G_r, terminals_fixed, m, n
+
 
 def computeUpperBound(G, root):
     """ Uses the PCST-Fast heuristic to compute an upper bound
@@ -206,6 +264,8 @@ def gurobi(G, root, voronoi_active = False, term_deg2 = None, nodes_deg3 = None,
     ###########################################################################################################################################
 
 
+    timeout = 3 * 60
+    m.setParam('TimeLimit', timeout)
 
     m.optimize()
 
@@ -238,3 +298,44 @@ def draw(G, edgelabel='weight',edges=None):
 
 
     plt.show()
+
+if __name__ == '__main__':
+    if __name__ == '__main__':
+        G = nx.Graph()
+
+        G.add_nodes_from([
+            (1, {'prize': 3}),
+            (2, {'prize': 5}),
+            (3, {'prize': 0})
+        ])
+
+        G.add_edges_from([(1, 2, {'weight': 3}), (1, 3, {'weight': 1}), (2, 3, {'weight': 1})
+                          ])
+
+    draw(G)
+    sum_of_prizes = 0
+    for n in G.nodes():
+        sum_of_prizes += G.nodes[n]['prize']
+    G, forced_terminals, sum_of_profits, root = pcst_to_rpcst(G)
+    draw(G)
+
+
+    optG = imp_nx.read(G)
+    m = stp.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+    m.optimize()
+    best_val = m.objVal
+    solution = stp.extract_solution(optG, m)
+    print(solution, best_val)
+    draw(G)
+
+    result = 0
+    res_nodes = set()
+    for (u, v) in solution:
+        result += G.get_edge_data(u, v)['weight']
+        res_nodes.add(u)
+        res_nodes.add(v)
+    for u in G.nodes():
+        if u not in res_nodes:
+            result += G.nodes[u]['prize']
+    result -= len(forced_terminals) * sum_of_profits
+    print(result)

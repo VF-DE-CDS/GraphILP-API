@@ -48,7 +48,10 @@ def findIndeces(dfNodes, terminals=None, root=None, accesspoints=None):
     # @root is used to specify we are searching for the variable root
     # iloc gets the value at the [nth] position
     # 'NewNodeInde' is the value we are finally interested in
-    rootIndex = int(dfNodes.query('Node == @root').iloc[0]['NewNodeIndex'])
+    if root != -1:
+        rootIndex = int(dfNodes.query('Node == @root').iloc[0]['NewNodeIndex'])
+    else:
+        rootIndex = -1
 
     # Find the indeces of the Terminals in the Dataframe. Same as with the root
     listTerminalsIndeces = dfNodes.query('Node == @terminals').values.tolist()
