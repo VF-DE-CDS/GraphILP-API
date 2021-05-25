@@ -8,7 +8,7 @@ in graphs" by Thomas Pajor, Eduardo Uchoa and Renato F. Werneck.
 
 import networkx as nx
 import matplotlib.pyplot as plt
-import graphilp.network.reductions.pcst_utilities as pcst_utilities
+from graphilp.network.reductions import pcst_utilities as pcst_utilities
 
 def parse_to_APCSTP(G):
     """
@@ -29,7 +29,7 @@ def terminals_to_leaves(G: nx.DiGraph, root):
     """
     terminals = pcst_utilities.computeTerminals(G)
     terminals = [t for t in terminals if t != root]
-    i = G.number_of_nodes() + 1
+    i = G.number_of_nodes() + 100000000
     for terminal in terminals:
         G.add_nodes_from([(i, {'prize': G.nodes[terminal]['prize']})])
         G.add_edge(terminal, i, weight=0)
@@ -59,7 +59,7 @@ def leaves_to_terminals(G: nx.DiGraph, root):
 
 
 #Nach Pajor2018 3.2 Processing a root component
-def bfs(G : nx.DiGraph, k, activeTerminals, root):
+def bfs(G : nx.DiGraph, k, activeTerminals, root, lb):
     """
     Looks for a given node to see if it belongs to the root component. Is divided into three different passes
     :param G:
@@ -78,8 +78,10 @@ def bfs(G : nx.DiGraph, k, activeTerminals, root):
         queue = [k]
         s = set()
         l = set()
+
         while queue:
             v = queue.pop(0)
+            l2 = [(u, v) for (u, v) in l if u not in s]
             for (neighbour, node) in G.in_edges(v):
                 s.add(node)
                 l.add((neighbour, node))
@@ -90,7 +92,7 @@ def bfs(G : nx.DiGraph, k, activeTerminals, root):
                         return None, None
         return s, l
 
-    def pass2(l, s):
+    def pass2(l, s, k):
         """
         Traverses the list of arcs in the root component and deletes all edges that are completely contained in the root component.
         Picks the minimum residual capacity among all edges.
@@ -98,28 +100,35 @@ def bfs(G : nx.DiGraph, k, activeTerminals, root):
             l: list only containing valid arcs
             delta: minimum residual capacity
         """
+
         l = [(u, v) for (u, v) in l if u not in s]
+        #TODO: DIesen Fehler beheben für Terminals terminals = [2940489796, 597866713, 1561646889, 1587058362, 616207353] und prize
+        #prizes = [300.2477213406118, 96.56324955440189, 139.00425087937106, 105.74329749514277, 471.0103725241828]
         delta = min([G.get_edge_data(u, v).get('reduced_costs') for (u, v) in l])
+        delta = min(delta, G.nodes[k]['pi'])
+        G.nodes[k]['pi'] -= delta
         return l, delta
 
     def pass3(G, delta, l):
         """
         Reduces the residual capacity of each arc in l by delta.
-        :return:
+        :return: x: list of all nodes that will ne part of the new root component
         """
         x = set()
         for (u, v) in l:
             G.edges[(u, v)]['reduced_costs'] -= delta
             if G.get_edge_data(u, v).get('reduced_costs') == 0:
                 x.add(u)
+
         return x
 
     s, l = pass1(G, k, activeTerminals, root)
     if s == None:
-        return None, G, None
-    l, delta = pass2(l, s)
+        return None, G, None, lb
+    l, delta = pass2(l, s, k)
     x = pass3(G, delta, l)
-    return x, G, delta
+    lb += delta
+    return (x, G, delta, lb)
 
 
 def dual_ascent(G : nx.DiGraph, root):
@@ -130,24 +139,14 @@ def dual_ascent(G : nx.DiGraph, root):
         G.edges[e]['reduced_costs'] = G.edges[e]['weight']
     for t in terminals:
         G.nodes[t]['pi'] = G.nodes[t]['prize']
-    ta = terminals
-    if root in ta:
-        ta.remove(root)
+    ta = [t for t in terminals if t != root]
     #loop
     while len(ta) != 0:
         # TODO: Noch gibt es keine Queue, um die Terminals nacheinander zu behandeln
         k = ta[0]
-        x, G, delta = bfs(G, k, ta, root)
-        if x == None:
+        (x, G, delta, lb) = bfs(G, k, ta, root, lb)
+        if x == None or G.nodes[k]['pi'] <= 0:
             ta.remove(k)
-        else:
-            #Hier sind alle Terminals in T_p?
-            delta = min(delta, G.nodes[k]["pi"])
-            G.nodes[k]["pi"] -= delta
-            lb += delta
-            if G.nodes[k]["pi"] == 0:
-                ta.remove(k)
-            #helpfunctions.draw(G)
     return lb, G
 
 def test1(G, lowerBound, upperBound, root):
@@ -176,6 +175,7 @@ def test2(G, lowerBound, upperBound, root):
         if lowerBound + distance_reduced + distTerminal - 0.001 > upperBound:
             G.remove_node(i)
 
+
 def test3(G, lowerBound, upperBound, root):
     terminals = [t for t in pcst_utilities.computeTerminals(G) if t != root]
     fixed_terminals = []
@@ -185,9 +185,33 @@ def test3(G, lowerBound, upperBound, root):
     return fixed_terminals
 
 def test4(G):
+    remove_edges = []
     for (i, j) in G.edges:
         if nx.shortest_path_length(G, i, j, weight='weight') < G.get_edge_data(i, j)["weight"]:
-            G.remove_edge((i, j))
+            remove_edges.append((i, j))
+    G.remove_edges_from(remove_edges)
+
+def test5(G):
+    for (i, j) in G.edges():
+        if G.get_edge_data(i, j) == None or G.get_edge_data(j, i) == None:
+            continue
+        edgecost = G.get_edge_data(i, j)['weight']
+        incoming_edges_i = [G.get_edge_data(u, v)['weight'] for (u, v) in G.in_edges(i)]
+        incoming_edges_j = [G.get_edge_data(u, v)['weight'] for (u, v) in G.in_edges(j)]
+
+        if G.get_edge_data(i, j)['weight'] != G.get_edge_data(j, i)['weight']:
+            continue
+        elif edgecost < min(G.nodes[i]['prize'], G.nodes[j]['prize']) and edgecost == min(incoming_edges_i) and edgecost == min(incoming_edges_j):
+            new_prize = G.nodes[i]['prize'] + G.nodes[j]['prize'] - edgecost
+            G = nx.contracted_nodes(G, i, j)
+            print("lohnt sich")
+            G.nodes[i]['prize'] = new_prize
+
+#Test 6 lohnt sich nicht, da die Kosten bei mir symmetrisch sind
+
+#TODO: Test 7 und 8
+
+
 
 
 def dual_ascent_tests(G, root):
@@ -199,5 +223,7 @@ def dual_ascent_tests(G, root):
     test1(G, lowerBound, upperBound, root)
     fixed_terminals = test3(G, lowerBound, upperBound, root)
     G = leaves_to_terminals(G, root)
-
+    test4(G)
+    test5(G)
+    G = G.to_undirected()
     return G, fixed_terminals
