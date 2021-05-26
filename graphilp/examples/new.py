@@ -28,6 +28,7 @@ from graphilp.network.reductions import pcst_utilities as pu
 from graphilp.network.reductions import pcst_basic_reductions as br
 from graphilp.network.reductions import pcst_voronoi as vor
 from graphilp.network.reductions import pcst_dualAscent as da
+from graphilp.network.heuristics import steiner_metric_closure as smc
 
 from graphilp.network import pcst_linear_tightened as plt
 
@@ -44,11 +45,11 @@ nodes_deg3 = None
 fixed_terminals = None
 
 cologne = True
-pucnu = True
+pucnu = False
 vodafone = False
 
 to_rooted = False
-ilp_method = "pcst_linear"
+ilp_method = "pcst"
 timeout = 310
 gap = 0.0
 
@@ -129,11 +130,15 @@ if to_rooted:
     for t in forced_terminals:
         G.nodes[t]['prize'] = 0
 
-
+terminals = pu.computeTerminals(G)
 G = nx.to_undirected(G)
 optG = imp_nx.read(G)
+warmstart, lower_bound = smc.get_heuristic(optG, terminals)
+#warmstart = []
+#lower_bound = None
+
 if ilp_method == "pcst":
-    m = p.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+    m = p.create_model(optG, forced_terminals=forced_terminals, weight='weight', warmstart = warmstart, lower_bound = lower_bound)
     m.setParam('TimeLimit', timeout)
     m.setParam('MIPGap', gap)
     m.optimize(p.callback_cycle)
