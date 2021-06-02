@@ -31,12 +31,16 @@ from graphilp.network.reductions import pcst_dualAscent as da
 from graphilp.network.heuristics import steiner_metric_closure as smc
 
 from graphilp.network import pcst_linear_tightened as plt
+from graphilp.network import pcst_flow as pf
+from graphilp.network import pcst_flow_v2 as pf2
+from graphilp.network import pcst_flow_indicator as pfi
+
 
 
 # Choose which reduction techniques to use
-basic_reductions_active = True
-voronoi_active = True
-dual_ascent_active = True
+basic_reductions_active = False
+voronoi_active = False
+dual_ascent_active = False
 
 
 # Variables for adding more constraints based on reductions
@@ -49,19 +53,21 @@ pucnu = False
 vodafone = False
 
 to_rooted = False
-ilp_method = "pcst"
-timeout = 310
+warmstart_used = False
+ilp_method = ["pcst_flow2"]
+lower_bound = None
+warmstart = None
+timeout = 100
 gap = 0.0
 
 
 forced_terminals = []
 if cologne == True:
     stp_file = "/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance/data/Dimacs/RPCST-cologne/cologne1/i101M2.stp"
-    result_file = open("/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance/data/res.txt", "w")
-    result_file.write("Instance: " + stp_file[35:41] + "\n")
     G, terminals, root = gf.stp_rooted_to_networkx(stp_file)
-    # TODO: Ändere Ergebnis um 1
-    forced_terminals = []
+    forced_terminals = [root]
+    #G.nodes[root]['prize'] = 1
+
 
 if pucnu == True:
     stp_file = "/home/addimator/Dropbox/WiSe21/Projektarbeit/real_instance_rooted/data/Dimacs/PCSPG-PUCNU/bip42nu.stp"
@@ -102,7 +108,6 @@ if voronoi_active:
         s = "Pcst-fast found only Root note, no Graph for the upperBound could be built. \nSolution is only the root node: " \
             + str(root) + "\nTime to compute: " + str(time_end - time_start) + ". \nObj. value reduction: " + str(
             G.nodes[root]['prize']) + ".\n"
-        result_file.write(s + "\n")
         print(s)
         sys.exit(0)
     except ValueError:
@@ -130,28 +135,45 @@ if to_rooted:
     for t in forced_terminals:
         G.nodes[t]['prize'] = 0
 
-terminals = pu.computeTerminals(G)
+
 G = nx.to_undirected(G)
 optG = imp_nx.read(G)
-warmstart, lower_bound = smc.get_heuristic(optG, terminals)
-#warmstart = []
-#lower_bound = None
+warmstart = []
+if warmstart_used:
+    terminals = pu.computeTerminals(G)
+    warmstart, lower_bound = smc.get_heuristic(optG, terminals)
 
-if ilp_method == "pcst":
-    m = p.create_model(optG, forced_terminals=forced_terminals, weight='weight', warmstart = warmstart, lower_bound = lower_bound)
-    m.setParam('TimeLimit', timeout)
-    m.setParam('MIPGap', gap)
-    m.optimize(p.callback_cycle)
-elif ilp_method == "pcst_linear":
-    m = stp.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+if "pcst" in ilp_method:
+    m = stp.create_model(optG, forced_terminals=[root], weight='weight')
     m.setParam('TimeLimit', timeout)
     m.setParam('MIPGap', gap)
     m.optimize()
-elif ilp_method == "pcst_linear_tightened":
-    m = plt.create_model(optG, forced_terminals=forced_terminals, weight='weight')
+if "pcst_linear" in ilp_method:
+    m = stp.create_model(optG, forced_terminals=[root], weight='weight')
     m.setParam('TimeLimit', timeout)
     m.setParam('MIPGap', gap)
     m.optimize()
+elif "pcst_linear_tightened" in ilp_method:
+    m = plt.create_model(optG, forced_terminals=[root], weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+elif "pcst_flow" in ilp_method:
+    m = pf.create_model(optG, forced_terminals=[root], weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+elif "pcst_flow2" in ilp_method:
+    m = pf2.create_model(optG, forced_terminals=[root], weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+elif "pcst_flow_indicator" in ilp_method:
+    m = pfi.create_model(optG, forced_terminals=[root], weight='weight', use_experimental=True)
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+
 best_val = m.objVal
 solution = p.extract_solution(optG, m)
 time_end = time.time()
@@ -170,7 +192,7 @@ for u in G.nodes():
 if to_rooted:
     result -= len(forced_terminals) * sum_of_profits
 
-
+print(sum_of_prizes)
 print(result)
 print("Gurobi gap is:", m.MIPGap, "%")
 print(solution)

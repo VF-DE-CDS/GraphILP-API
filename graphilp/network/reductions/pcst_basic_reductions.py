@@ -1,7 +1,5 @@
 import networkx as nx
 
-import graphilp.network.reductions.pcst_utilities as pcst_utilitiess
-from graphilp.network.reductions import pcst_utilities as pcst_utilitiess
 from network.reductions import pcst_utilities
 
 
@@ -126,6 +124,22 @@ def basic_reductions(G, root):
 
 if __name__ == '__main__':
     if __name__ == '__main__':
+
+        """
+        G = nx.Graph()
+
+           G.add_nodes_from([
+               (1, {'prize': 2}),
+               (2, {'prize': 2}),
+               (3, {'prize': 2}),
+               (4, {'prize': 1})
+           ])
+
+           G.add_edges_from([(1, 2, {'weight': 1}), (1, 3, {'weight': 1}), (2, 3, {'weight': 1}),
+                             (1, 4, {'weight': 3})
+                             ])
+           roots = []
+        """
         G = nx.Graph()
 
         G.add_nodes_from([
