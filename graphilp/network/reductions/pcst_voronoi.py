@@ -95,7 +95,7 @@ def proposition13(G, radius, upperBound):
         dNearestTerminal = pcst_utilities.dNearestTerminalsRoot(G, node, terminals, numberOfNearestTerminals=2)
         dNearestTerminal = list(dNearestTerminal.values())
         lowerBound = sum(radius[0:-2]) + sum(dNearestTerminal)
-        if lowerBound > upperBound:
+        if lowerBound -0.001> upperBound:
             G.remove_node(node)
 
 
@@ -125,7 +125,7 @@ def proposition15(G, radius, radius_dict, upperBound):
         radius.insert(0, radius_dict.get(t))
         dNearestTerminal = dNearestTerminals(G, t, terminals, 2)
         lowerBound = sum(radius[1:-2]) + sum(dNearestTerminal)
-        if lowerBound > upperBound:
+        if lowerBound -0.001 > upperBound:
             res_nodes.append(t)
     radius.sort()
     return res_nodes
@@ -157,7 +157,7 @@ def proposition18(G, radius, upperBound):
     for n in nodes:
         nearestTerminals = dNearestTerminals(G, n, terminals, 3)
         lowerBound = sum(nearestTerminals) + sum(radius[0:-3])
-        if lowerBound > upperBound:
+        if lowerBound -0.001 > upperBound:
             res_nodes.append(n)
     return res_nodes
 
@@ -190,3 +190,8 @@ def reductionTechniques(G, root=-1):
                 nodes.append(v)
         G.remove_nodes_from(nodes)
     return term_deg2, nodes_deg3
+
+
+
+
+
