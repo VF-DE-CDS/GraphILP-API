@@ -1,7 +1,8 @@
 import networkx as nx
 
-from network.reductions import pcst_utilities
-
+from graphilp.network.reductions import pcst_utilities
+from graphilp.network import pcst as p
+from graphilp.imports import networkx as imp_nx
 
 def ntd1(G, terminals):
     """
@@ -123,48 +124,48 @@ def basic_reductions(G, root):
     unconnectedComponent(G)
 
 if __name__ == '__main__':
-    if __name__ == '__main__':
 
-        """
-        G = nx.Graph()
 
-           G.add_nodes_from([
-               (1, {'prize': 2}),
-               (2, {'prize': 2}),
-               (3, {'prize': 2}),
-               (4, {'prize': 1})
-           ])
+    """
+    G = nx.Graph()
 
-           G.add_edges_from([(1, 2, {'weight': 1}), (1, 3, {'weight': 1}), (2, 3, {'weight': 1}),
-                             (1, 4, {'weight': 3})
-                             ])
-           roots = []
-        """
-        G = nx.Graph()
+       G.add_nodes_from([
+           (1, {'prize': 2}),
+           (2, {'prize': 2}),
+           (3, {'prize': 2}),
+           (4, {'prize': 1})
+       ])
 
-        G.add_nodes_from([
-            (1, {'prize': 6}),
-            (2, {'prize': 0}),
-            (3, {'prize': 0}),
-            (4, {'prize': 6}),
-            (5, {'prize': 0}),
-            (6, {'prize': 0}),
-            (7, {'prize': 1}),
-            (8, {'prize': 0}),
-            (9, {'prize': 2})
-        ])
+       G.add_edges_from([(1, 2, {'weight': 1}), (1, 3, {'weight': 1}), (2, 3, {'weight': 1}),
+                         (1, 4, {'weight': 3})
+                         ])
+       roots = []
+    """
+    G = nx.Graph()
 
-        G.add_edges_from([(1, 2, {'weight': 3}), (1, 5, {'weight': 4}), (2, 3, {'weight': 1}),
-                          (2, 4, {'weight': 4}), (3, 4, {'weight': 1}), (5, 6, {'weight': 2}),
-                          (5, 7, {'weight': 1}), (6, 4, {'weight': 7}), (7, 8, {'weight': 2}),
-                          (8, 4, {'weight': 3}), (7, 9, {'weight': 30})
-                          ])
+    G.add_nodes_from([
+        (1, {'prize': 6}),
+        (2, {'prize': 0}),
+        (3, {'prize': 0}),
+        (4, {'prize': 6}),
+        (5, {'prize': 0}),
+        (6, {'prize': 0}),
+        (7, {'prize': 1}),
+        (8, {'prize': 0}),
+        (9, {'prize': 2})
+    ])
+
+    G.add_edges_from([(1, 2, {'weight': 3}), (1, 5, {'weight': 4}), (2, 3, {'weight': 1}),
+                      (2, 4, {'weight': 4}), (3, 4, {'weight': 1}), (5, 6, {'weight': 2}),
+                      (5, 7, {'weight': 1}), (6, 4, {'weight': 7}), (7, 8, {'weight': 2}),
+                      (8, 4, {'weight': 3}), (7, 9, {'weight': 30})
+                      ])
     print(G.number_of_edges())
 
+    G = nx.to_undirected(G)
+    optG = imp_nx.read(G)
+    p.create_model(G, [])
 
-    pcst_utilities.draw(G)
-    basic_reductions(G)
-    pcst_utilities.draw(G)
 
 
 

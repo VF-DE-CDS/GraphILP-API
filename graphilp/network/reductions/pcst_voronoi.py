@@ -95,7 +95,7 @@ def proposition13(G, radius, upperBound):
         dNearestTerminal = pcst_utilities.dNearestTerminalsRoot(G, node, terminals, numberOfNearestTerminals=2)
         dNearestTerminal = list(dNearestTerminal.values())
         lowerBound = sum(radius[0:-2]) + sum(dNearestTerminal)
-        if lowerBound -0.001> upperBound:
+        if round(lowerBound, 3) > round(upperBound, 3):
             G.remove_node(node)
 
 
@@ -112,7 +112,7 @@ def corollary14(G, radius_list, radius_dict, upperBound):
             G.remove_node(t)
         else:
             lowerBound = sum(radius_list[1:-1]) + sum(dNearestTerminal)
-            if lowerBound -0.001 > upperBound:
+            if round(lowerBound, 3) > round(upperBound, 3):
                 G.remove_node(t)
 
 def proposition15(G, radius, radius_dict, upperBound):
@@ -125,7 +125,7 @@ def proposition15(G, radius, radius_dict, upperBound):
         radius.insert(0, radius_dict.get(t))
         dNearestTerminal = dNearestTerminals(G, t, terminals, 2)
         lowerBound = sum(radius[1:-2]) + sum(dNearestTerminal)
-        if lowerBound -0.001 > upperBound:
+        if round(lowerBound, 3) > round(upperBound, 3):
             res_nodes.append(t)
     radius.sort()
     return res_nodes
@@ -146,9 +146,10 @@ def proposition17(G, radius, upperBound, diagram):
             lowerBound = G.get_edge_data(v, w).get('weight') + \
                          min(dNearestTerminal_v[0] + dNearestTerminal_w[1], dNearestTerminal_v[1] + dNearestTerminal_w[0]) + \
                          sum(radius[0:-2])
-        if lowerBound - 0.001 > upperBound:
+        if round(lowerBound, 3) > round(upperBound, 3):
             edges_to_remove.append((v, w))
     G.remove_edges_from(edges_to_remove)
+
 
 def proposition18(G, radius, upperBound):
     terminals = pcst_utilities.computeTerminals(G)
@@ -157,7 +158,7 @@ def proposition18(G, radius, upperBound):
     for n in nodes:
         nearestTerminals = dNearestTerminals(G, n, terminals, 3)
         lowerBound = sum(nearestTerminals) + sum(radius[0:-3])
-        if lowerBound -0.001 > upperBound:
+        if round(lowerBound, 3) > round(upperBound, 3):
             res_nodes.append(n)
     return res_nodes
 

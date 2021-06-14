@@ -6,10 +6,11 @@ def steiner_arborescence_transformation(G, forced_terminals):
     transforms self.G into a directed graph for steiner arborescence problem
     """
     G_sa = nx.DiGraph()
-    G_sa.add_nodes_from(G.nodes())
+   # G_sa.add_nodes_from(G.nodes)
 
-    artificial_root = max(G.nodes()) + 1
-    G_sa.add_node(artificial_root)
+    for n in G.nodes(data = True):
+        G_sa.add_nodes_from([n])
+
 
     # add arcs
     for u, v, weight in G.edges(data='weight'):
@@ -19,11 +20,12 @@ def steiner_arborescence_transformation(G, forced_terminals):
 
         G_sa.add_weighted_edges_from([[u, v, cost_u_v - prize_v],
                                       [v, u, cost_u_v - prize_u]])
-
+    artificial_root = max(G.nodes()) + 1
+    G_sa.add_nodes_from([(artificial_root, {"prize": 0})])
     # add arcs from articial root to terminals
     if forced_terminals == []:
-        for t in pu.computeTerminals(G):
-            G_sa.add_weighted_edges_from([[artificial_root, t, -G.nodes[t]['prize']]])
+        for t in pu.computeTerminals(G_sa):
+            G_sa.add_weighted_edges_from([[artificial_root, t, -G_sa.nodes[t]['prize']]])
     else:
         for node in forced_terminals:
             G_sa.add_weighted_edges_from([[artificial_root, node, -G.nodes[node]['prize']]])

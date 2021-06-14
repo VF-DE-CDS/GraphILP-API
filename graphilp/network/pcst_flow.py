@@ -1,17 +1,19 @@
 from gurobipy import Model, GRB, quicksum
 import networkx as nx
+import random
+import itertools
 
 
 def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=[]):
-    r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
+    r""" Create an ILP for the rooted Prize Collecting Steiner Tree Problem.
 
     TODO Flow formulation.
 
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
-    :param terminals: a list of vertices that need to be connected by the Steiner tree
+    :param forced_terminals: a list of vertices that need to be connected by the Steiner tree
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
+    :param prize: name of the argument in the vertex dictionary of the graph used to store vertex prize values
     :param warmstart: a list of edges forming a tree in G connecting all terminals
-    :param lower_bound: give a known lower bound to the solution length
 
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
 
@@ -24,7 +26,7 @@ def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=
             :nowrap:
 
             \begin{align*}
-            \min \sum_{(u,v) \in \overrightarrow{E}} w_{uv} x_{uv}\\
+            \max \sum_{v \in V} p_v x_v- \sum_{(u,v) \in E} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
             \forall \{u,v\} \in E: x_{uv} + x_{vu} \leq 1 && \text{(restrict edges to one direction)}\\
             \forall t \in T: x_t = 1 && \text{(require terminals to be chosen)}\\
@@ -52,14 +54,16 @@ def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=
     m = Model("PCST Flow")
     
     G.G = nx.DiGraph(G.G)
-
-    terminals = [n for n in G.G.nodes() if G.G.nodes[n].get(prize, 0) > 0]
+    
+    terminals = set([node for node in G.G.nodes() if G.G.nodes[node].get(prize, 0) > 0] + forced_terminals)
     n = G.G.number_of_nodes()
     T = len(terminals)
     root = forced_terminals[0]
 
+    prize_bound = sum([G.G.nodes[node].get(prize, 0) for node in G.G.nodes()])
+
     # add variables for edges and nodes
-    edge_flow = m.addVars(G.G.edges(), vtype=GRB.INTEGER, lb=-T, ub=T)
+    edge_flow = m.addVars(G.G.edges(), vtype=GRB.CONTINUOUS, lb=0, ub=T-1)
     G.set_edge_vars(m.addVars(G.G.edges(), vtype=GRB.BINARY))
     G.set_node_vars(m.addVars(G.G.nodes(), vtype=GRB.BINARY))
 
@@ -76,13 +80,19 @@ def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=
     
     # node can be chosen if an adjacent edge is chosen
     for node in G.G.nodes():
+        #if node not in forced_terminals:
         m.addConstr(nodes[node] <= quicksum(edges[e] for e in G.G.edges(node)) + quicksum(edges[e] for e in G.G.in_edges(node)))
+        #else:
+        if node in forced_terminals:
+            m.addConstr(nodes[node] == 1)
 
-
-    # flow != 0 => edge chosen
+    # restrict to positive yield
+    m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) <= prize_bound)
+    
+    # flow != 0 <=> edge chosen
     for edge, edge_var in edges.items():
-        m.addConstr(2 * T * edge_var + edge_flow[edge] >= 0)
-        m.addConstr(2 * T * edge_var - edge_flow[edge] >= 0)
+        m.addConstr(T * edge_var - edge_flow[edge] >= 0)
+        m.addConstr(edge_var <= edge_flow[edge])
     
     # flow condition on non-terminal nodes
     for node in G.G.nodes():
@@ -91,6 +101,7 @@ def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=
     
     # flow condition on root
     m.addConstr(quicksum(edge_flow[e] for e in G.G.edges(root)) - quicksum(edge_flow[e] for e in G.G.in_edges(root)) >= -T+1)
+    m.addConstr(quicksum(edge_flow[e] for e in G.G.edges(root)) - quicksum(edge_flow[e] for e in G.G.in_edges(root)) <= 0)
     
     # flow conditions on non-root terminal
     for t in terminals:
@@ -99,8 +110,6 @@ def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=
                         == nodes[t])
 
     m.update()
-
-
 
     return m
 

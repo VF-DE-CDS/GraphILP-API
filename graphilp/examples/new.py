@@ -24,6 +24,7 @@ from graphilp.imports import networkx as imp_nx
 from graphilp.imports import readFile as gf
 from graphilp.network import pcst_linear as stp
 from graphilp.network import pcst as p
+from graphilp.network.transformations import pcst_to_sap as pts
 from graphilp.network.reductions import pcst_utilities as pu
 from graphilp.network.reductions import pcst_basic_reductions as br
 from graphilp.network.reductions import pcst_voronoi as vor
@@ -31,9 +32,11 @@ from graphilp.network.reductions import pcst_dualAscent as da
 from graphilp.network.heuristics import steiner_metric_closure as smc
 
 from graphilp.network import pcst_linear_tightened as plt
+from graphilp.network import pcst_flow_thomas as pft
 from graphilp.network import pcst_flow as pf
 from graphilp.network import pcst_flow_v2 as pf2
 from graphilp.network import pcst_flow_indicator as pfi
+from graphilp.network import pcst_morris as pm
 
 
 
@@ -51,13 +54,14 @@ fixed_terminals = None
 cologne = True
 pucnu = False
 vodafone = False
+minimal = False
 
 to_rooted = False
 warmstart_used = False
-ilp_method = ["pcst_flow2"]
+ilp_method = ["morris"]
 lower_bound = None
 warmstart = None
-timeout = 100
+timeout = 50
 gap = 0.0
 
 
@@ -79,6 +83,22 @@ if vodafone == True:
     G, terminals = gf.stp_to_networkx(stp_file)
     root = -1
 
+if minimal == True:
+    G = nx.Graph()
+    G.add_nodes_from([
+        (1, {'prize': 6}),
+        (2, {'prize': 0}),
+        (3, {'prize': 4}),
+        (4, {'prize': 9})
+
+    ])
+
+    G.add_edges_from([(1, 2, {'weight': 1}), (1, 3, {'weight': 4}), (2, 3, {'weight': 1})
+                      ])
+    roots = []
+    terminals = [1, 4, 7, 9]
+    root = -1
+
 sum_of_prizes = 0
 for n in G.nodes():
     sum_of_prizes += G.nodes[n]['prize']
@@ -88,6 +108,7 @@ if to_rooted == True:
     for t in forced_terminals:
         G.nodes[t]['prize'] = float("inf")
 
+term_orig = terminals.copy()
 pu.show_graph_size(G, "Original graph: ", None)
 time_start = time.time()
 
@@ -144,10 +165,10 @@ if warmstart_used:
     warmstart, lower_bound = smc.get_heuristic(optG, terminals)
 
 if "pcst" in ilp_method:
-    m = stp.create_model(optG, forced_terminals=[root], weight='weight')
+    m = p.create_model(optG, forced_terminals=[], weight='weight')
     m.setParam('TimeLimit', timeout)
     m.setParam('MIPGap', gap)
-    m.optimize()
+    m.optimize(p.callback_cycle)
 if "pcst_linear" in ilp_method:
     m = stp.create_model(optG, forced_terminals=[root], weight='weight')
     m.setParam('TimeLimit', timeout)
@@ -173,26 +194,37 @@ elif "pcst_flow_indicator" in ilp_method:
     m.setParam('TimeLimit', timeout)
     m.setParam('MIPGap', gap)
     m.optimize()
+elif "pcst_flow_thomas" in ilp_method:
+    m = pft.create_model(optG, forced_terminals=[], weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize()
+elif "morris" in ilp_method:
+    G_sa, art_root = pts.steiner_arborescence_transformation(G, forced_terminals = [root])
+    optG_sa = imp_nx.read(G_sa)
+    m = pm.create_model(optG_sa, art_root, forced_terminals=[root], weight='weight')
+    m.setParam('TimeLimit', timeout)
+    m.setParam('MIPGap', gap)
+    m.optimize(pm.callback_connect_constr)
+    solution = pm.extract_solution(optG_sa, m)
+    print(solution)
+    solution = [(u, v) for (u, v) in solution if u != max(G.nodes()) + 1 and v != max(G.nodes()) + 1 ]
+    result = m.objVal
+
 
 best_val = m.objVal
-solution = p.extract_solution(optG, m)
+#solution = p.extract_solution(optG, m)
 time_end = time.time()
 
 
+#result = pu.computeMinimizationResult(sum_of_prizes, G, solution)
 
-result = sum_of_prizes
-res_nodes = set()
-for (u, v) in solution:
-    result += G.get_edge_data(u, v)['weight']
-    res_nodes.add(u)
-    res_nodes.add(v)
-for u in G.nodes():
-    if u in res_nodes:
-        result -= G.nodes[u]['prize']
+
 if to_rooted:
     result -= len(forced_terminals) * sum_of_profits
 
-print(sum_of_prizes)
-print(result)
+print("\nObjective value:", result)
+print("Solution:", solution)
+print("Time to compute: ", str(time_end - time_start) + ".")
 print("Gurobi gap is:", m.MIPGap, "%")
-print(solution)
+pu.validate_solution(solution, G, term_orig, result)

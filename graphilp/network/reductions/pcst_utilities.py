@@ -27,7 +27,6 @@ def computeMinimizationResult(sum_of_prizes, G, solution):
     return result
 
 def validate_solution(solution, G, term_orig, result):
-
     H = nx.Graph()
     H.add_edges_from(solution)
     if not nx.is_connected(H):
@@ -36,12 +35,12 @@ def validate_solution(solution, G, term_orig, result):
         raise Exception("Solution is not a tree")
     check_sum = 0
     for (u, v) in H.edges:
-
         check_sum += G.get_edge_data(u, v)['weight']
 
 
     lost_profits = [p for (t, p) in term_orig if t not in H.nodes]
     check_sum += sum(lost_profits)
+
     if round(check_sum, 3) != round(result, 3):
         raise Exception("Checksum unequals result")
 
