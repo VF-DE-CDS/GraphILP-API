@@ -60,7 +60,7 @@ term_deg2 = None
 nodes_deg3 = None
 fixed_terminals = None
 gap = 0
-ilp_method = ['pcst_flow2']
+ilp_method = ['pcst']
 timeout = 100
 warmstart_used = False
 lower_bound = None
@@ -77,7 +77,7 @@ crs = pyproj.crs.CRS('epsg:31467')
 
 #%%
 
-place = 'Bredeney, Essen, Germany'
+place = 'Altstadt, Duesseldorf, Germany'
 
 # road network of suburb (converted to Gauss-Krüger 3)
 #G_ox = ox.project_graph(ox.graph_from_place(place, network_type='walk'), to_crs=crs)
@@ -87,7 +87,7 @@ node_list = list(G_ox.nodes())
 for i in range(1):
     num_terminals = 5
     terminals = [node_list[random.randint(0, len(node_list) -1)] for n in range(num_terminals)]
-    #terminals = [4278667367, 597866694, 1375218939, 1742945559, 597866735]
+    terminals = [78347643, 1595587303, 1577271720, 313480557, 7156935054]
 
     path = "results/" + str(terminals) + "/"
 
@@ -132,7 +132,9 @@ for i in range(1):
     prizes = [abs(np.random.normal(loc=distance, scale=distance * 2)) for i in range(num_terminals)]
     print("Prizes: ", prizes)
 
-    #prizes = [784.6116063222139, 265.5985845622647, 681.3936508460367, 146.39584149837412, 705.0922378798076]
+    prizes = [667.6186964819622, 427.8803127926392, 204.86725632742235, 734.4512016008016, 510.8782080834783]
+    term_orig = [(t, p) for t, p in zip(terminals, prizes)]
+    print(term_orig)
     for node in G.nodes():
             G.nodes[node]['prize'] = 0
     for i in range(len(terminals)):
@@ -231,23 +233,10 @@ for i in range(1):
         warmstart, lower_bound = smc.get_heuristic(optG, terminals)
 
     if "pcst" in ilp_method:
-        m = stp.create_model(optG, forced_terminals=[root], weight='weight')
+        m = p.create_model(optG, forced_terminals=[root], weight='weight')
         m.setParam('TimeLimit', timeout)
         m.setParam('MIPGap', gap)
-        m.optimize()
-
-        solution = p.extract_solution(optG, m)
-        result = sum_of_prizes
-        res_nodes = set()
-        for (u, v) in solution:
-            result += G.get_edge_data(u, v)['weight']
-            res_nodes.add(u)
-            res_nodes.add(v)
-        for u in G.nodes():
-            if u in res_nodes:
-                result -= G.nodes[u]['prize']
-        res1 = result
-        run1 = m.Runtime
+        m.optimize(p.callback_cycle)
     if "pcst_linear" in ilp_method:
         m = stp.create_model(optG, forced_terminals=[root], weight='weight')
         m.setParam('TimeLimit', timeout)
@@ -273,31 +262,13 @@ for i in range(1):
         m.setParam('TimeLimit', timeout)
         m.setParam('MIPGap', gap)
         m.optimize()
-    best_val = m.objVal
 
-    run2 = m.Runtime
-
-    ##############################
-    solution = p.extract_solution(optG, m)
-    result = sum_of_prizes
-    res_nodes = set()
-    for (u, v) in solution:
-        result += G.get_edge_data(u, v)['weight']
-        res_nodes.add(u)
-        res_nodes.add(v)
-    for u in G.nodes():
-        if u in res_nodes:
-            result -= G.nodes[u]['prize']
-    res2 = result
-
-    #################
 
     solution = p.extract_solution(optG, m)
     time_end = time.time()
-    res1 = 0
-    run1 = 0
-    results_compare.append((res1, res2))
-    results_compare.append((run1, run2))
+    result = pu.computeMinimizationResult(sum_of_prizes, G, solution)
+    print("Solution", solution)
+
 
     #%%
     translated = []
@@ -320,7 +291,7 @@ for i in range(1):
     node_list2 = [v for (u, v) in translated]
     res_node_list = list(set(node_list1 + node_list2))
     res_terminals = [t for t in res_node_list if t in terminals]
-    print(res_terminals)
+
 
 
     edge_colors = ['#ED0000' if (u, v) in translated or (v, u) in solution else '#AAA' for u, v in G_ox.edges()]
@@ -337,23 +308,11 @@ for i in range(1):
     ## Compare times used
 
     #%%
-    print(solution)
-    s = "\nTime to compute: " + str(time_end - time_start) + ". \n"
-    s += "Obj. value reduction: " + str(best_val) + ". \n\n"
-    result_file.write(s)
-    print(s)
 
-result = sum_of_prizes
-res_nodes = set()
-for (u, v) in solution:
-    result += G.get_edge_data(u, v)['weight']
-    res_nodes.add(u)
-    res_nodes.add(v)
-for u in G.nodes():
-    if u in res_nodes:
-        result -= G.nodes[u]['prize']
-#result -= len(forced_terminals) * sum_of_profits
-print(result)
-print(results_compare)
+
+pu.validate_solution(solution, G, term_orig, result)
+print("\nObjective value:", result)
+print("Solution:", solution)
+print("Time to compute: ", str(time_end - time_start) + ".")
 print("Gurobi gap is:", m.MIPGap, "%")
 

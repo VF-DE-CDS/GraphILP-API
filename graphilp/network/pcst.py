@@ -9,34 +9,26 @@ edge2var = None
 
 
 def create_model(G, forced_terminals=[], weight='weight', prize='prize',
-                warmstart=[], lower_bound=None):
+                 warmstart=[], lower_bound=None):
     r""" Create an ILP for the Prize Collecting Steiner Tree Problem.
-
     This formulation enforces a cycle in the solution if it is not connected.
     A callback will detect cycles and add constraints to explicity forbid them.
     Together, this ensures that the solution is a tree.
-
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
-    :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+    :param prize: name of the argument in the vertex dictionary of the graph used to store vertex prize values
     :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
-
     :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
-
     Callbacks:
         This model uses callbacks which need to be included when calling Gurobi's optimize function:
-
         model.optimize(callback = :obj:`callback_cycle`)
-
     ILP:
         Let :math:`T_f` be the set of forced terminals required to be part of the solution.
         Further, let :math:`p_v` be the prize associated with each vertex :math:`v`.
-
         .. math::
             :nowrap:
-
             \begin{align*}
             \max \sum_{v \in V} p_v x_v- \sum_{\{u,v\} \in E} w_{uv} x_{uv}\\
             \text{s.t.} &&\\
@@ -46,13 +38,10 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
             \forall \{u,v\}\in E: 2x_{uv} - x_u - x_v \leq 0 && \text{(require vertices to be chosen when edge is chosen)}\\
             \forall i \in V: x_i-\sum_{u=i \vee v=i}x_{uv} \leq 0 && \text{(forbid isolated vertices)}\\
             \end{align*}
-
         The callbacks add a new constraint for each cycle :math:`C` of length :math:`\ell(C)`
         coming up in a solution candidate:
-
         .. math::
             :nowrap:
-
             \begin{align*}
             \sum_{\{u, v\} \in C} x_{uv} < \ell(C) && \text{(forbid including complete cycle)}
             \end{align*}
@@ -93,19 +82,19 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
 
     # if edge is chosen, both adjacent nodes need to be chosen
     for edge, edge_var in edges.items():
-        m.addConstr(2*edge_var - nodes[edge[0]] - nodes[edge[1]] <= 0)
+        m.addConstr(2 * edge_var - nodes[edge[0]] - nodes[edge[1]] <= 0)
 
     # prohibit isolated vertices
     for node, node_var in nodes.items():
         edge_vars = [edge_var for edge, edge_var in edges.items() if (node == edge[0]) or (node == edge[1])]
         m.addConstr(node_var - quicksum(edge_vars) <= 0)
-        
+
     # set lower bound
     if lower_bound:
         m.addConstr(quicksum([edge_var * G.G.edges[edge][weight] for edge, edge_var in edges.items()]) >= lower_bound)
-        
+
     m.update()
-    
+
     # set warmstart
     if len(warmstart) > 0:
 
@@ -126,17 +115,17 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
             nodes[edge[0]].Start = 1
             nodes[edge[1]].Start = 1
 
-        m.update()    
+        m.update()
 
     return m
 
 
 def callback_cycle(model, where):
     """ Callback inserts constraints to forbid cycles in solution candidates
-    
+
     :param model: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
     :param where: a Gurobi callback parameter indicating from which step of the optimisation the callback
-        originated    
+        originated
     """
     if where == GRB.Callback.MIPSOL:
         # check for cycles whenever a new solution candidate is found
@@ -144,7 +133,8 @@ def callback_cycle(model, where):
         cur_sol = model.cbGetSolution(variables)
 
         # create graph from current solution
-        solution = [var2edge[variables[i]] for i in range(len(variables)) if (cur_sol[i] > 0.5) and (variables[i]in var2edge)]
+        solution = [var2edge[variables[i]] for i in range(len(variables)) if
+                    (cur_sol[i] > 0.5) and (variables[i] in var2edge)]
         G2 = Graph()
         G2.add_edges_from(solution)
 
@@ -163,10 +153,8 @@ def callback_cycle(model, where):
 
 def extract_solution(G, model):
     r""" Get the optimal prize collecting Steiner tree in G
-
         :param G: an ILPGraph
         :param model: a solved Gurobi model for Prize Collecting Steiner tree
-
         :return: the edges of an optimal prize collecting Steiner tree
     """
     solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]

@@ -9,7 +9,7 @@ def get_var_names():
 
 var2edge = None
 
-def create_model(G, G_sa, art_root, forced_terminals=[], weight='weight', prize='prize',
+def create_model(G_sa, art_root, forced_terminals=[], weight='weight', prize='prize',
                  warmstart=[], lower_bound=None):
     global var2edge
     global edge2var
@@ -18,38 +18,36 @@ def create_model(G, G_sa, art_root, forced_terminals=[], weight='weight', prize=
     global var2node
     global sap_instance
 
-    sap_instance = G_sa
-
-
-
     m = Model("graphilp_pcst_morris")
     m.Params.LazyConstraints = 1
 
     root_sa = art_root
-    """
-    initiates gurobi model and adds constraints except for connectivity constraints
-    self.G_sa must exist
-    """
-    edges = dict()
-    nodes = dict()
+    sap_instance = G_sa.G
 
 
 
-    # add binary variables: every vertex and every edge has one variable
-    for node in G_sa.nodes:
-        nodes[node] = (m.addVar(vtype=GRB.BINARY, name='node_{0}_is_included'.format(node)))
-    for arc in G_sa.edges:
-        # print('arc_({0},{1})_is_included'.format(arc[0], arc[1]))
-        edges[arc] = (m.addVar(vtype=GRB.BINARY, name='arc_({0},{1})_is_included'.format(arc[0], arc[1])))
+
+    # stick to gurobi workflow
+
+    G_sa.set_edge_vars(m.addVars(G_sa.G.edges(), vtype=GRB.BINARY))
+    G_sa.set_node_vars(m.addVars(G_sa.G.nodes(), vtype=GRB.BINARY))
+    edges = G_sa.edge_variables
+    nodes = G_sa.node_variables
+
     m.update()
+
     var2edge = dict(zip(edges.values(), edges.keys()))
     node2var = nodes
     edge2var = edges
     # stick to gurobi workflow
 
 
-    m.setObjective(quicksum([G.nodes[node][prize] for node in G.nodes]) +
-                   quicksum([G_sa.edges[edge]['weight'] * edge_var for edge, edge_var in edges.items()]), GRB.MINIMIZE)
+
+    # stick to gurobi workflow
+
+
+    m.setObjective(quicksum([G_sa.G.nodes[node][prize] for node in G_sa.G.nodes]) +
+                   quicksum([G_sa.G.edges[edge]['weight'] * edge_var for edge, edge_var in edges.items()]), GRB.MINIMIZE)
 
     # add init constraints
     """
@@ -70,28 +68,28 @@ def create_model(G, G_sa, art_root, forced_terminals=[], weight='weight', prize=
     else:
          m.addConstr(quicksum(
             [edges[(art_root, terminal)] for terminal in
-                              G.nodes() if G.nodes[terminal][prize] > 0]) == 1)
+                              G_sa.G.nodes() if G_sa.G.nodes[terminal][prize] > 0]) == 1)
 
 
     # in-degree equations: every selected vertex has exactly one predecessor from path to root (25)
-    for node in G_sa.nodes:
+    for node in G_sa.G.nodes:
         if node == art_root:
             continue
         m.addConstr(quicksum(
-            [edges[(pred, node)] for pred in G_sa.predecessors(node)]) == nodes[node])
+            [edges[(pred, node)] for pred in G_sa.G.predecessors(node)]) == nodes[node])
 
 
 
         # flow balance constraints for non-customer vertices (30)
-        if G.nodes[node][prize] == 0 and not node in forced_terminals:
+        if G_sa.G.nodes[node][prize] == 0 and not node in forced_terminals:
             # print('Adding:', quicksum([m.getVarByName('arc_({0},{1})_is_included'.format(neighbour, node)) for neighbour in self.G_sa.neighbors(node) if not neighbour==self.root_sa]) <= quicksum([m.getVarByName('arc_({0},{1})_is_included'.format(node, neighbour)) for neighbour in self.G_sa.neighbors(node) if not neighbour==self.root_sa]))
             m.addConstr(quicksum(
                 [edges[(neighbour, node)] for neighbour in
-                 G_sa.neighbors(node)]) <= quicksum(
+                 G_sa.G.neighbors(node)]) <= quicksum(
                 [edges[(node, neighbour)] for neighbour in
-                 G_sa.neighbors(node)]))
+                 G_sa.G.neighbors(node)]))
 
-        for neighbour in G_sa.neighbors(node):
+        for neighbour in G_sa.G.neighbors(node):
             # every arc can only be oriented in one way (not necessary but speeds up optimization since it has not be added implicitly during separation) (31)
             m.addConstr(
                 edges[(neighbour, node)] + edges[(node, neighbour)] <= nodes[node])
@@ -103,63 +101,61 @@ def create_model(G, G_sa, art_root, forced_terminals=[], weight='weight', prize=
 
 
 def callback_connect_constr(model, where):
+
     arc_attr_name = 'capacity'
-    # if where == GRB.Callback.MIPSOL:
-    #
-    #    #construct a graph from current solution (support graph)
-    #    G_sup = connectivity.__sup_graph_from_model__(model, arc_attr_name=arc_attr_name, where='MIPSOL')
-    #    connectivity.add_violated_constraints(model, G_sup, arc_attr_name)
-    # print('In MIPSOL')
 
     if where == GRB.Callback.MIPSOL:
-        # print('In MIPSOL')
+        #print("INTERMEDIATE:", model.cbGet(GRB.Callback.MIPSOL_OBJ))
         # construct a graph from current solution (support graph)
-        # where = Model
-        # create graph from current solution
+
         variables = model.getVars()
         cur_sol = model.cbGetSolution(variables)
         solution = [var2edge[variables[i]] for i in range(len(variables)) if
                     (cur_sol[i] > 0.5) and (variables[i] in var2edge)]
 
         G2 = nx.DiGraph()
-        G2.add_weighted_edges_from([(sol[0], sol[1], 1.0) for sol in solution],
-                                      weight=arc_attr_name)
+        G2.add_weighted_edges_from([(sol[0], sol[1], 1.0) for sol in solution], weight=arc_attr_name)
 
-
-
-
-
-        # for all pairs of nodes in G_sup check whether they are connected to the root
-        # for comb in combinations(G_sup.nodes, 2):
-        # TODO: find a way such that pcst must not be defined here (terrible hack because gurobi does not allow method as callback funtion)
-
-        artificial_root = root_sa
-        violated_count = 0
-        max_count = float('inf')
-
-
+        # Find all violated unconnected subsets
         for node in G2.nodes:
-            if node == artificial_root:
+            if node == root_sa:
                 continue
-            cut_value, partition = nx.algorithms.flow.minimum_cut(G2, artificial_root, node, capacity=arc_attr_name)
-            if round(cut_value, 3) < round(1, 3):
 
-                # print('{0} and {1} are not connected.'.format(artificial_root, node))
+            cut_value, partition = nx.algorithms.flow.minimum_cut(G2, root_sa, node, capacity=arc_attr_name)
+            if cut_value < 1:
                 S_r, S_node = partition  # S_r contains root vertex r; S_node contains node node
-                # print(S_r, S_node)
-                # TODO: find a way such that pcst must not be defined here (terrible hack because gurobi does not allow method as callback funtion)
+
                 delta_Sr = out_cut_induced_by(S_r, sap_instance)  # pcst must be defined here
                 for node_sr in S_r:
-                    # print('Adding: ', gurobipy.quicksum([model.getVarByName(arc_var_name.format(arc[0], arc[1])) for arc in delta_Sr])>=model.getVarByName(node_var_name.format(node)))
-                    new_constraint = quicksum(
-                        [edge2var[arc] for arc in
-                         delta_Sr]) >= node2var[node_sr]
-                    if not new_constraint in model.getConstrs():
 
+                    new_constraint = quicksum([edge2var[arc] for arc in delta_Sr]) >= node2var[node]
+                    if not new_constraint in model.getConstrs():
                             model.cbLazy(new_constraint)
 
-        return violated_count > 0
 
+def extract_solution(G, model):
+    r""" Get the optimal prize collecting Steiner tree in G
+        :param G: an ILPGraph
+        :param model: a solved Gurobi model for Prize Collecting Steiner tree
+        :return: the edges of an optimal prize collecting Steiner tree
+    """
+    #solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
+    #for v in model.getVars():
+    #    if v.x > 0:
+    #        print('%s %g' % (v.varName, v.x))
+
+
+    variables = model.getVars()
+    #for edge, edge_var in G.edge_variables.items():
+    #    print(edge_var.X)
+    #    print(edge_var)
+    #    print(edge)
+    solution = [edge for edge, edge_var in G.edge_variables.items() if edge_var.X > 0.5]
+
+    #cur_sol = model.cbGetSolution(variables)
+    #solution = [var2edge[variables[i]] for i in range(len(variables)) if
+    #            (cur_sol[i] > 0.5) and (variables[i] in var2edge)]
+    return solution
 
 def out_cut_induced_by(S, G):
     """
@@ -174,16 +170,5 @@ def out_cut_induced_by(S, G):
                 delta_S.append((node, node2))
     return delta_S
 
-def in_cut_induced_by(S, G):
-    """
-    """
-    delta_S = []
-    for node in S:
-        # get all adjacent edges
-        all_pred = G.predecessors(node)
-        # check whether exactly one endpoint is in S
-        for node2 in all_pred:
-            if node2 in S and not node in S:
-                delta_S.append((node, node2))
-    return delta_S
+
 
