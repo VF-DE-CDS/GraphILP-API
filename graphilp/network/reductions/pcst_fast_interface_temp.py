@@ -1,8 +1,9 @@
 import pickle
+
+import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 import pcst_fast
-import matplotlib.pyplot as plt
 
 
 def createDataframes(G):
@@ -141,8 +142,7 @@ def reformatToGraph(result_nodes, result_edges, dfFinal, dfNodes):
     return resultingNodes, resultingEdges, resultingGraph, prizesList
 
 
-def format(G, terminals=None, root=None, accesspoints=None):
-    return resultingGraph
+
 
 
 def instantiateManualGraph():

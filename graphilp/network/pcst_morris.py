@@ -1,5 +1,5 @@
-from gurobipy import Model, GRB, quicksum
 import networkx as nx
+from gurobipy import Model, GRB, quicksum
 
 
 def get_var_names():
