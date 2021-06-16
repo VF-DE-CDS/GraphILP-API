@@ -24,7 +24,7 @@ def steiner_arborescence_transformation(G, forced_terminals):
     G_sa.add_nodes_from([(artificial_root, {"prize": 0})])
     # add arcs from articial root to terminals
     if forced_terminals == []:
-        for t in pu.computeTerminals(G_sa):
+        for t in pu.compute_terminals(G_sa):
             G_sa.add_weighted_edges_from([[artificial_root, t, -G_sa.nodes[t]['prize']]])
     else:
         for node in forced_terminals:

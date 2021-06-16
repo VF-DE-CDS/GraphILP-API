@@ -1,5 +1,5 @@
-from gurobipy import Model, GRB, quicksum
 import networkx as nx
+from gurobipy import Model, GRB, quicksum
 
 
 def create_model(G, forced_terminals, weight='weight', prize='prize', warmstart=[]):

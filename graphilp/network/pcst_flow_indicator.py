@@ -1,6 +1,7 @@
-from gurobipy import Model, GRB, quicksum
-import networkx as nx
 from itertools import product
+
+import networkx as nx
+from gurobipy import Model, GRB, quicksum
 
 
 def create_model(G, forced_terminals, weight='weight', prize='prize', use_experimental=False, warmstart=[]):
