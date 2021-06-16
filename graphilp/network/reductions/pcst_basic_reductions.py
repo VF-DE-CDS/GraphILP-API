@@ -2,6 +2,7 @@ import networkx as nx
 from graphilp.network.reductions import pcst_utilities
 
 
+# Reduction techniques that use basic properties of the graph.
 # All reduction techniques described here are taken from the following paper:
 # REHFELDT, Daniel; KOCH, Thorsten; MAHER, Stephen J.
 # Reduction techniques for the prize collecting Steiner tree problem and the maximum‐weight connected subgraph problem.
@@ -13,7 +14,7 @@ def ntd1(G, terminals):
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param terminals: A list of all terminals
     """
-    nodes_to_remove = [n for n in G.node if G.degree[n] == 1 and n not in terminals]
+    nodes_to_remove = [n for n in G.nodes if G.degree[n] == 1 and n not in terminals]
     G.remove_nodes_from(nodes_to_remove)
 
 
@@ -32,6 +33,7 @@ def ntd2(G, terminals):
             # To translate it back after computation
             old_edges = G.edges(node, data=True)
             new_path = []
+
             for e in old_edges:
                 if 'path' in e[2]:
                     new_path += e[2]['path']
@@ -43,14 +45,22 @@ def ntd2(G, terminals):
         G.remove_node(node)
 
 
-def td1(G, terminals, root):
+def td1(G, terminals, root=None):
     """
     Substitute or delete all terminals of degree 1 depending on the cost of the incident edge.
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param terminals: A list of all terminals
     :param root: An integer representing the root
     """
-    candidates = [t for t in terminals if G.degree[t] == 1 and t != root]
+    if root is None:
+        # Without root the terminal with the biggest profit can't be deleted
+        max_terminal = [t for t in terminals if G.nodes[t]['prize'] == max([G.nodes[t]['prize'] for t in terminals])][0]
+        candidates = [t for t in terminals if G.degree[t] == 1 and t != root]
+        if max_terminal in candidates:
+            candidates.remove(max_terminal)
+    else:
+        # In the rooted case only the root can't be deleted
+        candidates = [t for t in terminals if G.degree[t] == 1 and t != root]
     nodes_to_remove = []
     for t in candidates:
         neighbour = list(G.neighbors(t))[0]
@@ -60,7 +70,15 @@ def td1(G, terminals, root):
             nodes_to_remove.append(t)
         else:
             G.nodes[neighbour]['prize'] += profit - edge_length
-            G.nodes[neighbour]['origin'] = (t, neighbour)
+            # To be able to translate back you have to give the path to the neighbour node
+            old_edges = G.edges(t, data=True)
+            new_path = []
+            for e in old_edges:
+                if 'path' in e[2]:
+                    new_path += e[2]['path']
+                else:
+                    new_path.append(e[:2])
+            G.nodes[neighbour]['origin'] = new_path
             nodes_to_remove.append(t)
         G.remove_nodes_from(nodes_to_remove)
 
@@ -126,6 +144,6 @@ def basic_reductions(G, root):
     terminals = pcst_utilities.compute_terminals(G)
     ntd1(G, terminals)
     ntd2(G, terminals)
-    td1(G, terminals, root)
+    td1(G, terminals, None)
     td2(G, root)
     unconnected_component(G, root)
