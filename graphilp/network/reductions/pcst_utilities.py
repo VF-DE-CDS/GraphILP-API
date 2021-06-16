@@ -80,24 +80,24 @@ def compute_terminals(G):
     return terminals
 
 
-def d_nearest_terminals(G, source, terminals, edge_weight='weight', numberOfNearestTerminals=1, duin=True):
+def d_nearest_terminals(G, source, terminals, edge_weight='weight', number_nearest_terminals=1, duin=True):
     """
     Returns the nearest terminals for a given node
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param source: integer representing the source node
     :param terminals: list of all terminals of the underlying graph
     :param edge_weight: Underlyingedgelabel
-    :param numberOfNearestTerminals: the desired number of nearest terminals
+    :param number_nearest_terminals: the desired number of nearest terminals
     :param duin: if true and source is a terminal itself, source is added to the list of the nearest terminals
     :return:
     """
 
-    shortestPaths = nx.shortest_path_length(G, source, weight=edge_weight)
+    shortest_paths = nx.shortest_path_length(G, source, weight=edge_weight)
     if duin:
-        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals}
+        shortest_paths_terminals = {k: v for k, v in shortest_paths.items() if k in terminals}
     else:
-        shortestPathsTerminals = {k: v for k, v in shortestPaths.items() if k in terminals and k != source}
-    return sorted(list(shortestPathsTerminals.values()))[0:numberOfNearestTerminals]
+        shortest_paths_terminals = {k: v for k, v in shortest_paths.items() if k in terminals and k != source}
+    return sorted(list(shortest_paths_terminals.values()))[0:number_nearest_terminals]
 
 
 def pcst_to_rpcst(G):
@@ -155,13 +155,13 @@ def compute_upper_bound(G, root):
     resultingNodes, resultingEdges, newGraph, prizesList = pcst.reformatToGraph(result_nodes, result_edges, dfFinal,
                                                                                 dfNodes)
     # Find the upper bound out of the computed solution
-    upperBound = 0
+    upper_bound = 0
     for i in terminals:
         if i not in list(resultingNodes['Node']):
-            upperBound += G.nodes[i]['prize']
+            upper_bound += G.nodes[i]['prize']
     # Computing the costs of the found solution:
-    upperBound += resultingEdges['Costs'].sum()
-    return upperBound
+    upper_bound += resultingEdges['Costs'].sum()
+    return upper_bound
 
 
 def draw(G, edgelabel='weight'):

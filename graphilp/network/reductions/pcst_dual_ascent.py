@@ -64,14 +64,14 @@ def leaves_to_terminals(G: nx.DiGraph, root):
     return G
 
 
-def compute_steiner_cut(G: nx.DiGraph, k, activeTerminals, root, lb):
+def compute_steiner_cut(G: nx.DiGraph, k, active_terminals, root, lb):
     """
     This routine searches for a cut for a given node k using a breath first search.
     The calculation is divided into 3 parts.
     The implementation is described in [2].
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param k: Node for which the cut is calculated
-    :param activeTerminals: A list of all active Terminals
+    :param active_terminals: A list of all active Terminals
                             (Terminals with positive potential profit and not connected to the root)
     :param root: Integer representing the root node
     :param lb: Intermediate lower bound
@@ -122,7 +122,7 @@ def compute_steiner_cut(G: nx.DiGraph, k, activeTerminals, root, lb):
         for (u, v) in l:
             G.edges[(u, v)]['reduced_costs'] -= delta
 
-    s, l = pass1(G, k, activeTerminals, root)
+    s, l = pass1(G, k, active_terminals, root)
     if s is None:  # k does not define a root component (is no longer an active Terminal)
         return None, lb
     l, delta = pass2(l, s, k)
@@ -166,12 +166,12 @@ def dual_ascent(G: nx.DiGraph, root):
 ###########################################################
 
 
-def test1(G, lowerBound, upperBound, root):
+def test1(G, lower_bound, upper_bound, root):
     """
     Deletes all edges for which the lower bound > upper bound.
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
-    :param lowerBound: Lower bound computed by the dual ascent routine
-    :param upperBound: Upper bound computed by pcst-fast
+    :param lower_bound: Lower bound computed by the dual ascent routine
+    :param upper_bound: Upper bound computed by pcst-fast
     :param root: Integer representing the root node
     """
     terminals = [t for t in pcst_utilities.compute_terminals(G) if t != root]
@@ -179,19 +179,19 @@ def test1(G, lowerBound, upperBound, root):
     for (i, j) in G.edges:
         distance_reduced = nx.shortest_path_length(G, root, i, weight='reduced_costs')
         reduced_costs = G.get_edge_data(i, j)['reduced_costs']
-        dist_terminal = pcst_utilities.d_nearest_terminals(G, j, terminals, edgeweight='reduced_costs')[0]
+        dist_terminal = pcst_utilities.d_nearest_terminals(G, j, terminals, edge_weight='reduced_costs')[0]
         # Sometimes there is a problem because of rounding, so I subtract 0.001
-        if lowerBound + distance_reduced + dist_terminal + reduced_costs - 0.001 > upperBound:
+        if lower_bound + distance_reduced + dist_terminal + reduced_costs - 0.001 > upper_bound:
             to_be_deleted.append((i, j))
     G.remove_edges_from(to_be_deleted)
 
 
-def test2(G, lowerBound, upperBound, root):
+def test2(G, lower_bound, upper_bound, root):
     """
     Deletes all nodes for which the lower bound > upper bound.
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
-    :param lowerBound: Lower bound computed by the dual ascent routine
-    :param upperBound: Upper bound computed by pcst-fast
+    :param lower_bound: Lower bound computed by the dual ascent routine
+    :param upper_bound: Upper bound computed by pcst-fast
     :param root: Integer representing the root node
     """
     terminals = [t for t in pcst_utilities.compute_terminals(G) if t != root]
@@ -199,29 +199,29 @@ def test2(G, lowerBound, upperBound, root):
     for i in nodes:
         try:
             distance_reduced = nx.shortest_path_length(G, root, i, weight='reduced_costs')
-            distTerminal = pcst_utilities.d_nearest_terminals(G, i, terminals, edgeweight='reduced_costs')[0]
+            dist_terminal = pcst_utilities.d_nearest_terminals(G, i, terminals, edge_weight='reduced_costs')[0]
         except nx.exception.NetworkXNoPath:
             G.remove_node(i)
             continue
         # Sometimes there is a problem because of rounding, so I subtract 0.001
-        if lowerBound + distance_reduced + distTerminal - 0.001 > upperBound:
+        if lower_bound + distance_reduced + dist_terminal - 0.001 > upper_bound:
             G.remove_node(i)
 
 
 # TODO: Not used right now, because it has to be implemented in the ILP too
-def test3(G, lowerBound, upperBound, root):
+def test3(G, lower_bound, upper_bound, root):
     """
     Determines terminals, which must be mandatory in the solution.
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
-    :param lowerBound: Lower bound computed by the dual ascent routine
-    :param upperBound: Upper bound computed by pcst-fast
+    :param lower_bound: Lower bound computed by the dual ascent routine
+    :param upper_bound: Upper bound computed by pcst-fast
     :param root: Integer representing the root node
     :return: oList of all terminals that are mandatory
     """
     terminals = [t for t in pcst_utilities.compute_terminals(G) if t != root]
     fixed_terminals = []
     for t in terminals:
-        if lowerBound + G.nodes[t]["pi"] > upperBound:
+        if lower_bound + G.nodes[t]["pi"] > upper_bound:
             fixed_terminals.append(t)
     return fixed_terminals
 
@@ -262,14 +262,14 @@ def dual_ascent_tests(G, root):
     G = parse_to_apcstp(G)
     G = terminals_to_leaves(G, root)
     # Compute the global upper bound
-    upperBound = pcst_utilities.compute_upper_bound(G, root)
+    upper_bound = pcst_utilities.compute_upper_bound(G, root)
     # Compute the overall lower bound
-    lowerBound = dual_ascent(G, root)
+    lower_bound = dual_ascent(G, root)
     # Apply reduction techniques
-    test2(G, lowerBound, upperBound, root)  # It's a lot faster to first compute test2
-    test1(G, lowerBound, upperBound, root)
+    test2(G, lower_bound, upper_bound, root)  # It's a lot faster to first compute test2
+    test1(G, lower_bound, upper_bound, root)
     # TODO: Really use test3
-    fixed_terminals = test3(G, lowerBound, upperBound, root)
+    fixed_terminals = test3(G, lower_bound, upper_bound, root)
     G = leaves_to_terminals(G, root)
     test4(G)
     test5(G)
