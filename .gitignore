@@ -1,4 +1,4 @@
 __pycache__/
 .ipynb_checkpoints/
 docs/build/*
-graphilp/examples/
+graphilp/examples/*
