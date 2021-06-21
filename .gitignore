@@ -3,10 +3,4 @@ __pycache__/
 docs/build/*
 graphilp/examples
 graphilp/examples/
-examples
-examples/
-/examples/
-graphilp/examples/*
-examples/*
-/examples/*
 .gitignore
