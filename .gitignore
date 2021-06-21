@@ -1,4 +1,12 @@
 __pycache__/
 .ipynb_checkpoints/
 docs/build/*
+graphilp/examples
+graphilp/examples/
+examples
 examples/
+/examples/
+graphilp/examples/*
+examples/*
+/examples/*
+.gitignore
