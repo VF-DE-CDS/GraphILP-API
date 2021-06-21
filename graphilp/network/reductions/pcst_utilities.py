@@ -147,21 +147,24 @@ def compute_upper_bound(G, root):
     """
     terminals = compute_terminals(G)
     dfNodes, dfEdges = pcst.createDataframes(G)
-    rootIndex, terminals_indeces, accesspoints_indeces = pcst.findIndeces(dfNodes, terminals, root)  # accesspoints)
+    rootIndex, terminalsIndeces, accesspointsIndeces = pcst.findIndeces(dfNodes, terminals, root)  # accesspoints)
     dfFinal, dfChanged = pcst.mergeDataFrames(dfNodes, dfEdges)
     edges, nodePrices, edgeCosts = pcst.dataframeToList(dfFinal, dfNodes, dfChanged)
+
     # Let PCST_fast do its magic, i.e. optimizing the problem setting
     result_nodes, result_edges = pcst_fast.pcst_fast(edges, nodePrices, edgeCosts, rootIndex, 1, 'strong', 0)
-    resultingNodes, resultingEdges, newGraph, prizesList = pcst.reformatToGraph(result_nodes, result_edges, dfFinal,
-                                                                                dfNodes)
+
+    containedTerminals, containedAccesspoints = pcst.extractSolution(result_nodes, terminalsIndeces, accesspointsIndeces)
+    resultingNodes, resultingEdges, newGraph, prizesList = pcst.reformatToGraph(result_nodes, result_edges, dfFinal, dfNodes)
+
     # Find the upper bound out of the computed solution
-    upper_bound = 0
+    upperBound = 0
     for i in terminals:
         if i not in list(resultingNodes['Node']):
-            upper_bound += G.nodes[i]['prize']
+            upperBound += G.nodes[i]['prize']
     # Computing the costs of the found solution:
-    upper_bound += resultingEdges['Costs'].sum()
-    return upper_bound
+    upperBound += resultingEdges['Costs'].sum()
+    return upperBound
 
 
 def draw(G, edgelabel='weight'):
