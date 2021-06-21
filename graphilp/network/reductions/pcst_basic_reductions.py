@@ -144,6 +144,6 @@ def basic_reductions(G, root):
     terminals = pcst_utilities.compute_terminals(G)
     ntd1(G, terminals)
     ntd2(G, terminals)
-    td1(G, terminals, None)
+    td1(G, terminals, root)
     td2(G, root)
     unconnected_component(G, root)
