@@ -2,19 +2,58 @@ import networkx as nx
 from gurobipy import Model, GRB, quicksum
 
 
-def get_var_names():
-    node_var_name = 'node_{0}_is_included'
-    arc_var_name = 'arc_({0},{1})_is_included'
-    return node_var_name, arc_var_name
-
-
 var2edge = None
 
 
-def create_model(G_sa, art_root, forced_terminals=None, weight='weight', prize='prize',
-                 warmstart=None, lower_bound=None):
-    if warmstart is None:
-        warmstart = []
+def create_model(G_sa, art_root, forced_terminals=None, weight='weight', prize='prize'):
+    """
+
+    :param G_sa: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph` (Originial graph has to be transformed to a Steiner Arborescence Problem)
+    :param art_root: Artificial root of the Steiner Arborescence Problem
+    :param forced_terminals: list of terminals that have to be connected
+    :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
+    :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+
+
+    :return: a `gurobipy model <https://www.gurobi.com/documentation/9.1/refman/py_model.html>`_
+
+    Create an ILP for the Prize Collecting Steiner Tree Problem.
+
+    This formulation enforces a cycle in the solution if it is not connected.
+    Cycles are then forbidden by enforcing an increasing labelling along the edges of the solution.
+    To this end, the formulation is working with a directed graph internally.
+
+    Callbacks:
+        This model uses callbacks which need to be included when calling Gurobi's optimize function:
+        model.optimize(callback = :obj:`callback_connect_constr`)
+
+    ILP:
+        Let :math:`V_{SA}` be the set of vertices in the graph and  :math:`A_{SA}` be the directed edge set used in the internal representation.
+        Let :math:`T_f` be the set of forced terminals required to be part of the solution.
+        Further, let :math:`p^{\prime}_{v}` be the prize associated with each vertex :math:`v` and
+        :math:`c^{\prime\prime}_{uv}`
+        be the cost associated with each edge :math:`(u, v)`.
+
+        .. math::
+            :nowrap:
+
+            \begin{align*}
+            \min \sum_{ij \in A_{SA}} c^{\prime\prime}_{uv}x_{uv} + \sum_{u \in V_{SA}} p^{\prime}_{u}\\
+            \text{s.t.} &&\\
+            x_u - \sum_{vu \in A_{SA}} x_{vu} = 0 && \forall u \in V_{SA} \setminus r  && \text{(forbid isolated vertices)}\\
+            \sum_{ru \in A_{SA}} x_{ru} = 1 && \text{(root has to be connected to exactly one node)}\\
+            \forall t \in T_f: x_t = 1 && \text{(require forced terminals to be chosen)}\\
+            x_{uv}, x_u \in \{0, 1\} && \forall (u, v) \in A_{SA}, \forall u \in V_{SA} \setminus r
+            \end{align*}
+        The callbacks add a new constraint for each cut :math:`C` of length :math:`\ell(C)`
+        coming up in a solution candidate:
+        .. math::
+            :nowrap:
+            \begin{align*}
+            x(\delta^{-}(S)) \geq x_k && k \in S, r \not\in S, \forall S \subset V_{SA} && \text{(cut constraints)}\\
+            \end{align*}
+    """
+
     if forced_terminals is None:
         forced_terminals = []
     global var2edge
@@ -24,14 +63,14 @@ def create_model(G_sa, art_root, forced_terminals=None, weight='weight', prize='
     global var2node
     global sap_instance
 
+    # Create model
     m = Model("graphilp_pcst_morris")
     m.Params.LazyConstraints = 1
 
     root_sa = art_root
     sap_instance = G_sa.G
 
-    # stick to gurobi workflow
-
+    # Add variables for edges and nodes
     G_sa.set_edge_vars(m.addVars(G_sa.G.edges(), vtype=GRB.BINARY))
     G_sa.set_node_vars(m.addVars(G_sa.G.nodes(), vtype=GRB.BINARY))
     edges = G_sa.edge_variables
@@ -39,22 +78,19 @@ def create_model(G_sa, art_root, forced_terminals=None, weight='weight', prize='
 
     m.update()
 
+    # abbreviations
     var2edge = dict(zip(edges.values(), edges.keys()))
     node2var = nodes
     edge2var = edges
-    # stick to gurobi workflow
 
-    # stick to gurobi workflow
-
+    # set objective: minimise the sum of the weights of edges selected for the solution
     m.setObjective(quicksum([G_sa.G.nodes[node][prize] for node in G_sa.G.nodes]) +
                    quicksum([G_sa.G.edges[edge][weight] * edge_var for edge, edge_var in edges.items()]),
                    GRB.MINIMIZE)
 
     # add init constraints
-    """
-    adds:
-        1. root constraints-- roots must be contained in feasible solution
-    """
+
+    #enforce artificial root
     m.addConstr(nodes[art_root] == 1)
 
     if forced_terminals:
@@ -148,7 +184,6 @@ def callback_connect_constr(model, where):
 
                 delta_Sr = out_cut_induced_by(S_r, sap_instance)  # pcst must be defined here
                 #for node_sr in S_r:
-                print(delta_Sr)
                 new_constraint = quicksum([edge2var[arc] for arc in delta_Sr]) >= node2var[node]
                 model.cbLazy(new_constraint)
 
