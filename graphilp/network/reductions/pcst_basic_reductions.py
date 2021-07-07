@@ -1,7 +1,6 @@
 import networkx as nx
 from graphilp.network.reductions import pcst_utilities
 
-
 # Reduction techniques that use basic properties of the graph.
 # All reduction techniques described here are taken from the following paper:
 # REHFELDT, Daniel; KOCH, Thorsten; MAHER, Stephen J.
@@ -33,12 +32,12 @@ def ntd2(G, terminals):
             # To translate it back after computation
             old_edges = G.edges(node, data=True)
             new_path = []
-
             for e in old_edges:
                 if 'path' in e[2]:
                     new_path += e[2]['path']
                 else:
                     new_path.append(e[:2])
+            # New edge
             edge_length = G.get_edge_data(node, u).get('weight') + G.get_edge_data(node, v).get('weight')
             if not G.has_edge(u, v) or G.has_edge(u, v) and G.get_edge_data(u, v).get('weight') > edge_length:
                 G.add_edge(u, v, weight=edge_length, path=new_path)
@@ -72,6 +71,7 @@ def td1(G, terminals, root=None):
             G.nodes[neighbour]['prize'] += profit - edge_length
             # To be able to translate back you have to give the path to the neighbour node
             old_edges = G.edges(t, data=True)
+            print("LOL:",old_edges)
             new_path = []
             for e in old_edges:
                 if 'path' in e[2]:
@@ -85,7 +85,7 @@ def td1(G, terminals, root=None):
 
 def td2(G, root):
     """
-    Terminal of degree 2 can be substituted by an edge if its profit is too small to include the terminal-
+    Terminal of degree 2 can be substituted by an edge if its profit is too small to include the terminal
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param root: An integer representing the root
     """
