@@ -1,6 +1,7 @@
 import networkx as nx
 import re
 
+
 def stp_to_networkx(path):
     """
     Creates a NetworkX Graph from an .stp file (`SteinLib format <http://steinlib.zib.de/format.php>`__).
@@ -24,7 +25,6 @@ def stp_to_networkx(path):
 
     edges = []
     terminals = []
-    root = 0
 
     for line in lines:
         # Remove + characters. This is not always necessary
@@ -34,30 +34,28 @@ def stp_to_networkx(path):
         if line.startswith('E '):
             # Extracting information(startingNode endingNode Distance)
             parts = line.rstrip().split(" ")
-            edges.append((int(parts[1]), int(parts[2]), {'weight':int(parts[3])}))
+            edges.append((int(parts[1]), int(parts[2]), {'weight': int(parts[3])}))
 
-            #print((tuple_data[0], tuple_data[1], {'weight':tuple_data[2]}))
+            # print((tuple_data[0], tuple_data[1], {'weight':tuple_data[2]}))
 
         # Found a Terminal Node
         if line.startswith('TP '):
             parts = line.rstrip().split(" ")
             terminals.append((int(float(parts[1])), float(parts[2])))
 
-        # Found root
-        if line.startswith('RootP '):
-            root = int(float(line.rstrip().split(" ")[1]))
 
     # Create a new NetworkX Graph object
     G = nx.Graph()
 
     # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
-    for n in G.nodes :
+    for n in G.nodes:
         G.nodes[n]['prize'] = 0
     for (t, p) in terminals:
         G.nodes[t]['prize'] = p
 
     return G, terminals
+
 
 def stp_rooted_to_networkx(path):
     """
@@ -90,8 +88,8 @@ def stp_rooted_to_networkx(path):
             parts = line.rstrip().split("\t")[1:]
 
             # Parse the data into tuples and from Array of Integer and append to list of all edges
-            tuple_data = tuple(int(float(p)) for p in parts)
-            edges.append((tuple_data[0], tuple_data[1], {'weight':tuple_data[2]}))
+            tuple_data = (int(float(parts[0])), int(float(parts[1])), float(parts[2]))
+            edges.append((tuple_data[0], tuple_data[1], {'weight': tuple_data[2]}))
 
         # Found a Terminal Node
         if line.startswith('TP '):
@@ -107,10 +105,9 @@ def stp_rooted_to_networkx(path):
 
     # Fill the graph with our edges. This method automatically fills in the nodes as well.
     G.add_edges_from(edges)
-    for n in G.nodes :
+    for n in G.nodes:
         G.nodes[n]['prize'] = 0
     for (t, p) in terminals:
         G.nodes[t]['prize'] = p
 
     return G, terminals, root
-
