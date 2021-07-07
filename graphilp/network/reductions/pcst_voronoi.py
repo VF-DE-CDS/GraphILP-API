@@ -200,10 +200,10 @@ def reduction_techniques(G, root=-1):
     corollary14(G, radius_dict, upper_bound)
     # TODO: The information is not used right now. Does it work with proposition 16?
     # TODO: Don't understand proposition 16, is it useful with prop 15?
-    term_deg2 = proposition15(G, radius_dict, upper_bound)
+    #term_deg2 = proposition15(G, radius_dict, upper_bound)
     proposition17(G, radius_list, upper_bound, diagram)
     # TODO: The information is not used right now.
-    nodes_deg3 = proposition18(G, radius_list, upper_bound)
+    #nodes_deg3 = proposition18(G, radius_list, upper_bound)
     # Delete components not connected to the root
     pcst_basic.unconnected_component(G, root)
-    return term_deg2, nodes_deg3
+    return

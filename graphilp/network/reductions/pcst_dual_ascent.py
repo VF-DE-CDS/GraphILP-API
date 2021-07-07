@@ -259,6 +259,12 @@ def test5(G):
 
 
 def dual_ascent_tests(G, root):
+    """
+    Routine for all the Voronoi diagram reduction tests
+    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
+    :param root: integer representing the root of the graph if -1 there is no root
+    :return:
+    """
     G = parse_to_apcstp(G)
     G = terminals_to_leaves(G, root)
     # Compute the global upper bound
@@ -268,10 +274,10 @@ def dual_ascent_tests(G, root):
     # Apply reduction techniques
     test2(G, lower_bound, upper_bound, root)  # It's a lot faster to first compute test2
     test1(G, lower_bound, upper_bound, root)
-    # TODO: Really use test3
-    fixed_terminals = test3(G, lower_bound, upper_bound, root)
+    # TODO: Really use test3 (With Gurobi user cuts?)
+    #fixed_terminals = test3(G, lower_bound, upper_bound, root)
     G = leaves_to_terminals(G, root)
     test4(G)
     test5(G)
     G = G.to_undirected()
-    return G, fixed_terminals
+    return G
