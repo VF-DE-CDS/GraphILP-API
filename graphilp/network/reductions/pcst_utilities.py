@@ -48,6 +48,7 @@ def validate_solution(solution, G, term_orig, result):
     check_sum += sum(lost_profits)
 
     if round(check_sum, 3) != round(result, 3):
+        print("Checksum: ", check_sum, "Result", result)
         raise Exception("Checksum unequals result")
 
 
@@ -100,71 +101,33 @@ def d_nearest_terminals(G, source, terminals, edge_weight='weight', number_neare
     return sorted(list(shortest_paths_terminals.values()))[0:number_nearest_terminals]
 
 
-def pcst_to_rpcst(G):
-    """
-    Routine to include a root to an PCSTP instance.
-    For the dual ascent reduction technique,
-    it is not possible to insert a node with very high profit and connect it to all nodes.
-    The transformation algorithm is taken from the following source:
-    Rehfeldt, Daniel, and Thorsten Koch.
-    "On the exact solution of prize-collecting Steiner tree problems." (2020).
-    :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
-    """
-    terminals = compute_terminals(G)
-    terminals_proper = [t for t in terminals if
-                        G.nodes[t]['prize'] > min([e.get('weight') for e in list(G.adj[t].values())])]
-    terminals_unproper = [t for t in terminals if
-                          G.nodes[t]['prize'] <= min([e.get('weight') for e in list(G.adj[t].values())])]
-    terminals_fixed = []
-    m = sum([G.nodes[t]['prize'] for t in terminals_proper])
-    G_r = G.copy()
-    for v in G_r.nodes:
-        if v not in terminals_unproper:
-            G_r.nodes[v]['prize'] = 0
-    j = min(terminals_proper, key=lambda x: G.nodes[x]['prize'])
-    n = G_r.number_of_nodes() + 1
-    G_r.add_nodes_from([(n, {'prize': 0})])
-    terminals_fixed.append(n)
-    for t in terminals_proper:
-        id = t + n
-        G_r.add_nodes_from([(id, {'prize': 0})])
-        G_r.add_edges_from([(n, t, {'weight': m}), (t, id, {'weight': m})])
-        terminals_fixed.append(id)
-    for t in terminals_proper:
-        if t == j:
-            continue
-        id = t + n
-        G_r.add_edges_from(
-            [(t, j + n, {'weight': m + G.nodes[j]['prize']}), (id, j + n, {'weight': m + G.nodes[t]['prize']})])
-    return G_r, terminals_fixed, m, n
-
-
 def compute_upper_bound(G, root):
-    """ Uses the PCST-Fast heuristic to compute an global upper bound
+    """ Uses the pcst-fast heuristic to compute an global upper bound (https://github.com/fraenkel-lab/pcst_fast)
     :param G: a `NetworkX graph <https://networkx.org/documentation/stable/reference/introduction.html#graphs>`__
     :param root: an integer representing the root of the graph
     :return: an integer representing an upper bound on the optimal solution
     """
+    # Some preparation of everything pcst-fast needs
     terminals = compute_terminals(G)
-    dfNodes, dfEdges = pcst.createDataframes(G)
-    rootIndex, terminalsIndeces, accesspointsIndeces = pcst.findIndeces(dfNodes, terminals, root)  # accesspoints)
-    dfFinal, dfChanged = pcst.mergeDataFrames(dfNodes, dfEdges)
-    edges, nodePrices, edgeCosts = pcst.dataframeToList(dfFinal, dfNodes, dfChanged)
+    df_nodes, df_edges = pcst.create_dataframes(G)
+    root_index, terminals_indeces, accesspoints_indeces = pcst.find_indeces(df_nodes, terminals, root)
+    df_final, df_changed = pcst.merge_dataframes(df_nodes, df_edges)
+    edges, node_prices, edge_costs = pcst.dataframe_to_list(df_final, df_nodes, df_changed)
 
     # Let PCST_fast do its magic, i.e. optimizing the problem setting
-    result_nodes, result_edges = pcst_fast.pcst_fast(edges, nodePrices, edgeCosts, rootIndex, 1, 'strong', 0)
+    result_nodes, result_edges = pcst_fast.pcst_fast(edges, node_prices, edge_costs, root_index, 1, 'strong', 0)
 
-    containedTerminals, containedAccesspoints = pcst.extractSolution(result_nodes, terminalsIndeces, accesspointsIndeces)
-    resultingNodes, resultingEdges, newGraph, prizesList = pcst.reformatToGraph(result_nodes, result_edges, dfFinal, dfNodes)
+    # Transform the solution of pst-fast to an graph
+    resulting_nodes, resulting_edges, new_graph, prizes_list = \
+        pcst.reformat_to_graph(result_nodes, result_edges, df_final, df_nodes)
 
-    # Find the upper bound out of the computed solution
-    upperBound = 0
+    # Find the upper bound out of the found solution
+    upper_bound = 0
     for i in terminals:
-        if i not in list(resultingNodes['Node']):
-            upperBound += G.nodes[i]['prize']
-    # Computing the costs of the found solution:
-    upperBound += resultingEdges['Costs'].sum()
-    return upperBound
+        if i not in list(resulting_nodes['Node']):
+            upper_bound += G.nodes[i]['prize']
+    upper_bound += resulting_edges['Costs'].sum()
+    return upper_bound
 
 
 def draw(G, edgelabel='weight'):
