@@ -71,7 +71,6 @@ def td1(G, terminals, root=None):
             G.nodes[neighbour]['prize'] += profit - edge_length
             # To be able to translate back you have to give the path to the neighbour node
             old_edges = G.edges(t, data=True)
-            print("LOL:",old_edges)
             new_path = []
             for e in old_edges:
                 if 'path' in e[2]:
