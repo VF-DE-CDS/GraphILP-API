@@ -34,7 +34,8 @@ def create_model(G, clique_size):
             \max \sum_{c \in C} y_c\\
             \text{s.t.} &&\\
             \forall v \in V: \sum_{c \in C} a_{cv} \leq 1 && \text{(each vertex can be in at most one clique)}\\
-            \forall \{u, v\} \in \overline{E}: \forall c \in C: a_{cu} + a_{cv} \leq 1
+            \forall \{u, v\} \in \overline{E}: \forall c \in C:\\
+            a_{cu} + a_{cv} \leq 1
             && \text{(unconnected vertices cannot be in the same clique)}\\
             \forall c \in C: \sum_{v \in V} a_{cv} - k y_c = 0 && \text{(chosen cliques need to have k members)}\\
             \forall c \in C: \forall v \in V: y_c - a_{cv} \geq 0

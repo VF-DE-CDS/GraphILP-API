@@ -4,7 +4,7 @@
 Covering
 *********
 
-Covering problems in graphs ask for substructures in the graph such that all other elements of the graph are adjacent to this substructure. For example, in a minimal vertex cover we look for a subset of the vertex set such that all other vertices are connected to the selected ones by an edge.
+Covering problems in graphs are about finding substructures in a graph to which all other elements of the graph are adjacent. For example, in a vertex cover we look for a subset of the vertex set containing at least one end-point of each edge and hence covering all edges.
 
 Dominating set
 ==============
@@ -52,7 +52,7 @@ A `dominating set <https://en.wikipedia.org/wiki/Dominating_set>`_ in a graph :m
 Edge dominating set
 ===================
 
-An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
+An `edge dominating set <https://en.wikipedia.org/wiki/Edge_dominating_set>`_ in a graph :math:`G = (V, E)` is a subset :math:`S \subseteq E` of the edge set such that each edge in :math:`E` is adjacent to an edge in :math:`S`.
 
 .. image:: images/illustration_edge_dom.png
     :height: 200

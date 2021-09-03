@@ -4,12 +4,12 @@ from numpy import ones
 def get_heuristic(S):
     """ Greedy heuristic for the set packing problem
 
-    Iteratively add the set with maximal size to weight ratio which does not contain an element
+    Iteratively add the set with highest size-to-weight ratio which does not contain an element
     that is already covered to the solution.
 
     :param S: a weighted :py:class:`~graphilp.imports.ilpsetsystem.ILPSetSystem`
 
-    :return: a list of the sets comprising the cover
+    :return: a list of disjoint sets of the set system
     """
     # abbreviations
     set_names = list(S.S.keys())

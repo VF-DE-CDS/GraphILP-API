@@ -13,7 +13,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
     :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
     :param forced_terminals: list of terminals that have to be connected
     :param weight: name of the argument in the edge dictionary of the graph used to store edge cost
-    :param prize: name of the argument in the node dictionary of the graph used to store node prize values
+    :param prize: name of the argument in the vertex dictionary of the graph used to store vertex prize values
     :param warmstart: a list of edges forming a tree in G connecting all terminals
     :param lower_bound: give a known lower bound to the solution length
 
@@ -81,7 +81,6 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
         # the outer loop makes sure that terminals that are not in the graph are ignored
         if node in forced_terminals:
             m.addConstr(node_var == 1)
-
             
     # enforce cycle when graph is not connected
     m.addConstr(quicksum(nodes.values()) - quicksum(edges.values()) == 1)
@@ -91,7 +90,6 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
 
     # if edge is chosen, both adjacent nodes need to be chosen
     m.addConstrs(2*(edges[(u, v)] + edges[(v, u)]) - nodes[u] - nodes[v] <= 0 for u, v in G.G.edges())
-
 
     # prohibit isolated vertices
     for node, node_var in nodes.items():
@@ -160,7 +158,7 @@ def create_model(G, forced_terminals=[], weight='weight', prize='prize',
 def extract_solution(G, model):
     r""" Get the optimal prize collecting Steiner tree in G
 
-        :param G: an ILPGraph
+        :param G: a weighted :py:class:`~graphilp.imports.ilpgraph.ILPGraph`
         :param model: a solved Gurobi model for Prize Collecting Steiner tree
 
         :return: the edges of an optimal prize collecting Steiner tree

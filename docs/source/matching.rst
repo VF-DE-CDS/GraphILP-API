@@ -4,7 +4,7 @@
 Matching
 *********
 
-A `matching <https://en.wikipedia.org/wiki/Matching_(graph_theory)>`__ in a graph :math:`G = (V, E)` is a subset :math:`S \subset E` of edges such no pair of edges in :math:`S` shares a vertex.
+A `matching <https://en.wikipedia.org/wiki/Matching_(graph_theory)>`__ in a graph :math:`G = (V, E)` is a subset :math:`S \subseteq E` of edges in which no pair of edges shares a vertex.
 
 .. image:: images/illustration_matching.png
     :height: 200
@@ -30,7 +30,7 @@ General matching
 Perfect matching
 ================
 
-A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in graph is a matching in which each vertex of the graph is covered by an edge of the matching.
+A `perfect matching <https://en.wikipedia.org/wiki/Perfect_matching>`__ in a graph is a matching in which each vertex of the graph is covered by an edge of the matching.
 
 .. automodule:: graphilp.matching.perfect
    :noindex:

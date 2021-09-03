@@ -4,7 +4,7 @@
 Packing
 *********
 
-Packing problems on graphs deal with the question of how to identify as many disjoint sub-structures of a given type as possible in a given graph. For example, we could look for finding as many pairwise non-connected vertices as possible (maximum independent set) or for as many disjoint cliques as possible (clique packing problem).
+Packing problems on graphs deal with the question of how to identify as many disjoint sub-structures of a given type as possible in a given graph. For example, we could try to find as many pairwise non-connected vertices as possible (maximum independent set) or as many disjoint cliques as possible (clique packing problem).
 
 .. tikz:: Example of clique packing for 3-cliques (aka triangles).
    :align: center
