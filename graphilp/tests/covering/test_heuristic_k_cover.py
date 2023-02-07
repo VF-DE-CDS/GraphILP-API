@@ -1,6 +1,8 @@
 from numpy import array
 from graphilp.imports import ilpsetsystem as ilpss
 from graphilp.covering.heuristics import setcover_greedy
+from graphilp.tests.covering.test_heuristic_set_cover import _is_set_covered
+
 
 def test_heuristic_k_cover():
     S = ilpss.ILPSetSystem()
@@ -15,3 +17,4 @@ def test_heuristic_k_cover():
     cover = setcover_greedy.get_heuristic(S, k)
 
     assert(len(cover) <= k)
+    assert _is_set_covered(S, cover)
